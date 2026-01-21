@@ -4,6 +4,7 @@ import ServiceTabs from "../ServiceTabs";
 import ServiceHero from "../ServiceHero";
 import { getServiceBySlug } from "../../lib/service";
 import LogoMarquee from "../../components/carousel/LogoMarquee";
+import { logos } from "../../common";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params; // ✅ unwrap params Promise
@@ -11,7 +12,8 @@ export async function generateMetadata({ params }) {
 
   return {
     title: data?.seoTitle || `${data?.name || "Service"} | Corpseed`,
-    description: data?.seoDescription || "Corpseed service details and enquiry.",
+    description:
+      data?.seoDescription || "Corpseed service details and enquiry.",
     alternates: { canonical: `/service/${slug}` }, // ✅ match your real route
   };
 }
@@ -23,17 +25,6 @@ export default async function ServicePage({ params }) {
   if (!data) return null;
 
 
-  const logos = [
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/SUPREME-INDUSTRIES.webp", alt: "SUPREME-INDUSTRIES.webp" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/RELIANCE-ENTERTAINMENT-STUDIOS-PRIVATE-LIMITED.webp", alt: "RELIANCE-ENTERTAINMENT-STUDIOS-PRIVATE-LIMITED.webp" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/OYO-HOTELS-AND-HOMES.webp", alt: "OYO-HOTELS-AND-HOMES.webp" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/LINC-PEN-AND-PLASTICS-LTd.webp", alt: "LINC" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/NARAYANA-HEALTH-CARE-CENTER.webp", alt: "NARAYANA-HEALTH-CARE-CENTER.webp" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/ACCORD-PRIVATE-LIMITED.webp", alt: "ACCORD-PRIVATE-LIMITED.webp" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/DELIGHTFUL-GOURMET.webp", alt: "DELIGHTFUL-GOURMET.webp" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/ALTEN-INDIA-PRIVATE-LIMITED.webp", alt: "ALTEN-INDIA-PRIVATE-LIMITED.webp" },
-  { src: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/BMW-INDIA-PRIVATE-LIMITED.webp", alt: "BMW-INDIA-PRIVATE-LIMITED.webp" },
-];
 
   return (
     <div className="bg-white text-gray-900">
@@ -45,9 +36,9 @@ export default async function ServicePage({ params }) {
         videoText={data.videoText || "Click to Watch & Know More"}
       />
 
-       <section className="mx-auto max-w-7xl px-4 py-10">
-      <LogoMarquee items={logos} speed={75} />
-    </section>
+      <section className="mx-auto max-w-7xl px-4 py-10">
+        <LogoMarquee items={logos} speed={75} />
+      </section>
 
       {/* Main layout */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">

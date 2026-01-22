@@ -1,6 +1,6 @@
 import { PlayCircle, Star } from "lucide-react";
 
-export default function ServiceHero({ title, subtitle, badgeText, ratingText, videoText }) {
+export default function ServiceHero({ title, summary, badgeText, ratingText, videoText }) {
   return (
     <section className="relative overflow-hidden border-b border-gray-200">
       {/* subtle gradient backdrop */}
@@ -24,7 +24,7 @@ export default function ServiceHero({ title, subtitle, badgeText, ratingText, vi
             </h1>
 
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg">
-              {subtitle}
+              {summary}
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-4">

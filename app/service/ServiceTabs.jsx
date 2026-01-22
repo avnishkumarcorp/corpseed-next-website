@@ -12,10 +12,10 @@ function slugify(str) {
 
 export default function ServiceTabs({ tabs = [] }) {
   const scrollerRef = useRef(null);
-  const [activeId, setActiveId] = useState(tabs?.[0]?.title ? slugify(tabs[0].title) : "");
+  const [activeId, setActiveId] = useState(tabs?.[0]?.tabName ? slugify(tabs[0].tabName) : "");
 
   const mapped = useMemo(
-    () => tabs.map((t) => ({ ...t, id: t.id || slugify(t.title) })),
+    () => tabs.map((t) => ({ ...t, id: t.id || slugify(t.tabName) })),
     [tabs]
   );
 
@@ -96,7 +96,7 @@ const scrollTo = (id) => {
               ].join(" ")}
               type="button"
             >
-              {t.title}
+              {t.tabName}
             </button>
           );
         })}

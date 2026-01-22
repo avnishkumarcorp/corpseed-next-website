@@ -95,5 +95,3 @@ body {
   touch-action: pan-y;
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

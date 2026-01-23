@@ -1,4 +1,4 @@
-import SafeHtml from "../components/SafeHtml";
+import SafeHtmlShadow from "../components/SafeHtmlShadow";
 
 function slugify(str) {
   return String(str || "")
@@ -23,7 +23,7 @@ export default function ServiceContent({ tabs = [] }) {
           </h2>
 
           <div className="mt-4">
-            <SafeHtml html={t?.description} />
+            <SafeHtmlShadow html={t?.description} />
           </div>
         </section>
       ))}

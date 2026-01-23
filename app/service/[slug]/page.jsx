@@ -1,30 +1,120 @@
-import EnquiryForm from "../../components/enquiry-form/EnquiryForm";
-import ServiceContent from "../ServiceContent";
-import ServiceTabs from "../ServiceTabs";
-import ServiceHero from "../ServiceHero";
+// app/service/[slug]/page.js
+import { logos } from "@/app/common";
 import { getServiceBySlug } from "../../lib/service";
-import LogoMarquee from "../../components/carousel/LogoMarquee";
-import { logos } from "../../common";
+import ServiceHero from "../ServiceHero";
+import ServiceTabs from "../ServiceTabs";
+import LogoMarquee from "@/app/components/carousel/LogoMarquee";
+import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
+import ServiceContent from "../ServiceContent";
 
 export async function generateMetadata({ params }) {
-  const { slug } =await params; // ✅ no await
+  const { slug } =await params;
   const data = await getServiceBySlug(slug);
 
+  const title =
+    data?.service?.seoTitle || data?.service?.title || "Service";
+
+  const description =
+    data?.service?.seoDescription ||
+    data?.service?.metaDescription ||
+    data?.service?.summary ||
+    "Corpseed service details and enquiry.";
+
+  const keywords =
+    data?.service?.keywords ||
+    data?.service?.metaKeywords ||
+    "";
+
+  const ogImageWebp = data?.service?.ogImageWebp || "/assets/images/corpseed.webp";
+  const ogImagePng = data?.service?.ogImagePng || "/assets/images/logo.png";
+
   return {
-    title: data?.title || `${data?.title || "Service"} | Corpseed`,
-    description: data?.metaDescription || "Corpseed service details and enquiry.",
-    alternates: { canonical: `/service/${slug}` },
+    title: `${title} - Corpseed`,
+    description,
+    alternates: {
+      canonical: `/service/${slug}`,
+    },
+    openGraph: {
+      title: `${title} - Corpseed`,
+      description,
+      url: `https://www.corpseed.com/service/${slug}`,
+      siteName: "CORPSEED ITES PRIVATE LIMITED",
+      type: "website",
+      images: [
+        { url: ogImageWebp, width: 1200, height: 630, type: "image/webp" },
+        { url: ogImagePng, width: 1200, height: 630, type: "image/png" },
+      ],
+    },
+    other: {
+      ...(keywords ? { keywords } : {}),
+    },
   };
+}
+function JsonLd({ data }) {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
 }
 
 export default async function ServicePage({ params }) {
-  const { slug } =await params; // ✅ no await
+  const { slug } = await params;
   const data = await getServiceBySlug(slug);
 
   if (!data) return null;
 
+  // Build schema objects (example; map from your API fields)
+  const productSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    name: "Corpseed",
+    image: "https://www.corpseed.com/assets/img/logo.webp",
+    description:
+      data?.service?.seoDescription ||
+      data?.service?.metaDescription ||
+      data?.service?.summary ||
+      "",
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      bestRating: "5",
+      worstRating: "1",
+      ratingCount: "69232",
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org/",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.corpseed.com/" },
+      { "@type": "ListItem", position: 3, name: data?.service?.title, item: `https://www.corpseed.com/service/${slug}` },
+    ],
+  };
+
+  // If you have FAQs in data, map them:
+  const faqSchema = data?.service?.faqs?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: data.service.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answerHtml || f.answer },
+        })),
+      }
+    : null;
+
   return (
     <div className="bg-white text-gray-900">
+      {/* JSON-LD scripts */}
+      <JsonLd data={productSchema} />
+      <JsonLd data={breadcrumbSchema} />
+      {faqSchema ? <JsonLd data={faqSchema} /> : null}
+
+      {/* Your existing UI */}
       <ServiceHero
         title={data?.service?.title}
         summary={data?.service?.summary}

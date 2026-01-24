@@ -5,320 +5,18 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
- * Safe default data (you can remove if you always pass props)
+ * You can still keep this fallback if needed
  */
 const FALLBACK_DATA = {
   title: "Our Exclusive Services",
-  cta: { label: "SEE ALL SERVICES", href: "/services" },
-  tabs: [
-    { key: "recycling", label: "Recycling Plant" },
-    { key: "epr", label: "EPR & CPCB Registrations" },
-    { key: "safety", label: "Safety and Regulatory" },
-    { key: "spcb", label: "State Pollution Boards/Committees Compliance" },
-  ],
-  itemsByTab: {
-    recycling: [
-      {
-        id: "ewaste-plant",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant1",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant1",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap1",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical1",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant2",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant2",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap2",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical2",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-    ],
-    epr: [
-      {
-        id: "ewaste-plant3",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant3",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap3",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical3",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant4",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant4",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap4",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical4",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant5",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant5",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap5",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical5",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-    ],
-    safety: [
-      {
-        id: "ewaste-plant6",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant6",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap6",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical6",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant7",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant7",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap7",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical7",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant8",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant8",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap8",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical8",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-    ],
-    spcb: [
-      {
-        id: "ewaste-plant9",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant9",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap9",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical9",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant10",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant10",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap10",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical10",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-      {
-        id: "ewaste-plant11",
-        title: "E Waste Recycling Plant Setup",
-        desc: "E-waste recycling in India is important to reduce electronic waste, recover valuable resources, and promote sustainable growth…",
-        href: "/service/e-waste-recycling-plant-setup",
-      },
-      {
-        id: "plastic-plant11",
-        title: "Plastic Waste Recycling Plant Setup",
-        desc: "Set up a plant to recycle uncollected plastic waste while complying with the CPCB norms. Enjoy simple processing, fast updates…",
-        href: "/service/plastic-waste-recycling-plant-setup",
-      },
-      {
-        id: "vehicle-scrap11",
-        title: "Vehicle Scrapping / Recycling Facility",
-        desc: "Set up an Authorized Vehicle Scrapping Facility (AVSF). Understand guidelines, obtain authorisations and get paperwork done…",
-        href: "/service/vehicle-scrapping-recycling-facility",
-      },
-      {
-        id: "biomedical11",
-        title: "Common Biomedical Waste Treatment Facility Setup",
-        desc: "Setup your Biomedical plant as per the CPCB guidelines. Simple processing, fast updates, and no hidden fees.",
-        href: "/service/biomedical-waste-facility-setup",
-      },
-    ],
-  },
+  cta: { label: "SEE ALL SERVICES", href: "/service" },
+  specialCategories: [],
+  cardCategories: [],
 };
 
 /**
  * Reusable section
- * @param {object} props.data - data object with { title, cta, tabs, itemsByTab }
+ * @param {object} props.data - your API response object
  * @param {string} props.defaultTabKey
  * @param {boolean} props.showDots
  */
@@ -327,16 +25,70 @@ export default function CardCarousel({
   defaultTabKey,
   showDots = false,
 }) {
-  // ---- Safe normalization to avoid crashes ----
-  const title =
-    typeof data?.title === "string" ? data.title : "Our Exclusive Services";
-  const ctaLabel = data?.cta?.label || "SEE ALL SERVICES";
-  const ctaHref = data?.cta?.href || "/services";
+  // ---------- 1) Pick source array from API ----------
+  const sourceList = useMemo(() => {
+    if (Array.isArray(data?.specialCategories) && data.specialCategories.length)
+      return data.specialCategories;
 
-  const tabs = Array.isArray(data?.tabs) ? data.tabs : [];
+    if (Array.isArray(data?.cardCategories) && data.cardCategories.length)
+      return data.cardCategories;
+
+    // if someone passes already-normalized
+    if (Array.isArray(data?.tabs) && data?.itemsByTab) return [];
+
+    return [];
+  }, [data]);
+
+  // ---------- 2) Build tabs + itemsByTab from API ----------
+  const normalized = useMemo(() => {
+    // If already normalized, use as-is
+    if (Array.isArray(data?.tabs) && data?.itemsByTab) {
+      return {
+        title: data?.title || "Our Exclusive Services",
+        cta: data?.cta || { label: "SEE ALL SERVICES", href: "/services" },
+        tabs: data.tabs,
+        itemsByTab: data.itemsByTab,
+      };
+    }
+
+    const tabs = sourceList.map((cat) => ({
+      key: cat?.uuid || String(cat?.id),
+      label: cat?.subCategoryName || cat?.categoryName || "Tab",
+    }));
+
+    const itemsByTab = sourceList.reduce((acc, cat) => {
+      const tabKey = cat?.uuid || String(cat?.id);
+
+      acc[tabKey] = Array.isArray(cat?.services)
+        ? cat.services.map((s) => ({
+            id: s?.id || s?.uuid,
+            title: s?.title || s?.serviceName || "Untitled Service",
+            desc: s?.summary || "Description will be available soon.",
+            href: s?.slug ? `/service/${s.slug}` : "#", // ✅ change if your route is /service/[slug]
+          }))
+        : [];
+
+      return acc;
+    }, {});
+
+    return {
+      title: data?.title || "Our Exclusive Services",
+      cta: data?.cta || { label: "SEE ALL SERVICES", href: "/service" },
+      tabs,
+      itemsByTab,
+    };
+  }, [data, sourceList]);
+
+  // ---------- 3) Safe values ----------
+  const title ="Our Exclusive Services";
+
+  const ctaLabel = normalized?.cta?.label || "SEE ALL SERVICES";
+  const ctaHref = normalized?.cta?.href || "/services";
+
+  const tabs = Array.isArray(normalized?.tabs) ? normalized.tabs : [];
   const itemsByTab =
-    data?.itemsByTab && typeof data.itemsByTab === "object"
-      ? data.itemsByTab
+    normalized?.itemsByTab && typeof normalized.itemsByTab === "object"
+      ? normalized.itemsByTab
       : {};
 
   // Pick a safe initial tab
@@ -371,7 +123,7 @@ export default function CardCarousel({
         </h2>
 
         {/* Tabs */}
-        {tabs.length > 0 && (
+        {tabs?.length > 0 && (
           <div className="mt-8 flex justify-center">
             <Tabs tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
           </div>
@@ -402,7 +154,7 @@ function Tabs({ tabs = [], activeKey, onChange }) {
 
   return (
     <div className="w-full max-w-5xl">
-      <div className="no-scrollbar flex items-center justify-center gap-10 overflow-x-auto px-2">
+      <div className="no-scrollbar flex items-center justify-center gap-10 overflow-x-auto px-2 py-2.5">
         {safeTabs.map((t) => {
           const key = t?.key ?? t?.label;
           const label = t?.label ?? String(key ?? "");
@@ -415,9 +167,7 @@ function Tabs({ tabs = [], activeKey, onChange }) {
               onClick={() => onChange?.(key)}
               className={[
                 "relative whitespace-nowrap text-sm font-medium cursor-pointer",
-                isActive
-                  ? "text-blue-600"
-                  : "text-gray-800 hover:text-blue-600",
+                isActive ? "text-blue-600" : "text-gray-800 hover:text-blue-600",
               ].join(" ")}
             >
               {label}
@@ -507,7 +257,7 @@ function ServicesCarousel({ items = [], showDots = true }) {
   const handlePrev = () => scrollToIndex(activeIndex - 1);
   const handleNext = () => scrollToIndex(activeIndex + 1);
 
-  // Empty state (no crash)
+  // Empty state
   if (safeItems.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-10 text-center text-sm text-gray-600">
@@ -548,7 +298,7 @@ function ServicesCarousel({ items = [], showDots = true }) {
         <ChevronRight className="h-5 w-5 text-gray-700" />
       </button>
 
-      {/* Scroll container (drag works on mobile & desktop) */}
+      {/* Scroll container */}
       <div
         ref={scrollerRef}
         className={[
@@ -557,14 +307,12 @@ function ServicesCarousel({ items = [], showDots = true }) {
           "touch-pan-x",
         ].join(" ")}
       >
-        {safeItems.map((it, idx) => {
-          return (
-            <ServiceTile
-              key={`serviceTiles${it.id}` || `tile${idx}`}
-              item={it}
-            />
-          );
-        })}
+        {safeItems.map((it, idx) => (
+          <ServiceTile
+            key={it?.id ? `serviceTile-${it.id}` : `tile-${idx}`} // ✅ fixed
+            item={it}
+          />
+        ))}
       </div>
 
       {/* Dots */}

@@ -262,10 +262,10 @@ export default function Header({ menuData, loading }) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header className="sticky top-0 z-50 bg-white/30 backdrop-blur-lg">
       {/* Main bar */}
       <div className="border-b border-slate-200">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 cursor-pointer">
             <Image

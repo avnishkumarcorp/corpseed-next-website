@@ -1,5 +1,4 @@
 // app/service/[slug]/page.js
-import { logos } from "@/app/common";
 import { getServiceBySlug } from "../../lib/service";
 import ServiceHero from "../ServiceHero";
 import ServiceTabs from "../ServiceTabs";
@@ -124,7 +123,7 @@ export default async function ServicePage({ params }) {
       />
 
       <section className="mx-auto max-w-7xl px-4 py-10">
-        <LogoMarquee items={logos} speed={75} />
+        <LogoMarquee speed={60} />
       </section>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">

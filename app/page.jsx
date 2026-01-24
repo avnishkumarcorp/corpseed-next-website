@@ -1,4 +1,3 @@
-import { logos } from "./common";
 import CardCarousel from "./components/carousel/CardCarousel";
 import LogoMarquee from "./components/carousel/LogoMarquee";
 import ComplianceUpdateSection from "./components/home/sections/ComplianceUpdateSection";
@@ -9,20 +8,58 @@ import NewsSection from "./components/home/sections/NewsSection";
 import OurSupportSection from "./components/home/sections/OurSupportSection";
 import VirtualMeetingSection from "./components/home/sections/VirtualMeetingSection";
 
-export default function HomePage() {
+import { getHomeTestData } from "./lib/home";
+
+// ✅ Home Page SEO (Meta)
+export async function generateMetadata() {
+  const data = await getHomeTestData();
+
+  const title =
+    data?.title ||
+    "Corpseed | Regulatory, Environmental, Sustainability, Plant Setup & Compliance";
+
+  const description =
+    data?.metaDescription ||
+    "Corpseed platform for Regulatory, Environmental, Sustainability, Plant Setup & Compliance.";
+
+  const keywords = data?.metaKeyword || "";
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: { canonical: "/" },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: "/",
+      siteName: "Corpseed",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
+
+export default async function HomePage() {
+  const homeData = await getHomeTestData();
+
   return (
     <>
-      <HomeHeroSection />
+      <HomeHeroSection data={homeData} />
       <section className="mx-auto max-w-7xl px-4 py-10">
-        <LogoMarquee items={logos} speed={20} />
+        <LogoMarquee speed={60} />
       </section>
-      <CardCarousel />
-      <ComplianceUpdateSection/>
-      <VirtualMeetingSection/>
-      <OurSupportSection/>
-      <NewsSection/>
-      <LatestArticlesSection/>
-      <LatestProductsSection/>
+      <CardCarousel data={homeData} />
+      <ComplianceUpdateSection data={homeData} />
+      <VirtualMeetingSection data={homeData} />
+      <OurSupportSection data={homeData} />
+      <NewsSection data={homeData} />
+      <LatestArticlesSection data={homeData} />
+      <LatestProductsSection data={homeData} />
     </>
   );
 }

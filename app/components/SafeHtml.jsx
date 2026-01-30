@@ -7,7 +7,7 @@ export default function SafeHtml({ html }) {
   return (
     <div className={styles.bsWrapper}>
       <div
-        className="bs prose max-w-none prose-headings:scroll-mt-28 prose-a:text-blue-600 prose-a:underline"
+        className="bs"
         dangerouslySetInnerHTML={{ __html: clean }}
       />
     </div>

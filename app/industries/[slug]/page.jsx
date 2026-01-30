@@ -1,42 +1,39 @@
 // app/service/[slug]/page.js
-import { getServiceBySlug } from "../../lib/service";
-import ServiceHero from "../ServiceHero";
-import ServiceTabs from "../ServiceTabs";
-import LogoMarquee from "@/app/components/carousel/LogoMarquee";
+import ServiceContent from "@/app/service/ServiceContent";
 import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
-import ServiceContent from "../ServiceContent";
+import ServiceTabs from "@/app/service/ServiceTabs";
+import ServiceHero from "@/app/service/ServiceHero";
+import LogoMarquee from "@/app/components/carousel/LogoMarquee";
+import { getIndustryBySlug } from "@/app/lib/industry";
 
 export async function generateMetadata({ params }) {
-  const { slug } =await params;
-  const data = await getServiceBySlug(slug);
+  const { slug } = await params;
+  const data = await getIndustryBySlug(slug);
 
-  const title =
-    data?.service?.seoTitle || data?.service?.title || "Service";
+  const title = data?.title || data?.industry?.metaTitle || "Industry";
 
   const description =
-    data?.service?.seoDescription ||
-    data?.service?.metaDescription ||
-    data?.service?.summary ||
+    data?.metaDescription ||
+    data?.industry?.metaDescription ||
+    data?.industry?.summary ||
     "Corpseed service details and enquiry.";
 
-  const keywords =
-    data?.service?.keywords ||
-    data?.service?.metaKeywords ||
-    "";
+  const keywords = data?.metaKeyword || data?.industry?.metaKeyword || "";
 
-  const ogImageWebp = data?.service?.ogImageWebp || "/assets/images/corpseed.webp";
-  const ogImagePng = data?.service?.ogImagePng || "/assets/images/logo.png";
+  const ogImageWebp =
+    data?.industry?.ogImageWebp || "/assets/images/corpseed.webp";
+  const ogImagePng = data?.industry?.ogImagePng || "/assets/images/logo.png";
 
   return {
     title: `${title} - Corpseed`,
     description,
     alternates: {
-      canonical: `/service/${slug}`,
+      canonical: `/industries/${slug}`,
     },
     openGraph: {
       title: `${title} - Corpseed`,
       description,
-      url: `https://www.corpseed.com/service/${slug}`,
+      url: `https://www.corpseed.com/industries/${slug}`,
       siteName: "CORPSEED ITES PRIVATE LIMITED",
       type: "website",
       images: [
@@ -58,9 +55,9 @@ function JsonLd({ data }) {
   );
 }
 
-export default async function ServicePage({ params }) {
+export default async function IndustryPage({ params }) {
   const { slug } = await params;
-  const data = await getServiceBySlug(slug);
+  const data = await getIndustryBySlug(slug);
 
   if (!data) return null;
 
@@ -88,8 +85,18 @@ export default async function ServicePage({ params }) {
     "@context": "https://schema.org/",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.corpseed.com/" },
-      { "@type": "ListItem", position: 3, name: data?.service?.title, item: `https://www.corpseed.com/service/${slug}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.corpseed.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: data?.service?.title,
+        item: `https://www.corpseed.com/service/${slug}`,
+      },
     ],
   };
 
@@ -115,9 +122,9 @@ export default async function ServicePage({ params }) {
 
       {/* Your existing UI */}
       <ServiceHero
-        title={data?.service?.title}
-        summary={data?.service?.summary}
-        videoUrl={data?.service?.videoUrl || "/videos/corpseed-intro.mp4"}
+        title={data?.industry?.title}
+        summary={data?.industry?.summary}
+        videoUrl={data?.industry?.videoUrl || "/videos/corpseed-intro.mp4"}
         badgeText="INCLUDES FREE SUPPORT"
         ratingText="Rated 4.9 by 74,861+ customers globally"
         videoText="Click to Watch & Know More"
@@ -131,17 +138,17 @@ export default async function ServicePage({ params }) {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <div className="sticky top-[72px] z-30 -mx-4 border-b border-gray-200 bg-white/80 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
-              <ServiceTabs tabs={data?.service?.serviceDetails} />
+              <ServiceTabs tabs={data?.industry?.industryDetails} />
             </div>
 
             <div className="py-6">
-              <ServiceContent tabs={data?.service?.serviceDetails} />
+              <ServiceContent tabs={data?.industry?.industryDetails} />
             </div>
           </div>
 
           <div className="lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
-              <EnquiryForm serviceName={data?.name} />
+              <EnquiryForm serviceName={data?.industry?.title} />
             </div>
           </div>
         </div>

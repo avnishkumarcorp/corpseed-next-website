@@ -1,6 +1,14 @@
-import { PlayCircle, Star } from "lucide-react";
+import { Star } from "lucide-react";
+import VideoPopup from "../components/VideoPopup";
 
-export default function ServiceHero({ title, summary, badgeText, ratingText, videoText }) {
+export default function ServiceHero({
+  title,
+  summary,
+  badgeText,
+  ratingText,
+  videoText = "Watch Overview",
+  videoUrl = "/videos/corpseed-intro.mp4",
+}) {
   return (
     <section className="relative overflow-hidden border-b border-gray-200">
       {/* subtle gradient backdrop */}
@@ -17,7 +25,9 @@ export default function ServiceHero({ title, summary, badgeText, ratingText, vid
             </div>
 
             <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-              <span className="text-blue-600">{title?.split(" ")?.[0] || title}</span>{" "}
+              <span className="text-blue-600">
+                {title?.split(" ")?.[0] || title}
+              </span>{" "}
               <span className="text-gray-900">
                 {title?.split(" ")?.slice(1).join(" ")}
               </span>
@@ -28,10 +38,7 @@ export default function ServiceHero({ title, summary, badgeText, ratingText, vid
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              <button className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 cursor-pointer">
-                <PlayCircle className="h-5 w-5 text-blue-600" />
-                {videoText}
-              </button>
+              <VideoPopup videoUrl={videoUrl} videoText={videoText} />
 
               <div className="inline-flex items-center gap-2 text-sm text-gray-700">
                 <Star className="h-4 w-4 text-yellow-500" />
@@ -47,7 +54,9 @@ export default function ServiceHero({ title, summary, badgeText, ratingText, vid
                 { value: "7+", label: "Offices" },
               ].map((s) => (
                 <div key={s.label} className="text-center">
-                  <div className="text-lg font-bold text-blue-600">{s.value}</div>
+                  <div className="text-lg font-bold text-blue-600">
+                    {s.value}
+                  </div>
                   <div className="text-xs text-gray-600">{s.label}</div>
                 </div>
               ))}
@@ -57,7 +66,9 @@ export default function ServiceHero({ title, summary, badgeText, ratingText, vid
           {/* Right highlight card */}
           <div className="lg:col-span-4">
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-              <p className="text-sm font-semibold text-gray-900">Why wait? Start now!</p>
+              <p className="text-sm font-semibold text-gray-900">
+                Why wait? Start now!
+              </p>
               <p className="mt-2 text-sm text-gray-600">We’re available 24/7</p>
 
               <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">

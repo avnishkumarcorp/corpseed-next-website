@@ -2,6 +2,9 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import footerLogo from "../../assets/logo-footer.png";
 
 export default function Footer() {
   const footerLinks = [
@@ -54,6 +57,17 @@ export default function Footer() {
     },
   ];
 
+  // ✅ bottom strip links (like your screenshot)
+  const bottomStripLinks = [
+    { label: "FAQ", href: "/faq" },
+    { label: "Sitemap", href: "/sitemap" },
+    { label: "Privacy Policy", href: "/legal/privacy-policy" },
+    { label: "Terms of Service", href: "/legal/terms-of-service" }, // change if needed
+    { label: "Refund Policy", href: "/legal/refund-policy" },
+    { label: "Cookies", href: "/legal/cookies-and-related-technology" },
+    { label: "Terms of Use", href: "/legal/terms-of-use" },
+  ];
+
   return (
     <footer className="w-full bg-white">
       {/* Top strip */}
@@ -65,17 +79,14 @@ export default function Footer() {
               Follow Us :
             </span>
 
-            <div className="flex items-center gap-3 text-slate-600">
+            <div className="flex items-center gap-0 text-slate-600">
               <SocialIcon label="LinkedIn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M6.94 6.5A2.44 2.44 0 1 1 7 2.5a2.44 2.44 0 0 1-.06 4z"
                     fill="currentColor"
                   />
-                  <path
-                    d="M4.5 21V9h4v12h-4z"
-                    fill="currentColor"
-                  />
+                  <path d="M4.5 21V9h4v12h-4z" fill="currentColor" />
                   <path
                     d="M13 9c2.5 0 4.5 1.6 4.5 5.2V21h-4v-6c0-1.6-.6-2.6-2-2.6-1.1 0-1.7.7-2 1.4-.1.2-.1.6-.1 1V21h-4s.1-10.7 0-12h4v1.7C10 9.8 11.2 9 13 9z"
                     fill="currentColor"
@@ -98,10 +109,7 @@ export default function Footer() {
                     d="M21 8.2s-.2-1.6-.8-2.3c-.8-.8-1.7-.8-2.1-.9C15.1 4.7 12 4.7 12 4.7h0s-3.1 0-6.1.3c-.4.1-1.3.1-2.1.9C3.2 6.6 3 8.2 3 8.2S2.7 10 2.7 11.8v.9C2.7 14.4 3 16.2 3 16.2s.2 1.6.8 2.3c.8.8 1.9.8 2.4.9 1.7.2 5.8.3 5.8.3s3.1 0 6.1-.3c.4-.1 1.3-.1 2.1-.9.6-.7.8-2.3.8-2.3s.3-1.8.3-3.6v-.9c0-1.8-.3-3.6-.3-3.6z"
                     fill="currentColor"
                   />
-                  <path
-                    d="M10.4 15.3v-6l5.6 3-5.6 3z"
-                    fill="#fff"
-                  />
+                  <path d="M10.4 15.3v-6l5.6 3-5.6 3z" fill="#fff" />
                 </svg>
               </SocialIcon>
 
@@ -190,6 +198,44 @@ export default function Footer() {
           >
             ALL SERVICES
           </button>
+        </div>
+      </div>
+
+      {/* ✅ Bottom strip (like screenshot) */}
+      <div className="border-t border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+          {/* Left: logo + copyright */}
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-slate-600">
+            <div className="flex items-center gap-3">
+              <div className="relative h-12 w-32">
+                <Image
+                  src={footerLogo}
+                  alt="Corpseed"
+                  fill
+                  priority
+                  className="object-contain"
+                />
+              </div>
+
+              <span className="text-sm text-slate-500">©2026</span>
+              <span className="text-sm text-slate-700">
+                Corpseed ITES Pvt Ltd
+              </span>
+            </div>
+          </div>
+
+          {/* Right: links */}
+          <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-slate-600">
+            {bottomStripLinks.map((x) => (
+              <Link
+                key={x.label}
+                href={x.href}
+                className="hover:text-slate-900 cursor-pointer"
+              >
+                {x.label}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

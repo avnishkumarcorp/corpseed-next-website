@@ -25,7 +25,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
 .section {
   @apply py-16 md:py-24;
 }
@@ -58,7 +57,6 @@ body {
   @apply text-gray-600 text-base md:text-lg leading-relaxed;
 }
 
-
 .iti {
   width: 100%;
 }
@@ -68,8 +66,13 @@ body {
 }
 
 /* globals.css */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 @keyframes logoMarquee {
   0% {
@@ -87,16 +90,12 @@ body {
   animation-iteration-count: infinite;
 }
 
-
 /* globals.css */
 .marquee-no-select {
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
 }
-
-
-
 
 .page-header {
   padding: 0.3rem 0;
@@ -282,7 +281,7 @@ body {
   display: inline-block;
   margin-right: 8px;
   vertical-align: bottom;
-  background: url('./assets/icons/info-circle.svg') no-repeat;
+  background: url("./assets/icons/info-circle.svg") no-repeat;
   background-size: cover;
   border-radius: 50%;
   margin-bottom: 0.2rem;
@@ -476,8 +475,12 @@ body {
   right: 0;
   width: 100%;
   padding: 0.5rem 1.5rem 2rem;
-  -webkit-box-shadow: 0 2px 4px #0003, 0 0 0 15px #f8f9fa;
-  box-shadow: 0px 3px 8px #0003, 0 0 0 8px #f8f9fa;
+  -webkit-box-shadow:
+    0 2px 4px #0003,
+    0 0 0 15px #f8f9fa;
+  box-shadow:
+    0px 3px 8px #0003,
+    0 0 0 8px #f8f9fa;
 }
 @media only screen and (max-width: 991.98px) {
   .form-inqry .call-inq {
@@ -910,8 +913,12 @@ body {
 }
 .contact .contact-form {
   padding: 1rem 3rem 3rem;
-  -webkit-box-shadow: 0 2px 4px #0003, 0 0 0 15px #f8f9fa;
-  box-shadow: 0 2px 4px #0003, 0 0 0 15px #f8f9fa;
+  -webkit-box-shadow:
+    0 2px 4px #0003,
+    0 0 0 15px #f8f9fa;
+  box-shadow:
+    0 2px 4px #0003,
+    0 0 0 15px #f8f9fa;
 }
 @media only screen and (max-width: 1199.98px) {
   .contact .contact-form {
@@ -1210,8 +1217,12 @@ body {
   opacity: 1;
 }
 .all-blog .sidebar .subscribe {
-  -webkit-box-shadow: 0 2px 4px #0003, 0 0 0 15px #f8f9fa;
-  box-shadow: 0 2px 4px #0003, 0 0 0 15px #f8f9fa;
+  -webkit-box-shadow:
+    0 2px 4px #0003,
+    0 0 0 15px #f8f9fa;
+  box-shadow:
+    0 2px 4px #0003,
+    0 0 0 15px #f8f9fa;
 }
 @media only screen and (max-width: 767.98px) {
   .calculator .display-4 {
@@ -1294,8 +1305,12 @@ body {
   text-align: center;
 }
 .online-pay {
-  -webkit-box-shadow: 0 2px 4px #0003, 0 0 0 15px #f8f9fa;
-  box-shadow: 0 2px 4px #0003, 0 0 0 15px #f8f9fa;
+  -webkit-box-shadow:
+    0 2px 4px #0003,
+    0 0 0 15px #f8f9fa;
+  box-shadow:
+    0 2px 4px #0003,
+    0 0 0 15px #f8f9fa;
   padding: 1rem 2rem 0;
 }
 @media only screen and (max-width: 767.98px) {
@@ -5517,25 +5532,70 @@ p.toc_title {
   font-weight: 700;
 }
 
+.page-header article .checklist li,
+.page-header article ul li {
+  position: relative;
+  font-size: 16px;
+  color: rgb(33, 37, 41);
+  display: block;
+  line-height: 28px;
+  padding: 0.1rem;
+}
 
-.page-header article .checklist li, .page-header article ul li {
-    position: relative;
-    font-size: 16px;
-    color: rgb(33, 37, 41);
+.page-header article .checklist li::before,
+.page-header article ul li::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: bottom;
+  margin-bottom: 0.46rem;
+  background: url("./assets/icons/info-circle.svg") 0% 0% / cover no-repeat;
+  border-radius: 50%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Make API HTML nicer */
+.press-content h2,
+.press-content h3 {
+  scroll-margin-top: 110px;
+}
+
+.press-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 14px;
+}
+
+/* If API has float images, keep it decent on mobile */
+@media (max-width: 640px) {
+  .press-content img[style*="float"] {
+    float: none !important;
     display: block;
-    line-height: 28px;
-    padding: 0.1rem;
+    margin: 0 auto 14px auto !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* Style the TOC from API */
+#main-toc .toc_title {
+  margin: 0;
+}
+#main-toc ol {
+  margin: 0;
+  padding-left: 18px;
+}
+#main-toc a {
+  color: #0f172a;
+  text-decoration: none;
+}
+#main-toc a:hover {
+  text-decoration: underline;
 }
 
 
-.page-header article .checklist li::before, .page-header article ul li::before{
-    content: "";
-    width: 15px;
-    height: 15px;
-    display: inline-block;
-    margin-right: 8px;
-    vertical-align: bottom;
-    margin-bottom: 0.46rem;
-    background: url("./assets/icons/info-circle.svg") 0% 0% / cover no-repeat;
-    border-radius: 50%;
-}

@@ -1,3 +1,117 @@
+.bsWrapper {
+  width: 100%;
+}
+
+/* --- Base typography only inside .bs wrapper --- */
 .bsWrapper :global(.bs) {
-  /* nothing needed */
+  color: #0f172a; /* slate-900 */
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* Headings */
+.bsWrapper :global(.bs h1) {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 1.2rem 0 0.6rem;
+}
+
+.bsWrapper :global(.bs h2) {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 1.1rem 0 0.55rem;
+}
+
+.bsWrapper :global(.bs h3) {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+}
+
+/* Paragraph spacing */
+.bsWrapper :global(.bs p) {
+  margin: 0.75rem 0;
+}
+
+/* Lists */
+.bsWrapper :global(.bs ul),
+.bsWrapper :global(.bs ol) {
+  padding-left: 1.2rem;
+  margin: 0.75rem 0;
+}
+
+.bsWrapper :global(.bs li) {
+  margin: 0.35rem 0;
+}
+
+/* Links */
+.bsWrapper :global(.bs a) {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Images: keep bootstrap float-left working */
+.bsWrapper :global(.bs img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Bootstrap utility support (common ones your content uses) */
+.bsWrapper :global(.bs .text-center) {
+  text-align: center;
+}
+.bsWrapper :global(.bs .text-right) {
+  text-align: right;
+}
+.bsWrapper :global(.bs .text-left) {
+  text-align: left;
+}
+
+/* float helpers (Bootstrap 4-ish) */
+.bsWrapper :global(.bs .float-left) {
+  float: left;
+  margin-right: 16px;
+  margin-bottom: 12px;
+}
+.bsWrapper :global(.bs .float-right) {
+  float: right;
+  margin-left: 16px;
+  margin-bottom: 12px;
+}
+
+/* Clear floats */
+.bsWrapper :global(.bs::after) {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Tables (Bootstrap-ish) */
+.bsWrapper :global(.bs table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 14px;
+}
+
+.bsWrapper :global(.bs th),
+.bsWrapper :global(.bs td) {
+  border: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  vertical-align: top;
+}
+
+.bsWrapper :global(.bs thead th) {
+  background: #f8fafc; /* slate-50 */
+  font-weight: 600;
+}
+
+/* Blockquotes */
+.bsWrapper :global(.bs blockquote) {
+  border-left: 3px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #475569;
 }

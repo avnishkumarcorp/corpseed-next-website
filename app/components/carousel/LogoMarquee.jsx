@@ -397,7 +397,7 @@ export default function LogoMarquee({
                     onMouseLeave={hideTip}
                   >
                     <div
-                      className="relative opacity-80 transition-opacity duration-200 hover:opacity-100"
+                      className="relative flex items-center justify-center opacity-80 transition-opacity duration-200 hover:opacity-100"
                       style={{ height, width: itemWidth }}
                       title={item.name}
                     >
@@ -405,8 +405,8 @@ export default function LogoMarquee({
                         src={item.src}
                         alt={item.name}
                         fill
-                        className="object-contain"
                         sizes="(max-width: 768px) 120px, 160px"
+                        className="object-contain max-w-[85%] max-h-[85%]"
                       />
                     </div>
                   </div>

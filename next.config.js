@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  devIndicators: {
+    buildActivity: false,
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "www.corpseed.com" },
@@ -14,6 +17,12 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8080",
+        pathname: "/**",
       },
     ],
   },

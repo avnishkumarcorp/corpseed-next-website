@@ -1,38 +1,26 @@
 // app/service/[slug]/page.js
-import { getServiceBySlug } from "../../lib/service";
 import ServiceHero from "../ServiceHero";
 import ServiceTabs from "../ServiceTabs";
 import LogoMarquee from "@/app/components/carousel/LogoMarquee";
 import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
 import ServiceContent from "../ServiceContent";
+import { getServiceData } from "./serviceData";
 
 export async function generateMetadata({ params }) {
   const { slug } =await params;
-  const data = await getServiceBySlug(slug);
+  const data = await getServiceData(slug);
 
-  const title =
-    data?.service?.seoTitle || data?.service?.title || "Service";
-
+  const title = data?.service?.seoTitle || data?.service?.title || "Service";
   const description =
     data?.service?.seoDescription ||
     data?.service?.metaDescription ||
     data?.service?.summary ||
     "Corpseed service details and enquiry.";
 
-  const keywords =
-    data?.service?.keywords ||
-    data?.service?.metaKeywords ||
-    "";
-
-  const ogImageWebp = data?.service?.ogImageWebp || "/assets/images/corpseed.webp";
-  const ogImagePng = data?.service?.ogImagePng || "/assets/images/logo.png";
-
   return {
     title: `${title} - Corpseed`,
     description,
-    alternates: {
-      canonical: `/service/${slug}`,
-    },
+    alternates: { canonical: `/service/${slug}` },
     openGraph: {
       title: `${title} - Corpseed`,
       description,
@@ -40,12 +28,9 @@ export async function generateMetadata({ params }) {
       siteName: "CORPSEED ITES PRIVATE LIMITED",
       type: "website",
       images: [
-        { url: ogImageWebp, width: 1200, height: 630, type: "image/webp" },
-        { url: ogImagePng, width: 1200, height: 630, type: "image/png" },
+        { url: data?.service?.ogImageWebp || "/assets/images/corpseed.webp", width: 1200, height: 630, type: "image/webp" },
+        { url: data?.service?.ogImagePng || "/assets/images/logo.png", width: 1200, height: 630, type: "image/png" },
       ],
-    },
-    other: {
-      ...(keywords ? { keywords } : {}),
     },
   };
 }
@@ -60,7 +45,7 @@ function JsonLd({ data }) {
 
 export default async function ServicePage({ params }) {
   const { slug } = await params;
-  const data = await getServiceBySlug(slug);
+  const data = await getServiceData(slug);
 
   if (!data) return null;
 

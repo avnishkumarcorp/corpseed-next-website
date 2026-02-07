@@ -47,6 +47,7 @@ export default async function ServicePage({ params }) {
   const { slug } = await params;
   const data = await getServiceData(slug);
 
+  
   if (!data) return null;
 
   // Build schema objects (example; map from your API fields)
@@ -126,7 +127,7 @@ export default async function ServicePage({ params }) {
 
           <div className="lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
-              <EnquiryForm serviceName={data?.name} />
+              <EnquiryForm serviceName={data?.service?.title} />
             </div>
           </div>
         </div>

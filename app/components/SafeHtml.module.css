@@ -115,3 +115,103 @@
   margin: 1rem 0;
   color: #475569;
 }
+
+.vediosec  {
+  background: #fff;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+  max-width: 640px;
+  max-height: 360px;
+  border: 1px solid #2b63f9;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.page-header article img {
+  margin: 0.4rem 1rem 0 0;
+  padding: 0;
+  max-width: 100%;
+}
+
+.page-header article p,
+.page-header article span {
+  font-size: 16px;
+  line-height: 28px;
+  color: #212529;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.page-header article .checklist li,
+.page-header article ul li {
+  position: relative;
+  padding: 0.1rem;
+  font-size: 16px;
+  color: #212529;
+  display: block;
+  line-height: 28px;
+}
+
+.page-header article .checklist li:before,
+.page-header article ul li:before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: bottom;
+  background: url("../assets/icons/info-circle.svg") no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+  margin-bottom: 0.46rem;
+}
+
+.page-header article ul li:before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: bottom;
+  background: url("../assets/icons/info-circle.svg") no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+  margin-bottom: 0.46rem;
+}
+
+.page-header article ul li {
+  font-size: 16px;
+  color: #212529;
+  display: block;
+  line-height: 28px;
+  list-style-type: inherit;
+}
+
+.page-header h2 {
+  font-weight: 400;
+  color: #303134;
+  font-size: 24px;
+}
+
+.blog-desc h1 {
+  letter-spacing: 0.2px !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 500 !important;
+}
+
+.page-header article p, .page-header article span {
+    font-size: 16px !important;
+    line-height: 28px;
+    color: #212529;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.page-header article img {
+    margin: 0.4rem 1rem 0 0;
+    padding: 0;
+    max-width: 100%;
+}

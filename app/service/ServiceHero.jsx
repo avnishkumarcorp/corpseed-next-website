@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import VideoPopup from "../components/VideoPopup";
+import EnquiryOtpFlow from "../components/otp/EnquiryOtpFlow";
 
 export default function ServiceHero({
   title,
@@ -89,6 +90,7 @@ export default function ServiceHero({
                 By continuing, you agree to Terms & Privacy Policy.
               </p>
             </div>
+            <EnquiryOtpFlow triggerText="Get Free Consultation" />
           </div>
         </div>
       </div>

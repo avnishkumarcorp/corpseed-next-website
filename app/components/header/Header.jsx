@@ -24,7 +24,7 @@ const ALL_CORPSEED_ROUTE_MAP = {
   "Compliance Updates": "/compliance-updates",
   "Knowledge Centre": "/knowledge-centre",
   NewsRoom: "/news-room",
-  "Product Based Services": "/product-based-services",
+  "Product Based Services": "/products",
 };
 
 function buildMenuMap(menuData) {

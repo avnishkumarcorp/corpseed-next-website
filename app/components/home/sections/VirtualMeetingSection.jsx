@@ -3,9 +3,12 @@ import Image from "next/image";
 import calendarImg from "../../../../public/home/calander.svg";
 import Link from "next/link";
 
-const RightCard = ({ icon, title, desc }) => {
+const RightCard = ({ icon, title, desc, href }) => {
   return (
-    <div className="flex gap-3 rounded-xl bg-white px-5 py-4 shadow-[0_10px_30px_-22px_rgba(2,6,23,0.35)] ring-1 ring-slate-200">
+    <Link
+      href={href || ""}
+      className="flex gap-3 rounded-xl bg-white px-5 py-4 shadow-[0_10px_30px_-22px_rgba(2,6,23,0.35)] ring-1 ring-slate-200"
+    >
       <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
         {icon}
       </div>
@@ -14,7 +17,7 @@ const RightCard = ({ icon, title, desc }) => {
         <div className="text-[15px] font-semibold text-slate-900">{title}</div>
         <div className="mt-1 text-[14px] text-slate-600">{desc}</div>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -42,7 +45,7 @@ export default function VirtualMeetingSection() {
               </h3>
 
               <Link
-                href={'/book-meeting'}
+                href={"/book-meeting"}
                 className="mt-5 inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-[14px] font-semibold text-white shadow-sm cursor-pointer"
               >
                 Book Now
@@ -110,6 +113,7 @@ export default function VirtualMeetingSection() {
               <RightCard
                 title="Become a partner"
                 desc="At Corpseed We Understand Our Responsibility"
+                href="partner"
                 icon={
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path

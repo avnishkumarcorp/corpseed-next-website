@@ -61,7 +61,6 @@ export async function submitPartnerEnquiry({
     mobile: String(mobile || "").trim(),
     message: String(message || "").trim(),
     location: String(location || "").trim(),
-    // postDate/modifyDate usually backend handles; send only if required
   };
 
   const res = await fetch("/api/enquiry/partner", {
@@ -72,4 +71,41 @@ export async function submitPartnerEnquiry({
   });
 
   return { ok: res.ok, status: res.status, data: await res.text().catch(() => "") };
+}
+
+
+
+// app/lib/enquiry.js
+
+export async function submitConsultNowEnquiry({
+  otp,
+  name,
+  email,
+  mobile,
+  message,
+  location,
+}) {
+  const payload = {
+    otp: String(otp || "").trim(),
+    name: String(name || "").trim(),
+    email: String(email || "").trim(),
+    mobile: String(mobile || "").trim(),
+    message: String(message || "").trim(),
+    location: String(location || "").trim(),
+    postDate: "",
+    modifyDate: "",
+  };
+
+  const res = await fetch("/api/enquiry/consult-now", {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  return {
+    ok: res.ok,
+    status: res.status,
+    data: await res.text().catch(() => ""),
+  };
 }

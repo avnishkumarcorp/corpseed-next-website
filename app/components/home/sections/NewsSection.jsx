@@ -154,7 +154,7 @@ function NewsSlide({ slide }) {
             </div>
 
             {/* Optional CTA */}
-            <div className="mt-8">
+            {/* <div className="mt-8">
               <button
                 type="button"
                 className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-[13px] font-semibold text-white shadow-sm cursor-pointer"
@@ -170,7 +170,7 @@ function NewsSlide({ slide }) {
                   />
                 </svg>
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

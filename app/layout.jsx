@@ -2,6 +2,7 @@ import Script from "next/script";
 import Footer from "./components/footer/Footer";
 import "./globals.css";
 import HeaderWrapper from "./components/header/HeaderWrapper";
+import WhatsAppFloat from "./components/WhatsAppFloat";
 
 export const metadata = {
   title: "Corpseed",
@@ -33,6 +34,10 @@ export default function RootLayout({ children }) {
           {/* Middle content changes by route */}
           <main className="flex-1">{children}</main>
           <Footer />
+          <WhatsAppFloat
+            phone="917558640644"
+            message="Welcome to Corpseed. Please type your query, and we shall provide immediate assistance."
+          />
         </div>
         <Script id="fb-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?

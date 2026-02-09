@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { X, CheckCircle2 } from "lucide-react";
-import { sendOtp, verifyOtp, submitPartnerEnquiry } from "@/app/lib/enquiry";
+import { sendOtp,verifyOtp, submitPartnerEnquiry } from "../lib/enquiryOtp";
 
 function Input({ label, required, value, onChange, type = "text", placeholder }) {
   return (

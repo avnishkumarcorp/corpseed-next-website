@@ -2,15 +2,18 @@
 import { createPortal } from "react-dom";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import logo from "../../assets/CORPSEED.webp";
 import Image from "next/image";
+import logo from "../../assets/CORPSEED.webp";
 
+/* -------------------------
+   CONFIG
+-------------------------- */
 const NAV_ITEMS = [
   { label: "About", key: "Who We Are" },
   { label: "Environmental Compliance", key: "Environment & Sustainability" },
   { label: "Factory Setup", key: "Project Planning & Setup" },
-  { label: "Compliance", key: "Compliance Solutions" }, // if exists in API later
-  { label: "Industries Setup", key: "Industries Solutions" }, // if exists in API later
+  { label: "Compliance", key: "Compliance Solutions" },
+  { label: "Industries Setup", key: "Industries Solutions" },
 ];
 
 const ALL_CORPSEED_ALLOWED_KEYS = [
@@ -27,6 +30,31 @@ const ALL_CORPSEED_ROUTE_MAP = {
   "Product Based Services": "/products",
 };
 
+/**
+ * ✅ Mobile fallback routes (so top tabs always work even if API missing)
+ * Update these to your real routes.
+ */
+const MOBILE_FALLBACK_ROUTES = {
+  "Who We Are": "/about",
+  "Environment & Sustainability": "/environmental-compliance",
+  "Project Planning & Setup": "/factory-setup",
+  "Compliance Solutions": "/compliance",
+  "Industries Solutions": "/industries",
+};
+
+const GRID_KEYS_ORDER = [
+  "Services",
+  "Product Based Services",
+  "Knowledge Center",
+  "Knowledge Centre",
+  "Department Updates",
+  "Compliance Updates",
+  "Industries",
+];
+
+/* -------------------------
+   HELPERS
+-------------------------- */
 function buildMenuMap(menuData) {
   const map = {};
   (menuData || []).forEach((item) => {
@@ -57,16 +85,6 @@ function useDebouncedValue(value, delay = 250) {
   return debounced;
 }
 
-const GRID_KEYS_ORDER = [
-  "Services",
-  "Product Based Services",
-  "Knowledge Center",
-  "Knowledge Centre",
-  "Department Updates",
-  "Compliance Updates",
-  "Industries",
-];
-
 function normalizeGroups(apiData) {
   if (!apiData || typeof apiData !== "object") return [];
   const entries = Object.entries(apiData).map(([k, v]) => [
@@ -74,7 +92,6 @@ function normalizeGroups(apiData) {
     Array.isArray(v) ? v : [],
   ]);
 
-  // Order known groups first, then remaining
   const known = [];
   const unknown = [];
 
@@ -91,11 +108,29 @@ function normalizeGroups(apiData) {
   return [...known, ...unknown];
 }
 
+function Chevron({ open }) {
+  return (
+    <span
+      className={[
+        "inline-flex items-center justify-center",
+        "transition-transform duration-200",
+        open ? "rotate-90" : "rotate-0",
+      ].join(" ")}
+      aria-hidden="true"
+    >
+      ▶
+    </span>
+  );
+}
+
+/* -------------------------
+   DESKTOP: SEARCH PANEL
+-------------------------- */
 const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
   open,
   onClose,
   baseUrl,
-  topOffset = 72, // ✅ header height fallback
+  topOffset = 72,
 }) {
   const [q, setQ] = useState("");
   const dq = useDebouncedValue(q, 250);
@@ -162,11 +197,11 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
         setLoading(true);
         setErr("");
 
-        const url = `${baseUrl}/search/service-industry-blog/${encodeURIComponent(query)}`;
+        const url = `${baseUrl}/search/service-industry-blog/${encodeURIComponent(
+          query,
+        )}`;
         const res = await fetch(url, { signal: controller.signal });
-
         if (!res.ok) throw new Error(`Search failed: ${res.status}`);
-
         const json = await res.json();
         setApiData(json);
       } catch (e) {
@@ -185,7 +220,6 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
 
   if (!open || !mounted) return null;
 
-  // ✅ full width panel via portal
   return createPortal(
     <div
       className={[
@@ -200,10 +234,8 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
           ref={panelRef}
           className="mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
         >
-          {/* Header strip */}
           <div className="h-1 w-full bg-gradient-to-r from-slate-900 via-blue-600 to-slate-900 opacity-70" />
 
-          {/* Search bar row */}
           <div className="border-b border-slate-200 bg-white/80 px-4 py-4 backdrop-blur">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative flex-1">
@@ -249,7 +281,6 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
             </div>
           </div>
 
-          {/* Body */}
           <div className="max-h-[68vh] overflow-y-auto overflow-x-hidden [scrollbar-gutter:stable] p-5">
             {err ? (
               <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -359,6 +390,9 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
   );
 });
 
+/* -------------------------
+   DESKTOP: MegaPanel + AllCorpseedDropdown (as you have)
+-------------------------- */
 function renderLinksList(list) {
   return (
     <ul className="space-y-2 pl-3">
@@ -398,7 +432,6 @@ function MegaPanel({ open, navKey, menuMap, loading }) {
         open ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1",
       ].join(" ")}
     >
-      {/* ✅ increased width */}
       <div className="mx-auto max-w-[92rem] px-4 sm:px-6 lg:px-8">
         <div className="mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
           <div className="grid grid-cols-12">
@@ -446,7 +479,6 @@ function MegaPanel({ open, navKey, menuMap, loading }) {
               )}
             </div>
 
-            {/* ✅ Right content (only this scrolls; half screen height) */}
             <div className="col-span-12 lg:col-span-9">
               <div className="max-h-[68vh] overflow-y-auto overflow-x-hidden [scrollbar-gutter:stable] p-5">
                 {loading ? (
@@ -498,7 +530,6 @@ function MegaPanel({ open, navKey, menuMap, loading }) {
 
                       const renderGroupsColumnsLocal = (groupsObj) => {
                         const groupKeys = Object.keys(groupsObj || {});
-
                         return (
                           <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
                             {groupKeys.map((groupTitle) =>
@@ -594,7 +625,6 @@ function AllCorpseedDropdown({ open, menuMap }) {
         <div className="h-1 w-full bg-gradient-to-r from-slate-900 via-blue-600 to-slate-900 opacity-70" />
 
         <div className="p-3">
-          {/* Header */}
           <div className="flex items-center justify-between px-2 py-2">
             <div>
               <p className="text-[12px] font-semibold tracking-wide text-slate-500 uppercase">
@@ -610,7 +640,6 @@ function AllCorpseedDropdown({ open, menuMap }) {
             </span>
           </div>
 
-          {/* Items */}
           <div className="mt-2 grid gap-2">
             {items.map((k) => (
               <Link
@@ -639,7 +668,6 @@ function AllCorpseedDropdown({ open, menuMap }) {
             ))}
           </div>
 
-          {/* Footer */}
           <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
             <p className="text-[12px] text-slate-600">
               Explore Corpseed resources
@@ -651,14 +679,589 @@ function AllCorpseedDropdown({ open, menuMap }) {
   );
 }
 
+/* -------------------------
+   MOBILE: Search + Menu Drawer (FULL)
+-------------------------- */
+function MobileSearchInline({ baseUrl, onNavigate }) {
+  const [q, setQ] = useState("");
+  const dq = useDebouncedValue(q, 250);
+
+  const [loading, setLoading] = useState(false);
+  const [apiData, setApiData] = useState(null);
+  const [err, setErr] = useState("");
+
+  const abortRef = useRef(null);
+  const groups = useMemo(() => normalizeGroups(apiData), [apiData]);
+
+  useEffect(() => {
+    const query = dq.trim();
+    if (!query) {
+      setApiData(null);
+      setErr("");
+      setLoading(false);
+      if (abortRef.current) abortRef.current.abort();
+      return;
+    }
+
+    if (!baseUrl) {
+      setErr("Search base URL is missing.");
+      setApiData(null);
+      setLoading(false);
+      return;
+    }
+
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+
+        const url = `${baseUrl}/search/service-industry-blog/${encodeURIComponent(
+          query,
+        )}`;
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`Search failed: ${res.status}`);
+        const json = await res.json();
+        setApiData(json);
+      } catch (e) {
+        if (e?.name === "AbortError") return;
+        setErr("Something went wrong while searching. Please try again.");
+        setApiData(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    return () => controller.abort();
+  }, [dq, baseUrl]);
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="flex items-center gap-2">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search services, updates, blogs…"
+          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm
+                     outline-none transition
+                     focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
+        {q ? (
+          <button
+            type="button"
+            onClick={() => setQ("")}
+            className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm
+                       text-slate-700 hover:bg-slate-50 cursor-pointer"
+          >
+            Clear
+          </button>
+        ) : null}
+      </div>
+
+      <div className="mt-2 text-xs text-slate-600">
+        {loading
+          ? "Searching…"
+          : q.trim()
+            ? groups.length
+              ? `Results for “${q.trim()}”`
+              : `No results for “${q.trim()}”`
+            : "Tip: try “EPR”, “BIS”, “IMEI”, “NOC”…"}
+      </div>
+
+      {err ? (
+        <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {err}
+        </div>
+      ) : !q.trim() ? null : loading ? (
+        <div className="mt-3 space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-4 w-36 animate-pulse rounded bg-slate-200" />
+              <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+              <div className="h-3 w-11/12 animate-pulse rounded bg-slate-100" />
+            </div>
+          ))}
+        </div>
+      ) : groups.length ? (
+        <div className="mt-3 space-y-4">
+          {groups.slice(0, 4).map(([groupTitle, list]) => (
+            <div key={groupTitle} className="rounded-xl bg-slate-50 p-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-blue-700">
+                  {groupTitle}
+                </p>
+                <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                  {list.length}
+                </span>
+              </div>
+
+              <ul className="mt-2 space-y-1">
+                {list.slice(0, 4).map((x) => (
+                  <li key={x?.url || x?.slug || x?.name}>
+                    <Link
+                      href={x?.url || "#"}
+                      onClick={onNavigate}
+                      className="block rounded-lg px-2 py-2 text-[13px] leading-5
+                                 text-slate-700 hover:bg-white hover:text-slate-900 cursor-pointer"
+                    >
+                      <div className="font-medium">{x?.name}</div>
+                      {x?.track ? (
+                        <div className="text-[12px] text-slate-500">
+                          {x.track}
+                        </div>
+                      ) : null}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-2">
+                <Link
+                  href="/service"
+                  onClick={onNavigate}
+                  className="text-[12px] font-semibold text-blue-700 hover:text-blue-900 cursor-pointer"
+                >
+                  View all →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function MobileMenuSection({ title, children, open, onToggle }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full px-4 py-4 flex items-center justify-between text-left cursor-pointer"
+      >
+        <div>
+          <p className="text-sm font-semibold text-slate-900">{title}</p>
+          <p className="text-xs text-slate-500">Tap to expand</p>
+        </div>
+        <Chevron open={open} />
+      </button>
+
+      <div
+        className={[
+          "grid transition-all duration-200 ease-out",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden px-4 pb-4">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function MobileCategoryAccordion({
+  categoryTitle,
+  value,
+  onNavigate,
+  open,
+  onToggle,
+}) {
+  const renderGroup = (groupTitle, list) => {
+    const items = Array.isArray(list) ? list : [];
+    const visible = items.slice(0, 6);
+    return (
+      <div key={groupTitle} className="rounded-xl bg-slate-50 p-3">
+        <p className="text-sm font-semibold text-blue-700">{groupTitle}</p>
+        <ul className="mt-2 space-y-1">
+          {visible.map((x) => (
+            <li key={x?.url || x?.slug || x?.name}>
+              <Link
+                href={x?.url || "#"}
+                onClick={onNavigate}
+                className="block rounded-lg px-2 py-2 text-[13px] leading-5 text-slate-700 hover:bg-white hover:text-slate-900 cursor-pointer"
+              >
+                {x?.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  return (
+    <div className="rounded-2xl border border-slate-200 overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full px-4 py-3 flex items-center justify-between text-left bg-white cursor-pointer"
+      >
+        <p className="text-sm font-semibold text-slate-800">{categoryTitle}</p>
+        <Chevron open={open} />
+      </button>
+
+      <div
+        className={[
+          "grid transition-all duration-200 ease-out",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden bg-white px-4 pb-4">
+          {isLinksArray(value) ? (
+            <ul className="space-y-1">
+              {value.slice(0, 10).map((x) => (
+                <li key={x?.url || x?.slug || x?.name}>
+                  <Link
+                    href={x?.url || "#"}
+                    onClick={onNavigate}
+                    className="block rounded-lg px-2 py-2 text-[13px] leading-5 text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
+                  >
+                    {x?.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : isGroupObject(value) ? (
+            <div className="space-y-3">
+              {Object.keys(value || {}).map((groupTitle) =>
+                renderGroup(groupTitle, value[groupTitle]),
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-slate-600">No data available.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileDrawer({ open, onClose, menuMap, loading, baseUrl, navItems }) {
+  const [mounted, setMounted] = useState(false);
+  const [activeNavKey, setActiveNavKey] = useState(null);
+  const [openCatByNav, setOpenCatByNav] = useState({}); // { [navKey]: "CategoryName" }
+
+  const contentRef = useRef(null);
+
+  useEffect(() => setMounted(true), []);
+
+  // lock body scroll only when open
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  const goToNav = (navKey) => {
+    setActiveNavKey(navKey);
+
+    // wait a tick so accordion can open before scrolling
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`mobile-section-${navKey}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  const openNav = (navKey) => {
+    setActiveNavKey(navKey);
+
+    const item = menuMap?.[navKey];
+    const sideKeys = Object.keys(item?.categoryMap || {});
+    if (sideKeys.length) {
+      setOpenCatByNav((p) => ({ ...p, [navKey]: sideKeys[0] }));
+    }
+
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`mobile-section-${navKey}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  // close on ESC only when open
+  useEffect(() => {
+    if (!open) return;
+
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose?.();
+    };
+
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div
+      className={[
+        "fixed inset-0 z-[9999]",
+        open ? "pointer-events-auto" : "pointer-events-none",
+      ].join(" ")}
+      aria-hidden={!open}
+    >
+      {/* Backdrop */}
+      <div
+        className={[
+          "absolute inset-0 bg-black/40 backdrop-blur-[1px]",
+          "transition-opacity duration-200",
+          open ? "opacity-100" : "opacity-0",
+        ].join(" ")}
+        onClick={onClose}
+      />
+
+      {/* Drawer */}
+      <div
+        className={[
+          "absolute right-0 top-0 h-full w-full bg-white shadow-2xl",
+          "transition-transform duration-300 ease-out",
+          open ? "translate-x-0" : "translate-x-full",
+          "flex flex-col", // ✅ important
+        ].join(" ")}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Top bar */}
+        <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
+          <div className="flex items-center justify-between px-4 py-4">
+            <Link href="/" onClick={onClose} className="cursor-pointer">
+              <Image
+                src={logo}
+                alt="Corpseed"
+                width={130}
+                height={52}
+                priority
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose?.();
+              }}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+            >
+              Close ✕
+            </button>
+          </div>
+
+          <div className="px-4 pb-4">
+            <MobileSearchInline baseUrl={baseUrl} onNavigate={onClose} />
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="h-[calc(100%-124px)] overflow-y-auto px-4 pb-8">
+          {/* ✅ Quick tiles */}
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <Link
+              href="/service"
+              onClick={onClose}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 cursor-pointer"
+            >
+              <p className="text-sm font-semibold text-slate-900">Services</p>
+              <p className="mt-1 text-xs text-slate-600">Browse catalogue</p>
+            </Link>
+            <Link
+              href="/knowledge-centre"
+              onClick={onClose}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 cursor-pointer"
+            >
+              <p className="text-sm font-semibold text-slate-900">
+                Knowledge Centre
+              </p>
+              <p className="mt-1 text-xs text-slate-600">Guides & updates</p>
+            </Link>
+          </div>
+
+          {/* ✅ Top navigation tabs (ALWAYS visible like desktop) */}
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-white overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-200">
+              <p className="text-sm font-semibold text-slate-900">Menu</p>
+              <p className="text-xs text-slate-500">
+                Quick access to main sections
+              </p>
+            </div>
+
+            <div className="p-2">
+              {navItems.map((nav) => {
+                const item = menuMap?.[nav.key];
+                const categoryMap = item?.categoryMap;
+                const sideKeys = Object.keys(categoryMap || {});
+
+                return (
+                  <div
+                    key={nav.key}
+                    id={`mobile-section-${nav.key}`}
+                    className="scroll-mt-28"
+                  >
+                    <MobileMenuSection
+                      title={nav.label}
+                      open={activeNavKey === nav.key}
+                      onToggle={() =>
+                        setActiveNavKey((k) => (k === nav.key ? null : nav.key))
+                      }
+                    >
+                      {sideKeys.map((cat) => (
+                        <MobileCategoryAccordion
+                          key={cat}
+                          categoryTitle={cat}
+                          value={categoryMap?.[cat]}
+                          open={openCatByNav[nav.key] === cat}
+                          onToggle={() =>
+                            setOpenCatByNav((p) => ({
+                              ...p,
+                              [nav.key]: p[nav.key] === cat ? null : cat,
+                            }))
+                          }
+                          onNavigate={onClose}
+                        />
+                      ))}
+                    </MobileMenuSection>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ✅ All Corpseed (always) */}
+          {/* <div className="mt-4">
+            <MobileMenuSection
+              title={nav.label}
+              open={activeNavKey === nav.key}
+              onToggle={() =>
+                setActiveNavKey((k) => (k === nav.key ? null : nav.key))
+              }
+            >
+              {sideKeys.map((cat) => (
+                <MobileCategoryAccordion
+                  key={cat}
+                  categoryTitle={cat}
+                  value={categoryMap?.[cat]}
+                  onNavigate={onClose}
+                  open={openCatByNav[nav.key] === cat}
+                  onToggle={() =>
+                    setOpenCatByNav((p) => ({
+                      ...p,
+                      [nav.key]: p[nav.key] === cat ? null : cat,
+                    }))
+                  }
+                />
+              ))}
+            </MobileMenuSection>
+          </div> */}
+
+          {/* ✅ Expandable sections for each desktop tab */}
+          <div className="mt-4 space-y-3">
+            {navItems.map((nav) => {
+              const item = menuMap?.[nav.key];
+              const categoryMap = item?.categoryMap;
+              const sideKeys = getSideKeys(categoryMap);
+
+              return (
+                <div
+                  key={nav.key}
+                  id={`mobile-section-${nav.key}`}
+                  className="scroll-mt-28"
+                >
+                  <MobileMenuSection
+                    title={nav.label}
+                    forceOpen={activeNavKey === nav.key}
+                  >
+                    {loading ? (
+                      <div className="space-y-3">
+                        <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+                        <div className="h-4 w-56 animate-pulse rounded bg-slate-100" />
+                        <div className="h-4 w-48 animate-pulse rounded bg-slate-100" />
+                      </div>
+                    ) : !item || !sideKeys.length ? (
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <p className="text-sm font-semibold text-slate-800">
+                          {nav.label}
+                        </p>
+                        <p className="mt-1 text-sm text-slate-600">
+                          This section doesn’t have menu items yet.
+                        </p>
+                        <Link
+                          href={MOBILE_FALLBACK_ROUTES[nav.key] || "/"}
+                          onClick={onClose}
+                          className="mt-2 inline-flex text-[12px] font-semibold text-blue-700 hover:text-blue-900 cursor-pointer"
+                        >
+                          Open page →
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {sideKeys.map((cat) => (
+                          <MobileCategoryAccordion
+                            key={cat}
+                            categoryTitle={cat}
+                            value={categoryMap?.[cat]}
+                            onNavigate={onClose}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </MobileMenuSection>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Footer */}
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="text-sm font-semibold text-slate-900">
+              Need help choosing a service?
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              Use search above or open the Services catalogue.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <Link
+                href="/service"
+                onClick={onClose}
+                className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
+              >
+                Explore Services
+              </Link>
+              <Link
+                href="/contact"
+                onClick={onClose}
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+
+          <div className="h-8" />
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/* -------------------------
+   HEADER (UPDATED): Mobile drawer + desktop as-is
+-------------------------- */
 export default function Header({ menuData, loading }) {
   const menuMap = useMemo(() => buildMenuMap(menuData), [menuData]);
 
   const [openKey, setOpenKey] = useState(null);
   const closeTimerRef = useRef(null);
+
   const [allOpen, setAllOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  const [mobileOpen, setMobileOpen] = useState(false);
   const allCloseTimerRef = useRef(null);
 
   const open = (key) => {
@@ -668,7 +1271,6 @@ export default function Header({ menuData, loading }) {
 
   const close = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    // tiny delay prevents “jerk” when moving mouse between nav and panel
     closeTimerRef.current = setTimeout(() => setOpenKey(null), 120);
   };
 
@@ -684,7 +1286,6 @@ export default function Header({ menuData, loading }) {
 
   return (
     <header className="sticky top-0 z-50 bg-white/30 backdrop-blur-lg">
-      {/* Main bar */}
       <div className="border-b border-slate-200">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
           {/* Logo */}
@@ -736,7 +1337,6 @@ export default function Header({ menuData, loading }) {
               </button>
 
               <div className="ml-6 flex items-center gap-4">
-                {/* All Corpseed Dropdown */}
                 <div
                   className="relative"
                   onMouseEnter={openAll}
@@ -753,7 +1353,6 @@ export default function Header({ menuData, loading }) {
               </div>
             </div>
 
-            {/* Mega Panel */}
             <div onMouseEnter={() => open(openKey)} onMouseLeave={close}>
               <MegaPanel
                 open={!!openKey}
@@ -764,18 +1363,37 @@ export default function Header({ menuData, loading }) {
             </div>
           </nav>
 
-          {/* Mobile (basic) */}
-          <button className="lg:hidden rounded-lg border border-slate-200 px-3 py-2 text-sm cursor-pointer">
-            Menu
+          {/* Mobile button */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden inline-flex items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-sm hover:bg-slate-50 cursor-pointer"
+            aria-label="Open menu"
+          >
+            ☰ Menu
           </button>
         </div>
       </div>
+
+      {/* Desktop search overlay */}
       <FullWidthSearchPanel
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
         baseUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
         topOffset={72}
       />
+
+      {/* Mobile drawer */}
+      {mobileOpen ? (
+        <MobileDrawer
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+          menuMap={menuMap}
+          loading={loading}
+          baseUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
+          navItems={NAV_ITEMS}
+        />
+      ) : null}
     </header>
   );
 }

@@ -1,26 +1,26 @@
-// app/lib/faq.js
+// app/lib/sitemap.js
 
-export async function getFaqMeta() {
+export async function getSitemapMeta() {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-faq`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sitemap`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store", // SSR fresh SEO
-      }
+        cache: "no-store",
+      },
     );
 
     if (!res.ok) {
       const errText = await res.text().catch(() => "");
-      console.error("FAQ Meta API Error:", res.status, res.statusText, errText);
+      console.error("Sitemap API Error:", res.status, res.statusText, errText);
       return null;
     }
 
     const data = await res.json(); // ✅ read once
     return data;
-  } catch (error) {
-    console.error("getFaqMeta error:", error);
+  } catch (err) {
+    console.error("getSitemapMeta error:", err);
     return null;
   }
 }

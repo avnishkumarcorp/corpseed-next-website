@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import footerLogo from "../../assets/logo-footer.png";
 
-
 const ABOUT_US_COL = {
   title: "About Us",
   links: [
@@ -18,7 +17,6 @@ const ABOUT_US_COL = {
     { label: "Online Payment", href: "/online-payment" },
   ],
 };
-
 
 function safeHrefFromFooterCatSlug(slug) {
   if (!slug) return "#";
@@ -219,6 +217,15 @@ export default function FooterClient({ data }) {
           </div>
 
           <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-slate-600">
+            <Link href={"/faq"} className="hover:text-slate-900 cursor-pointer">
+              FAQ
+            </Link>
+            <Link
+              href={"/sitemap"}
+              className="hover:text-slate-900 cursor-pointer"
+            >
+              Sitemap
+            </Link>
             {bottomStripLinks.map((x) => (
               <Link
                 key={x.label}

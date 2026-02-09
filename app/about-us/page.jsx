@@ -1,12 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FileText, MessageCircle, Shield, ArrowRight } from "lucide-react";
+import { getAboutUsData } from "../lib/about";
 
-export const metadata = {
-  title: "About Us | Corpseed",
-  description:
-    "Learn about Corpseed’s story, mission and vision — simplifying business compliance through technology-driven solutions.",
-};
+export async function generateMetadata() {
+  const data = await getAboutUsData();
+
+  const title = data?.title || "About Us | Corpseed";
+  const description =
+    data?.metaDescription ||
+    "Learn about Corpseed’s story, mission and vision — simplifying business compliance through technology-driven solutions.";
+
+  // API gives a single string with "|" separators
+  const keywords = data?.metaKeyword
+    ? data.metaKeyword
+        .split("|")
+        .map((k) => k.trim())
+        .filter(Boolean)
+    : undefined;
+
+  return {
+    title,
+    description,
+    keywords, // Next.js supports array or string
+  };
+}
 
 function Section({ children, className = "" }) {
   return (
@@ -49,8 +67,8 @@ export default function AboutUsPage() {
                 </h1>
 
                 <p className="mt-4 text-white/90 text-base md:text-lg leading-relaxed max-w-2xl">
-                  At Corpseed, we believe in simplifying business compliance through
-                  innovative AI-driven solutions.
+                  At Corpseed, we believe in simplifying business compliance
+                  through innovative AI-driven solutions.
                 </p>
 
                 <div className="mt-7 flex flex-wrap gap-3">
@@ -100,7 +118,9 @@ export default function AboutUsPage() {
                 </div>
                 <div className="rounded-xl bg-white border border-gray-300 p-4">
                   <p className="text-sm text-gray-500">Customers</p>
-                  <p className="mt-1 font-semibold text-gray-900">SMEs + Enterprise</p>
+                  <p className="mt-1 font-semibold text-gray-900">
+                    SMEs + Enterprise
+                  </p>
                 </div>
                 <div className="rounded-xl bg-white border border-gray-300 p-4">
                   <p className="text-sm text-gray-500">Value</p>
@@ -135,8 +155,9 @@ export default function AboutUsPage() {
                   Read about how the Corpseed team is committed to empowering
                   startups, SMEs, and enterprises through technology-driven
                   compliance solutions. Our mission is to simplify complex
-                  regulatory processes and enable businesses to move forward with
-                  confidence, transparency, and trust—every step of the way.
+                  regulatory processes and enable businesses to move forward
+                  with confidence, transparency, and trust—every step of the
+                  way.
                 </p>
 
                 <button className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition cursor-pointer">
@@ -160,12 +181,12 @@ export default function AboutUsPage() {
 
             <p className="mt-4 text-gray-700 text-sm md:text-base lg:text-lg leading-relaxed">
               Through helping Indian startups & businesses mitigate regulatory
-              compliance risks through robust processes and AI-driven proprietary
-              technology, we simplify business compliance whilst protecting the
-              confidentiality and privacy of our customers. This enables our
-              clients to save time and money, which can drive positive,
-              sustainable change for our clients, our people and society at
-              large.
+              compliance risks through robust processes and AI-driven
+              proprietary technology, we simplify business compliance whilst
+              protecting the confidentiality and privacy of our customers. This
+              enables our clients to save time and money, which can drive
+              positive, sustainable change for our clients, our people and
+              society at large.
             </p>
           </div>
 
@@ -278,7 +299,7 @@ export default function AboutUsPage() {
       </Section>
 
       {/* WHERE WE BEGIN FROM */}
-      <Section className="bg-slate-50" >
+      <Section className="bg-slate-50">
         <div id="begin" />
         <div className="flex items-end justify-between gap-6 flex-wrap">
           <h2 className="text-3xl md:text-5xl font-semibold text-gray-900">
@@ -336,10 +357,10 @@ export default function AboutUsPage() {
 
               <p className="text-gray-600 text-base md:text-lg leading-relaxed mb-4">
                 At Corpseed, our purpose is to build a stronger compliance
-                ecosystem, inspire confidence, and empower positive change in your
-                business. The insights and quality-driven services we deliver help
-                build trust and confidence in managing regulatory compliance
-                effectively.
+                ecosystem, inspire confidence, and empower positive change in
+                your business. The insights and quality-driven services we
+                deliver help build trust and confidence in managing regulatory
+                compliance effectively.
               </p>
 
               <Link
@@ -384,9 +405,7 @@ export default function AboutUsPage() {
 
           <div className="rounded-2xl border border-gray-300 bg-slate-50 p-7 hover:bg-slate-100 transition">
             <Shield className="w-10 h-10 mb-4 text-blue-700" />
-            <h3 className="text-xl font-semibold mb-2">
-              Compliance Resources
-            </h3>
+            <h3 className="text-xl font-semibold mb-2">Compliance Resources</h3>
             <p className="text-gray-600 text-base leading-relaxed">
               Access guides, checklists, and tools to simplify your compliance
               journey and ensure regulatory adherence.

@@ -1,205 +1,97 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { getFaqData } from "../lib/faq";
+import { getFaqMeta } from "../lib/faq";
+import FaqAccordion from "./FaqAccordion";
 
-function safeText(v, fallback = "") {
-  if (v == null) return fallback;
-  return String(v);
-}
+// app/faq/faqData.js
 
-// Normalize any API shape safely
-function normalizeFaq(apiData) {
-  // Common possibilities:
-  // 1) { title, metaDescription, faqList: [{id, question, answer}] }
-  // 2) { faqs: [...] }
-  // 3) [{...}] directly
-  const title = apiData?.title || "F.A.Q";
-  const metaDescription =
-    apiData?.metaDescription || "Frequently Asked Questions";
-
-  const list =
-    apiData?.faqList ||
-    apiData?.faqs ||
-    apiData?.data ||
-    (Array.isArray(apiData) ? apiData : []);
-
-  const items = (Array.isArray(list) ? list : [])
-    .map((x, idx) => ({
-      id: x?.id ?? x?.uuid ?? `${idx}`,
-      question: safeText(x?.question || x?.title || x?.q, ""),
-      answer: x?.answer || x?.description || x?.a || "",
-      category: safeText(x?.category || x?.group || "", ""),
-    }))
-    .filter((x) => x.question);
-
-  // Optional grouping (if category exists)
-  const grouped = items.reduce((acc, item) => {
-    const key = item.category || "Services We Provide";
-    acc[key] = acc[key] || [];
-    acc[key].push(item);
-    return acc;
-  }, {});
-
-  return { title, metaDescription, items, grouped };
-}
-
-function Card({ children, className = "" }) {
-  return (
-    <div
-      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function FaqItem({ q, a, defaultOpen = false }) {
-  // If answer is HTML from API, we render it nicely using prose.
-  const isHtml = typeof a === "string" && /<\/?[a-z][\s\S]*>/i.test(a);
-
-  return (
-    <details
-      className="group border-b border-slate-200 last:border-b-0"
-      open={defaultOpen}
-    >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
-        <p className="text-sm font-medium text-slate-900 sm:text-[15px]">
-          {q}
-        </p>
-
-        <span className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition group-open:bg-slate-50">
-          <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
-        </span>
-      </summary>
-
-      <div className="px-5 pb-5">
-        {isHtml ? (
-          <div
-            className="prose prose-slate max-w-none prose-p:leading-relaxed prose-a:text-blue-700"
-            dangerouslySetInnerHTML={{ __html: a }}
-          />
-        ) : (
-          <p className="text-sm leading-relaxed text-slate-600">{safeText(a, "")}</p>
-        )}
-      </div>
-    </details>
-  );
-}
+export const FAQ_DATA = {
+  sections: [
+    {
+      title: "Services We Provide",
+      items: [
+        {
+          id: "benefits",
+          question: "Benefits of taking services from Corpseed ?",
+          answer:
+            "At Corpseed, we are committed to offer our services to the entrepreneurs and businesses as a very cost-effective proposition. We believe that a customer is always right and the focus of any business activity should be to serve the customer with utmost loyalty. All our services come with SLAs (Service Level Agreements) for on-time service delivery and money back guarantee to ensure high level of customer satisfaction.",
+        },
+        {
+          id: "cashback",
+          question: "What is Corpseed cashback policy?",
+          answer:
+            "If a customer is not satisfied with the service we provided and if he contacts our customer care helpline and files a formal complaint within 15 days of service delivery date, Corpseed would refund the entire or partial amount of Professional Fee charged for that particular service.",
+        },
+        {
+          id: "complaints",
+          question: "Process to register customer complaints?",
+          answer:
+            "If a customer is having issues with our service delivery process, he has various alternatives available at his disposal to register his grievance with us. He can either email his complaint at complaints@corpseed.com or he can call our 24x7 Customer Care Helpline. Also, any customer is always welcome to visit our office to lodge a complaint with the senior management.",
+        },
+        {
+          id: "online-payment",
+          question: "What is the process for online payment?",
+          answer:
+            "A customer can buy our services directly from our online platform, for which he need to make online payment. Once he clicks on “Apply Now”, a new window will open, a customer is required to submit the information in the respective fields and click “Make Payment”. A unique ticket number will be auto generated, the customer need to quote this number as reference for any enquiry regarding his service request.",
+        },
+        {
+          id: "payment-secured",
+          question: "Is the online payment secured?",
+          answer:
+            "All the monetary transactions performed on Corpseed online platform are secured with SSL System Protocol. We encrypt the customer information such as credit card and bank account details, before these are transmitted anywhere. We adhere to PCI DSS for data security standards for payment processing.",
+        },
+      ],
+    },
+  ],
+};
 
 export async function generateMetadata() {
-  const apiData = await getFaqData();
-  const { title, metaDescription } = normalizeFaq(apiData || {});
+  const data = await getFaqMeta();
+
+  // Prefer SEO object (best practice)
+  const seo = data?.seo || {};
+
+  const title = seo.metaTitle || data?.title || "FAQ | Corpseed";
+
+  const description =
+    seo.metaDescription ||
+    data?.metaDescription ||
+    "Frequently Asked Questions about Corpseed services.";
+
+  // Convert " | " separated keywords → array
+  const keywords = (seo.metaKeyword || data?.metaKeyword)
+    ?.split("|")
+    .map((k) => k.trim())
+    .filter(Boolean);
 
   return {
-    title: `${title} | Corpseed`,
-    description: metaDescription,
+    title,
+    description,
+    keywords,
   };
 }
 
-export default async function FaqPage() {
-  const apiData = await getFaqData();
-  const { title, metaDescription, grouped, items } = normalizeFaq(apiData || {});
-
+export default function FaqPage() {
   return (
-    <div className="bg-white">
-      {/* HERO (like screenshot but smoother) */}
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
+    <main className="bg-white">
+      {/* Header like screenshot */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-5xl px-6 pt-10 md:pt-14">
           <div className="text-center">
-            <p className="text-5xl font-semibold tracking-[0.35em] text-slate-900 sm:text-6xl">
-              {title}
-            </p>
-            <p className="mt-4 text-base text-slate-500">
-              {metaDescription}
+            <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-slate-900">
+              F.A.Q
+            </h1>
+            <p className="mt-3 text-base md:text-lg text-slate-500">
+              Frequently Asked Questions
             </p>
           </div>
+
+          <div className="mt-8 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
         </div>
       </section>
 
-      {/* BODY */}
-      <section className="bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14">
-          {/* Empty state */}
-          {items.length === 0 ? (
-            <div className="mx-auto max-w-3xl">
-              <Card className="p-8 text-center">
-                <p className="text-lg font-semibold text-slate-900">
-                  FAQs will appear here soon
-                </p>
-                <p className="mt-2 text-sm text-slate-600">
-                  Your API currently returns no FAQ items. Once Swagger has data,
-                  it will automatically render here.
-                </p>
-
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                  <Link
-                    href="/"
-                    className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50"
-                  >
-                    Go Home
-                  </Link>
-                  <a
-                    href="#"
-                    className="cursor-pointer rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                  >
-                    Contact Support
-                  </a>
-                </div>
-              </Card>
-            </div>
-          ) : (
-            <div className="mx-auto max-w-4xl">
-              {Object.entries(grouped).map(([sectionTitle, sectionItems], si) => (
-                <div key={sectionTitle} className={si === 0 ? "" : "mt-10"}>
-                  {/* Section header like screenshot */}
-                  <h2 className="text-center text-xl font-semibold text-slate-900 sm:text-2xl">
-                    {sectionTitle}
-                  </h2>
-                  <div className="mx-auto mt-6 h-px w-full max-w-3xl bg-slate-200" />
-
-                  {/* Accordion */}
-                  <div className="mx-auto mt-8 max-w-3xl">
-                    <Card className="overflow-hidden">
-                      {sectionItems.map((x, idx) => (
-                        <FaqItem
-                          key={x.id}
-                          q={x.question}
-                          a={x.answer}
-                          defaultOpen={si === 0 && idx === 0}
-                        />
-                      ))}
-                    </Card>
-                  </div>
-                </div>
-              ))}
-
-              {/* Bottom links like screenshot */}
-              <div className="mx-auto mt-10 max-w-3xl space-y-3 text-center text-sm text-slate-700">
-                <p>
-                  For job opportunities, please view our{" "}
-                  <Link
-                    href="/careers"
-                    className="cursor-pointer font-medium text-blue-700 hover:underline"
-                  >
-                    open roles
-                  </Link>
-                  .
-                </p>
-                <p>
-                  For business partnerships, please visit our{" "}
-                  <Link
-                    href="/forum"
-                    className="cursor-pointer font-medium text-blue-700 hover:underline"
-                  >
-                    forum
-                  </Link>
-                  .
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Accordion */}
+      <section className="mx-auto max-w-5xl px-6 py-10 md:py-14">
+        <FaqAccordion data={FAQ_DATA} />
       </section>
-    </div>
+    </main>
   );
 }

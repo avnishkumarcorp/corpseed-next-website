@@ -5,9 +5,10 @@ import LogoMarquee from "@/app/components/carousel/LogoMarquee";
 import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
 import ServiceContent from "../ServiceContent";
 import { getServiceData } from "./serviceData";
+import ServiceFaqs from "../ServiceFaqs";
 
 export async function generateMetadata({ params }) {
-  const { slug } =await params;
+  const { slug } = await params;
   const data = await getServiceData(slug);
 
   const title = data?.service?.seoTitle || data?.service?.title || "Service";
@@ -28,8 +29,18 @@ export async function generateMetadata({ params }) {
       siteName: "CORPSEED ITES PRIVATE LIMITED",
       type: "website",
       images: [
-        { url: data?.service?.ogImageWebp || "/assets/images/corpseed.webp", width: 1200, height: 630, type: "image/webp" },
-        { url: data?.service?.ogImagePng || "/assets/images/logo.png", width: 1200, height: 630, type: "image/png" },
+        {
+          url: data?.service?.ogImageWebp || "/assets/images/corpseed.webp",
+          width: 1200,
+          height: 630,
+          type: "image/webp",
+        },
+        {
+          url: data?.service?.ogImagePng || "/assets/images/logo.png",
+          width: 1200,
+          height: 630,
+          type: "image/png",
+        },
       ],
     },
   };
@@ -47,7 +58,6 @@ export default async function ServicePage({ params }) {
   const { slug } = await params;
   const data = await getServiceData(slug);
 
-  
   if (!data) return null;
 
   // Build schema objects (example; map from your API fields)
@@ -74,8 +84,18 @@ export default async function ServicePage({ params }) {
     "@context": "https://schema.org/",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.corpseed.com/" },
-      { "@type": "ListItem", position: 3, name: data?.service?.title, item: `https://www.corpseed.com/service/${slug}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.corpseed.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: data?.service?.title,
+        item: `https://www.corpseed.com/service/${slug}`,
+      },
     ],
   };
 
@@ -132,6 +152,8 @@ export default async function ServicePage({ params }) {
           </div>
         </div>
       </div>
+
+      <ServiceFaqs faqs={data?.service?.serviceFaqs} />
 
       <section className="border-t border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

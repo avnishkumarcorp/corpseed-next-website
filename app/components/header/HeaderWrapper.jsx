@@ -13,8 +13,6 @@ export default function HeaderWrapper() {
     (async () => {
       setLoading(true);
       const data = await getHeaderMenu();
-
-      console.log("dfkjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjs",data)
       if (alive) {
         setMenuData(data);
         setLoading(false);

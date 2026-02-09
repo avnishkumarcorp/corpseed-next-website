@@ -27,11 +27,13 @@ async function fetchClientsOnce(apiUrl, signal) {
   if (CLIENTS_CACHE.promise) return CLIENTS_CACHE.promise;
 
   CLIENTS_CACHE.promise = (async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/${apiUrl}`,
-      { signal },
-    );
+    // ✅ same-origin request (no CORS)
+    const proxyUrl = `/api/proxy/clients?apiUrl=${encodeURIComponent(apiUrl)}`;
+
+    const res = await fetch(proxyUrl, { signal, cache: "no-store" });
+
     if (!res.ok) throw new Error(`API failed: ${res.status}`);
+
     const json = await res.json();
 
     const arr = Array.isArray(json) ? json : json?.data || [];
@@ -47,6 +49,7 @@ async function fetchClientsOnce(apiUrl, signal) {
 
   return CLIENTS_CACHE.promise;
 }
+
 
 /** Tooltip rendered to document.body so it doesn't get clipped by overflow-hidden */
 function TooltipPortal({ open, text, anchorRect }) {

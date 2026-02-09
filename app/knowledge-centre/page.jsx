@@ -3,10 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { getKnowledgeCentreList } from "../lib/knowledgeCentre";
+import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 function Card({ children, className = "" }) {
   return (
-    <div className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
+    <div
+      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
+    >
       {children}
     </div>
   );
@@ -33,11 +36,24 @@ function buildQueryString(next) {
   return qs ? `?${qs}` : "";
 }
 
-function Pagination({ currentPage, totalPages, pageNumbers, q, categorySlug, tag }) {
-  const pages = Array.isArray(pageNumbers) && pageNumbers.length ? pageNumbers : [currentPage];
+function Pagination({
+  currentPage,
+  totalPages,
+  pageNumbers,
+  q,
+  categorySlug,
+  tag,
+}) {
+  const pages =
+    Array.isArray(pageNumbers) && pageNumbers.length
+      ? pageNumbers
+      : [currentPage];
 
   const prevPage = Math.max(1, Number(currentPage || 1) - 1);
-  const nextPage = Math.min(Number(totalPages || 1), Number(currentPage || 1) + 1);
+  const nextPage = Math.min(
+    Number(totalPages || 1),
+    Number(currentPage || 1) + 1,
+  );
 
   const mkHref = (page) =>
     `/knowledge-centre${buildQueryString({ page, q, categorySlug, tag })}`;
@@ -146,14 +162,25 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                   Knowledge Centre
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                  Articles, guides and latest updates — clean UI, fast reading, and category-wise browsing.
+                  Articles, guides and latest updates — clean UI, fast reading,
+                  and category-wise browsing.
                 </p>
               </div>
 
               {/* ✅ Search (SERVER-safe: GET form, no onSubmit) */}
-              <form action="/knowledge-centre" method="GET" className="w-full max-w-xl">
+              <form
+                action="/knowledge-centre"
+                method="GET"
+                className="w-full max-w-xl"
+              >
                 {/* preserve filters */}
-                {categorySlug ? <input type="hidden" name="categorySlug" value={categorySlug} /> : null}
+                {categorySlug ? (
+                  <input
+                    type="hidden"
+                    name="categorySlug"
+                    value={categorySlug}
+                  />
+                ) : null}
                 {tag ? <input type="hidden" name="tag" value={tag} /> : null}
                 <input type="hidden" name="page" value="1" />
 
@@ -179,9 +206,12 @@ export default async function KnowledgeCentrePage({ searchParams }) {
           <div className="lg:col-span-8">
             {blogs.length === 0 ? (
               <Card className="p-6">
-                <p className="text-sm font-semibold text-slate-900">No blogs found.</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  No blogs found.
+                </p>
                 <p className="mt-2 text-sm text-slate-600">
-                  Try changing search or filters. If API is returning empty data, it will show here.
+                  Try changing search or filters. If API is returning empty
+                  data, it will show here.
                 </p>
               </Card>
             ) : (
@@ -215,7 +245,9 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                           {b?.visited != null ? (
                             <span className="text-slate-400">•</span>
                           ) : null}{" "}
-                          {b?.visited != null ? <span>{b.visited} views</span> : null}
+                          {b?.visited != null ? (
+                            <span>{b.visited} views</span>
+                          ) : null}
                         </div>
 
                         <p className="mt-3 line-clamp-3 text-sm text-slate-600">
@@ -224,7 +256,9 @@ export default async function KnowledgeCentrePage({ searchParams }) {
 
                         <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-200 pt-3">
                           <span className="text-[11px] font-semibold uppercase tracking-wide text-blue-700">
-                            {b?.category?.subCategoryName || b?.category?.categoryName || "Knowledge"}
+                            {b?.category?.subCategoryName ||
+                              b?.category?.categoryName ||
+                              "Knowledge"}
                           </span>
                           <Link
                             href={href}
@@ -255,9 +289,11 @@ export default async function KnowledgeCentrePage({ searchParams }) {
           <aside className="lg:col-span-4">
             <div className="space-y-8 lg:sticky lg:top-24">
               {/* Active filters */}
-              {(q || categorySlug || tag) ? (
+              {q || categorySlug || tag ? (
                 <Card className="p-5">
-                  <p className="text-sm font-semibold text-slate-900">Active filters</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    Active filters
+                  </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {q ? (
                       <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
@@ -290,7 +326,9 @@ export default async function KnowledgeCentrePage({ searchParams }) {
               {/* Categories */}
               <Card className="overflow-hidden">
                 <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
-                  <p className="text-sm font-semibold text-slate-900">Categories</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    Categories
+                  </p>
                 </div>
 
                 <div className="divide-y divide-slate-200">
@@ -352,7 +390,9 @@ export default async function KnowledgeCentrePage({ searchParams }) {
               {/* Top Articles */}
               <Card className="overflow-hidden">
                 <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
-                  <p className="text-sm font-semibold text-slate-900">Top Articles</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    Top Articles
+                  </p>
                 </div>
 
                 <div className="divide-y divide-slate-200">
@@ -395,33 +435,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
               </Card>
 
               {/* ✅ Callback box (SERVER-safe: no onSubmit; if you want real submit, point action to your API route) */}
-              <Card className="p-6">
-                <p className="text-lg font-semibold text-slate-900">Schedule a call back</p>
-                <p className="mt-2 text-sm text-slate-600">
-                  Leave your details and we’ll call you back.
-                </p>
-
-                {/* Example: server-safe form. Change action to your real endpoint if you have one */}
-                <form action="/contact-us" method="GET" className="mt-4 space-y-3">
-                  <input
-                    name="name"
-                    placeholder="Name*"
-                    className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-600"
-                  />
-                  <input
-                    name="phone"
-                    placeholder="Phone Number"
-                    className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-600"
-                  />
-
-                  <button
-                    type="submit"
-                    className="h-11 w-full rounded-xl bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
-                  >
-                    Submit
-                  </button>
-                </form>
-              </Card>
+              <EnquiryOtpInline />
             </div>
           </aside>
         </div>

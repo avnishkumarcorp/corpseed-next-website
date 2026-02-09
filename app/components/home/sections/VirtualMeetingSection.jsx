@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import calendarImg from "../../../../public/home/calander.svg";
+import Link from "next/link";
 
 const RightCard = ({ icon, title, desc }) => {
   return (
@@ -40,12 +41,12 @@ export default function VirtualMeetingSection() {
                 Book a Virtual Meeting
               </h3>
 
-              <button
-                type="button"
+              <Link
+                href={'/book-meeting'}
                 className="mt-5 inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-[14px] font-semibold text-white shadow-sm cursor-pointer"
               >
                 Book Now
-              </button>
+              </Link>
             </div>
 
             {/* RIGHT */}

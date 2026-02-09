@@ -148,7 +148,7 @@ export default function FaqAccordion({ data }) {
             <p>
               For job opportunities, please view our{" "}
               <a
-                href="/career"
+                href="/join-our-team"
                 className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
               >
                 open roles
@@ -158,7 +158,7 @@ export default function FaqAccordion({ data }) {
             <p>
               For business partnerships, please visit our{" "}
               <a
-                href="/forum"
+                href="/partner"
                 className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
               >
                 forum

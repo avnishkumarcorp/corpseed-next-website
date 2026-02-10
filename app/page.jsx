@@ -9,6 +9,9 @@ import OurSupportSection from "./components/home/sections/OurSupportSection";
 import VirtualMeetingSection from "./components/home/sections/VirtualMeetingSection";
 
 import { getHomeTestData } from "./lib/home";
+import { getLatestBlogs } from "./lib/knowledgeCentre";
+import { getLatestNews } from "./lib/pressRelease";
+import { getLatestProducts } from "./lib/products";
 
 // ✅ Home Page SEO (Meta)
 export async function generateMetadata() {
@@ -46,6 +49,9 @@ export async function generateMetadata() {
 
 export default async function HomePage() {
   const homeData = await getHomeTestData();
+  const newsData =await getLatestNews()
+  const latestBlogs = await getLatestBlogs();
+  const products = await getLatestProducts();
 
   return (
     <>
@@ -57,9 +63,9 @@ export default async function HomePage() {
       <ComplianceUpdateSection data={homeData} />
       <VirtualMeetingSection data={homeData} />
       <OurSupportSection data={homeData} />
-      <NewsSection data={homeData} />
-      <LatestArticlesSection data={homeData} />
-      <LatestProductsSection data={homeData} />
+      <NewsSection data={newsData} />
+      <LatestArticlesSection data={latestBlogs} />
+      <LatestProductsSection data={products} />
     </>
   );
 }

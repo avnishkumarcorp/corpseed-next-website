@@ -4,15 +4,12 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getLatestNews } from "@/app/lib/pressRelease";
-
 
 function toImgUrl(image) {
   const img = String(image || "").trim();
   if (!img) return "";
   if (img.startsWith("http://") || img.startsWith("https://")) return img;
 
-  // ✅ same bucket style you’re using
   return `https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/${img}`;
 }
 
@@ -21,38 +18,25 @@ function clampText(text, n = 220) {
   return t.length > n ? t.slice(0, n).trim() + "…" : t;
 }
 
-export default function NewsSection() {
+export default function NewsSection({ data }) {
   const [slides, setSlides] = React.useState([]);
   const [index, setIndex] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
-  const [err, setErr] = React.useState("");
 
+  // ✅ sync slides from parent + fix loading + reset index
   React.useEffect(() => {
-    let alive = true;
+    const nextSlides = Array.isArray(data) ? data : [];
+    setSlides(nextSlides);
+    setIndex(0);
+    setLoading(false);
+  }, [data]);
 
-    (async () => {
-      try {
-        setLoading(true);
-        setErr("");
-        const data = await getLatestNews();
-        if (!alive) return;
-
-        setSlides(Array.isArray(data) ? data : []);
-        setIndex(0);
-      } catch (e) {
-        if (!alive) return;
-        setErr("Unable to load latest news.");
-        setSlides([]);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
+  // ✅ keep index safe when slides length changes
+  React.useEffect(() => {
+    if (!slides.length) return;
+    setIndex((p) => Math.min(p, slides.length - 1));
+  }, [slides.length]);
 
   // ✅ autoplay
   React.useEffect(() => {
@@ -81,13 +65,6 @@ export default function NewsSection() {
   return (
     <section className="w-full bg-white">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        {err ? (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {err}
-          </div>
-        ) : null}
-
-        {/* Carousel shell (fixed height => no jump) */}
         <div
           className="relative overflow-hidden rounded-2xl bg-[#f6f8fb] shadow-[0_24px_60px_-50px_rgba(2,6,23,0.5)] ring-1 ring-slate-200"
           onMouseEnter={() => setPaused(true)}
@@ -98,32 +75,34 @@ export default function NewsSection() {
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${index * 100}%)` }}
           >
-            {loading
-              ? Array.from({ length: 3 }).map((_, i) => <NewsSkeleton key={i} />)
-              : slides.map((slide) => (
-                  <NewsSlide key={slide?.id || slide?.slug} slide={slide} />
-                ))}
+            {loading ? (
+              Array.from({ length: 2 }).map((_, i) => <NewsSkeleton key={i} />)
+            ) : slides.length ? (
+              slides.map((slide) => (
+                <NewsSlide key={slide?.id || slide?.slug} slide={slide} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
           </div>
 
-          {/* Center dots */}
+          {/* dots */}
           {!loading && slides.length > 1 ? (
             <div className="pointer-events-auto absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
-              <Dots
-                count={slides.length}
-                activeIndex={index}
-                onDot={goTo}
-              />
+              <Dots count={slides.length} activeIndex={index} onDot={goTo} />
             </div>
           ) : null}
 
-          {/* Optional nav arrows */}
+          {/* arrows */}
           <button
             type="button"
             onClick={prev}
             disabled={loading || slides.length < 2}
             className={[
               "hidden md:flex absolute left-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              loading || slides.length < 2 ? "opacity-40 cursor-not-allowed" : "",
+              loading || slides.length < 2
+                ? "opacity-40 cursor-not-allowed"
+                : "hover:bg-white",
             ].join(" ")}
             aria-label="Previous"
           >
@@ -144,7 +123,9 @@ export default function NewsSection() {
             disabled={loading || slides.length < 2}
             className={[
               "hidden md:flex absolute right-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              loading || slides.length < 2 ? "opacity-40 cursor-not-allowed" : "",
+              loading || slides.length < 2
+                ? "opacity-40 cursor-not-allowed"
+                : "hover:bg-white",
             ].join(" ")}
             aria-label="Next"
           >
@@ -159,7 +140,7 @@ export default function NewsSection() {
             </svg>
           </button>
 
-          {/* Top-left label */}
+          {/* label */}
           <div className="absolute left-5 top-5 z-20 -translate-y-1/2 rounded-md bg-white px-6 py-3 text-[14px] font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
             In The News
           </div>
@@ -171,21 +152,20 @@ export default function NewsSection() {
 
 function NewsSlide({ slide }) {
   const imgUrl = toImgUrl(slide?.image);
-
-  // ✅ adjust route if your page is different
-  const href = `/news-room/${slide?.slug}`;
+  const href = `/news-room/${slide?.slug}`; // adjust route if needed
 
   return (
     <div className="w-full shrink-0">
       <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
         {/* LEFT IMAGE */}
-        <div className="relative min-h-[240px] md:min-h-[360px]">
+        <div className="relative min-h-[240px] md:min-h-[360px] bg-slate-100">
           {imgUrl ? (
             <Image
               src={imgUrl}
               alt={slide?.title || "News"}
               fill
-              priority
+              priority={false}
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           ) : null}
@@ -195,7 +175,6 @@ function NewsSlide({ slide }) {
 
         {/* RIGHT CONTENT */}
         <div className="relative bg-[#eaf3ff] px-6 py-10 sm:px-10">
-          {/* pointer/triangle */}
           <div className="hidden md:block absolute left-0 top-10 -translate-x-full">
             <div className="h-0 w-0 border-y-[14px] border-y-transparent border-r-[18px] border-r-[#eaf3ff]" />
           </div>
@@ -205,7 +184,7 @@ function NewsSlide({ slide }) {
               NEWS
             </div>
 
-            <h3 className="mt-5 text-[22px] font-semibold leading-snug text-blue-600 sm:text-[24px]">
+            <h3 className="mt-5 text-[22px] font-semibold leading-snug text-blue-600 sm:text-[24px] line-clamp-3">
               {slide?.title}
             </h3>
 
@@ -216,10 +195,12 @@ function NewsSlide({ slide }) {
               </p>
             </div>
 
-            <div className="mt-6 flex items-center gap-3 text-xs text-slate-600">
-              <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
-                {slide?.postDate}
-              </span>
+            <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-slate-600">
+              {slide?.postDate ? (
+                <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
+                  {slide.postDate}
+                </span>
+              ) : null}
               <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
                 {slide?.visited ?? 0} views
               </span>
@@ -284,6 +265,24 @@ function NewsSkeleton() {
               <div className="h-4 w-11/12 animate-pulse rounded bg-slate-200" />
               <div className="h-4 w-10/12 animate-pulse rounded bg-slate-200" />
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="w-full shrink-0">
+      <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
+        <div className="min-h-[240px] md:min-h-[360px] bg-slate-100" />
+        <div className="bg-[#eaf3ff] px-6 py-10 sm:px-10 flex items-center">
+          <div>
+            <p className="text-lg font-semibold text-slate-900">No news found</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Please try again later.
+            </p>
           </div>
         </div>
       </div>

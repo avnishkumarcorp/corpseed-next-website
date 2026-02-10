@@ -384,8 +384,8 @@ export default function HomeHeroSection({
   title = "Tailored Solutions\nFor Your Business",
   categories = [
     { label: "Regulatory", href: "/service/regulatory-compliance" },
-    { label: "Sustainability", href: "/service/sustainability" },
     { label: "Environmental", href: "/service/environmental" },
+    { label: "Sustainability", href: "/service/sustainability" },
     { label: "Legal", href: "/service/legal" },
     { label: "Plant Setup", href: "/service/industry-setup-solution" },
   ],
@@ -399,8 +399,8 @@ export default function HomeHeroSection({
     <section className="relative bg-white overflow-visible">
       {/* soft background (keep subtle like your 1st image) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-    <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-blue-100/50 blur-3xl" />
-    <div className="absolute -right-40 top-20 h-[520px] w-[520px] rounded-full bg-indigo-100/50 blur-3xl" />
+        <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-blue-100/50 blur-3xl" />
+        <div className="absolute -right-40 top-20 h-[520px] w-[520px] rounded-full bg-indigo-100/50 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 pt-10 pb-10 sm:px-6 lg:px-8 lg:pt-12 lg:pb-12">
@@ -471,10 +471,7 @@ export default function HomeHeroSection({
               {/* stage height less than viewport */}
               <div className="flex flex-col gap-8">
                 <div className="flex justify-center gap-8">
-                  <Link
-                    href="/service/industry-setup-solution"
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer"
-                  >
+                  <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer">
                     <div className="text-[14px] font-semibold text-gray-900">
                       Industry Setup Solution
                     </div>
@@ -489,12 +486,18 @@ export default function HomeHeroSection({
                     </div>
 
                     <div className="mt-2 text-[12px] leading-snug text-gray-500">
-                      Bio-fuels / Medical / Electronics <br />
-                      Waste Management / Renewable
+                      <Link href="/service/biofuel-manufacturing-plant-setup-in-india">
+                        Bio-fuels
+                      </Link>{" "}
+                      / <Link href="/">Medical</Link> /{" "}
+                      <Link href="/">Electronics</Link> <br />
+                      <Link href="industries/recycling-and-waste-management">
+                        Waste Management / Renewable
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
 
-                  <Link
+                  <div
                     href="/service/sustainability"
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer"
                   >
@@ -512,16 +515,32 @@ export default function HomeHeroSection({
                     </div>
 
                     <div className="mt-2 text-[12px] leading-snug text-gray-500">
-                      ESG / ESDD / ESMS / Net Zero <br />
-                      Waste Channelization / Carbon Credits
+                      <Link href="/service/environmental-social-and-governance-esg">
+                        ESG
+                      </Link>{" "}
+                      /{" "}
+                      <Link href="/service/environmental-and-social-due-diligence-esdd">
+                        ESDD
+                      </Link>{" "}
+                      /{" "}
+                      <Link href="/service/environmental-and-social-management-system-esms">
+                        ESMS
+                      </Link>{" "}
+                      /{" "}
+                      <Link href="/service/leed-zero-carbon-certification">
+                        Net Zero
+                      </Link>{" "}
+                      <br />
+                      <Link href="/service/carbon-credit-trading-scheme">
+                        Waste Channelization / Carbon Credits
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 </div>
 
                 {/* MIDDLE ROW (3) - with center card slightly forward */}
                 <div className="flex justify-between">
-                  <Link
-                    href="/service/regulatory-compliance"
+                  <div
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer"
                   >
                     <div className="text-[14px] font-semibold leading-tight text-gray-900">
@@ -538,11 +557,15 @@ export default function HomeHeroSection({
                     </div>
 
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
-                      Factory / Fire / Trade <br />
+                      <Link href="/service/factory-license">Factory</Link> /
+                      <Link href="/service/fire-noc-fire-noc-renewal">
+                        Fire
+                      </Link>{" "}
+                      / Trade <br />
                       FSSAI / CGWA / Labour <br />
                       &amp; Other Compliance
                     </div>
-                  </Link>
+                  </div>
 
                   {/* Center card (on top) */}
                   <Link

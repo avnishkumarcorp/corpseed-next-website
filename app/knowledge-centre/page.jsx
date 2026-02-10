@@ -339,7 +339,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                       categorySlug: c.slug,
                       tag,
                     })}`;
-
+console.log("dsjhgsjgjhgj",href,c.slug)
                     return (
                       <Link
                         key={c.id}

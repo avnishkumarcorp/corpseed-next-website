@@ -226,7 +226,7 @@ export default function EnquiryForm({ serviceName }) {
     <>
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <p className="text-lg font-bold text-gray-900">Enquiry Now for</p>
-        <p className="text-lg font-bold text-blue-600">{serviceName}?</p>
+        <p className="text-lg font-bold text-blue-600">{serviceName}</p>
 
         <form onSubmit={onSubmit} className="mt-5 space-y-4">
           <div>

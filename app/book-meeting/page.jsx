@@ -122,7 +122,7 @@ export default function BookMeetingPage() {
                         {s.desc}
                       </div>
 
-                      {idx === 0 ? (
+                      {/* {idx === 0 ? (
                         <div className="mt-4 flex flex-wrap gap-2">
                           <a
                             href="tel:7558640644"
@@ -137,7 +137,7 @@ export default function BookMeetingPage() {
                             Email us
                           </a>
                         </div>
-                      ) : null}
+                      ) : null} */}
                     </div>
 
                     {/* subtle bottom highlight */}

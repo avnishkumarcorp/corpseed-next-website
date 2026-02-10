@@ -64,7 +64,10 @@ export default function LatestArticlesSection({
 
     const recalc = () => {
       const w = el.getBoundingClientRect().width;
-      const pv = getPerViewByWidth(window.innerWidth);
+      const pv = getPerViewByWidth(
+        wrapRef.current?.getBoundingClientRect().width || window.innerWidth,
+      );
+
       setPerView(pv);
 
       // card width = (container - totalGaps) / perView
@@ -163,7 +166,7 @@ export default function LatestArticlesSection({
             type="button"
             onClick={next}
             disabled={loading || !canNext}
-            style={{right:"-16px"}}
+            style={{ right: "-16px" }}
             className={[
               "hidden md:flex absolute right-0 top-1/2 z-30 translate-x-1/2 -translate-y-1/2",
               "h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
@@ -185,8 +188,10 @@ export default function LatestArticlesSection({
           </button>
 
           {/* Measured viewport */}
-          <div ref={wrapRef} className="md:px-10">
-            <div className="overflow-hidden">
+          {/* Padding wrapper (NOT measured) */}
+          <div className="md:px-10">
+            {/* ✅ Measured viewport (NO padding, correct width) */}
+            <div ref={wrapRef} className="overflow-hidden">
               <div
                 className="flex"
                 style={{
@@ -206,10 +211,10 @@ export default function LatestArticlesSection({
                       {loading ? (
                         <ArticleSkeleton imgH={IMG_H} />
                       ) : (
-                        <ArticleCard article={a} imgH={IMG_H} />
+                        <ArticleCard article={a} />
                       )}
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -245,7 +250,7 @@ export default function LatestArticlesSection({
   );
 }
 
-function ArticleCard({ article, imgH }) {
+function ArticleCard({ article }) {
   const href = `/knowledge-centre/${article?.slug || ""}`;
   const imgUrl = toImgUrl(article?.image);
 
@@ -254,35 +259,23 @@ function ArticleCard({ article, imgH }) {
       href={href}
       className="block h-full overflow-hidden rounded-2xl bg-white shadow-[0_18px_45px_-35px_rgba(2,6,23,0.35)] ring-1 ring-slate-200 cursor-pointer"
     >
-      {/* ✅ card wrapper becomes full height */}
       <div className="flex h-full flex-col">
-        {/* Image (fixed height already) */}
-        <div className="relative w-full bg-slate-50" style={{ height: imgH }}>
+        {/* ✅ Equal image area for all cards */}
+        <div className="relative w-full overflow-hidden bg-white aspect-[16/9]">
           {imgUrl ? (
             <Image
               src={imgUrl}
               alt={article?.title || "Article"}
               fill
               sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-cover"
+              className="object-contain object-center p-2"
             />
           ) : (
             <div className="h-full w-full bg-slate-200" />
           )}
-
-          {/* logo */}
-          <div className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-md bg-white shadow-sm ring-1 ring-slate-200">
-            <Image
-              src={corpseedLogo}
-              alt="Corpseed"
-              width={24}
-              height={24}
-              className="h-6 w-auto object-contain"
-            />
-          </div>
         </div>
 
-        {/* ✅ Content area fixed height so all cards match */}
+        {/* Content */}
         <div className="flex flex-1 flex-col p-5">
           <div className="flex items-center gap-3">
             <span className="rounded-md bg-orange-500 px-3 py-1 text-[11px] font-semibold tracking-wide text-white">
@@ -294,12 +287,10 @@ function ArticleCard({ article, imgH }) {
             </span>
           </div>
 
-          {/* ✅ Force a consistent title block height */}
           <h3 className="mt-4 text-[15px] font-semibold leading-6 text-slate-900 line-clamp-2 min-h-[48px]">
             {article?.title}
           </h3>
 
-          {/* ✅ pushes bottom spacing consistently */}
           <div className="mt-auto" />
         </div>
       </div>
@@ -307,11 +298,13 @@ function ArticleCard({ article, imgH }) {
   );
 }
 
-
 function ArticleSkeleton({ imgH }) {
   return (
     <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
-      <div className="w-full animate-pulse bg-slate-200" style={{ height: imgH }} />
+      <div
+        className="w-full animate-pulse bg-slate-200"
+        style={{ height: imgH }}
+      />
       <div className="p-5">
         <div className="flex gap-3">
           <div className="h-6 w-24 animate-pulse rounded bg-slate-200" />

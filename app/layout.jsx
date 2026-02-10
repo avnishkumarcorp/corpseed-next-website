@@ -11,8 +11,8 @@ export const metadata = {
   metadataBase: new URL("https://corpseed.com"),
   charset: "utf-8",
   icons: {
-    icon: "/corpseed.jpg",
-    apple: "/corpseed.jpg",
+    icon: "/fav.png",
+    apple: "/fav.png",
   },
   other: {
     "msvalidate.01": "6FE373E64B7D16AE4CC9FA10A4FCA067",

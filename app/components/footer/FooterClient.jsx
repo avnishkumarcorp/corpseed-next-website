@@ -162,12 +162,18 @@ export default function FooterClient({ data }) {
       </div>
 
       {/* Links */}
+
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        {/* 5 columns only on lg */}
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        {/* Auto-fit grid: equal columns, wrap when needed */}
+        <div
+          className="
+      grid gap-x-14 gap-y-10
+      [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]
+    "
+        >
           {/* API Columns */}
           {footerCols.map((col) => (
-            <div key={col.title}>
+            <div key={col.title} className="min-w-0">
               <h3 className="text-[18px] font-semibold text-slate-900">
                 {col.title}
               </h3>
@@ -188,7 +194,7 @@ export default function FooterClient({ data }) {
           ))}
 
           {/* STATIC About Us Column */}
-          <div>
+          <div className="min-w-0">
             <h3 className="text-[18px] font-semibold text-slate-900">
               {ABOUT_US_COL.title}
             </h3>
@@ -215,13 +221,15 @@ export default function FooterClient({ data }) {
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-slate-600">
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-32">
-                <Image
-                  src={footerLogo}
-                  alt="Corpseed"
-                  fill
-                  priority
-                  className="object-contain"
-                />
+                <Link href={"/"}>
+                  <Image
+                    src={footerLogo}
+                    alt="Corpseed"
+                    fill
+                    priority
+                    className="object-contain"
+                  />
+                </Link>
               </div>
 
               <span className="text-sm text-slate-500">©2026</span>
@@ -256,7 +264,6 @@ export default function FooterClient({ data }) {
     </footer>
   );
 }
-
 
 export function SocialIcon({ label, href, className = "", children }) {
   return (

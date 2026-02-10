@@ -141,7 +141,7 @@ export default function NewsSection({ data }) {
           </button>
 
           {/* label */}
-          <div className="absolute left-5 top-5 z-20 -translate-y-1/2 rounded-md bg-white px-6 py-3 text-[14px] font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
+          <div className="absolute left-0 top-5 z-20 -translate-y-1/2 rounded-md bg-white px-6 py-3 text-[14px] font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
             In The News
           </div>
         </div>
@@ -158,17 +158,16 @@ function NewsSlide({ slide }) {
     <div className="w-full shrink-0">
       <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
         {/* LEFT IMAGE */}
-        <div className="relative min-h-[240px] md:min-h-[360px] bg-slate-100">
-          {imgUrl ? (
+        <div className="relative min-h-[240px] md:min-h-[360px] bg-slate-100 overflow-hidden">
+          {imgUrl && (
             <Image
               src={imgUrl}
               alt={slide?.title || "News"}
               fill
-              priority={false}
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
+              className="object-contain object-center"
             />
-          ) : null}
+          )}
 
           <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent" />
         </div>
@@ -279,7 +278,9 @@ function EmptyState() {
         <div className="min-h-[240px] md:min-h-[360px] bg-slate-100" />
         <div className="bg-[#eaf3ff] px-6 py-10 sm:px-10 flex items-center">
           <div>
-            <p className="text-lg font-semibold text-slate-900">No news found</p>
+            <p className="text-lg font-semibold text-slate-900">
+              No news found
+            </p>
             <p className="mt-1 text-sm text-slate-600">
               Please try again later.
             </p>

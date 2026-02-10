@@ -442,6 +442,15 @@ export default function HomeHeroSection({
               </span>
             </div>
 
+            <p className="mt-3 max-w-xl text-base text-gray-700 sm:text-lg">
+              {subtitle}
+            </p>
+
+            <div className="mt-6 flex items-center gap-2 text-sm text-gray-700">
+              <Star className="h-5 w-5 text-amber-500" />
+              <span className="font-medium">{ratingText}</span>
+            </div>
+
             {/* HERO SEARCH */}
             <div className="mt-6">
               <HeroSearch
@@ -453,15 +462,6 @@ export default function HomeHeroSection({
                   "Try “IMEI Number”…",
                 ]}
               />
-            </div>
-
-            <p className="mt-3 max-w-xl text-base text-gray-700 sm:text-lg">
-              {subtitle}
-            </p>
-
-            <div className="mt-6 flex items-center gap-2 text-sm text-gray-700">
-              <Star className="h-5 w-5 text-amber-500" />
-              <span className="font-medium">{ratingText}</span>
             </div>
           </div>
 
@@ -540,9 +540,7 @@ export default function HomeHeroSection({
 
                 {/* MIDDLE ROW (3) - with center card slightly forward */}
                 <div className="flex justify-between">
-                  <div
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer"
-                  >
+                  <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer">
                     <div className="text-[14px] font-semibold leading-tight text-gray-900">
                       Regulatory Compliance
                     </div>

@@ -3,73 +3,128 @@
 
 import React from "react";
 import Image from "next/image";
-const SLIDES = [
-  {
-    image: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/Corpseed_and_CII_Conference_Join_Forces_to_Revolutionize_MSMEs_Corpseed.webp",
-    tag: "PRESS RELEASE",
-    title:
-      "Corpseed and CII Join Forces to Revolutionize MSMEs at Groundbreaking Conference on Tech and Trade",
-    excerpt:
-      "Corpseed ITES Pvt. Ltd is honoured to be the Knowledge Partner with the Confederation of Indian Industry (CII) at the much-anticipated conference on MSMEs Fueling India’s Strength, with the theme ‘Thriving Through Trade and Tech’.",
-  },
-  {
-    image: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/CII_Knowledge_Partner_Corpseed.webp",
-    tag: "PRESS RELEASE",
-    title:
-      "Corpseed and CII Announce Strategic Collaboration to Boost Business Compliance and Innovation",
-    excerpt:
-      "New Delhi, July 26, 2024 – Corpseed ITES Pvt. Ltd., a leading business consulting firm in India, has announced a strategic collaboration with the Confederation of Indian Industry (CII) to enhance business compliance and foster innovation across various sectors.",
-  },
-  {
-    image: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/Corpseeds_New_Branch_Office_Gujarat_Corpseed.webp",
-    tag: "PRESS RELEASE",
-    title: "Corpseed’s New Branch Office - Gujarat",
-    excerpt:
-      "Surat, Gujarat, May 15, 2023: Corpseed, one of the fastest-growing Financial, Environment and Legal Compliance Advisory Platform for Individuals, SMEs and Enterprises, is delighted to announce that it has opened a new branch office in Gujarat on 15th May of 2023.",
-  },
-];
+import Link from "next/link";
+import { getLatestNews } from "@/app/lib/pressRelease";
+
+
+function toImgUrl(image) {
+  const img = String(image || "").trim();
+  if (!img) return "";
+  if (img.startsWith("http://") || img.startsWith("https://")) return img;
+
+  // ✅ same bucket style you’re using
+  return `https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/${img}`;
+}
+
+function clampText(text, n = 220) {
+  const t = String(text || "").trim();
+  return t.length > n ? t.slice(0, n).trim() + "…" : t;
+}
 
 export default function NewsSection() {
+  const [slides, setSlides] = React.useState([]);
   const [index, setIndex] = React.useState(0);
+  const [paused, setPaused] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [err, setErr] = React.useState("");
 
-  // autoplay
   React.useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const data = await getLatestNews();
+        if (!alive) return;
+
+        setSlides(Array.isArray(data) ? data : []);
+        setIndex(0);
+      } catch (e) {
+        if (!alive) return;
+        setErr("Unable to load latest news.");
+        setSlides([]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // ✅ autoplay
+  React.useEffect(() => {
+    if (paused) return;
+    if (!slides?.length || slides.length < 2) return;
+
     const id = setInterval(() => {
-      setIndex((p) => (p + 1) % SLIDES.length);
+      setIndex((p) => (p + 1) % slides.length);
     }, 3500);
 
     return () => clearInterval(id);
-  }, []);
+  }, [paused, slides]);
 
   const goTo = (i) => setIndex(i);
+
+  const prev = () => {
+    if (!slides?.length) return;
+    setIndex((p) => (p - 1 + slides.length) % slides.length);
+  };
+
+  const next = () => {
+    if (!slides?.length) return;
+    setIndex((p) => (p + 1) % slides.length);
+  };
 
   return (
     <section className="w-full bg-white">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        {err ? (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {err}
+          </div>
+        ) : null}
+
         {/* Carousel shell (fixed height => no jump) */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#f6f8fb] shadow-[0_24px_60px_-50px_rgba(2,6,23,0.5)] ring-1 ring-slate-200">
+        <div
+          className="relative overflow-hidden rounded-2xl bg-[#f6f8fb] shadow-[0_24px_60px_-50px_rgba(2,6,23,0.5)] ring-1 ring-slate-200"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
           {/* Slides track */}
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${index * 100}%)` }}
           >
-            {SLIDES.map((slide, i) => (
-              <NewsSlide key={i} slide={slide} />
-            ))}
+            {loading
+              ? Array.from({ length: 3 }).map((_, i) => <NewsSkeleton key={i} />)
+              : slides.map((slide) => (
+                  <NewsSlide key={slide?.id || slide?.slug} slide={slide} />
+                ))}
           </div>
 
-          {/* Center dots (like your screenshot) */}
-          <div className="pointer-events-auto absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
-            <Dots count={SLIDES.length} activeIndex={index} onDot={goTo} />
-          </div>
+          {/* Center dots */}
+          {!loading && slides.length > 1 ? (
+            <div className="pointer-events-auto absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
+              <Dots
+                count={slides.length}
+                activeIndex={index}
+                onDot={goTo}
+              />
+            </div>
+          ) : null}
 
-          {/* Optional nav arrows (hidden on small screens) */}
+          {/* Optional nav arrows */}
           <button
             type="button"
-            onClick={() =>
-              setIndex((p) => (p - 1 + SLIDES.length) % SLIDES.length)
-            }
-            className="hidden md:flex absolute left-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer"
+            onClick={prev}
+            disabled={loading || slides.length < 2}
+            className={[
+              "hidden md:flex absolute left-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
+              loading || slides.length < 2 ? "opacity-40 cursor-not-allowed" : "",
+            ].join(" ")}
             aria-label="Previous"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -85,8 +140,12 @@ export default function NewsSection() {
 
           <button
             type="button"
-            onClick={() => setIndex((p) => (p + 1) % SLIDES.length)}
-            className="hidden md:flex absolute right-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer"
+            onClick={next}
+            disabled={loading || slides.length < 2}
+            className={[
+              "hidden md:flex absolute right-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
+              loading || slides.length < 2 ? "opacity-40 cursor-not-allowed" : "",
+            ].join(" ")}
             aria-label="Next"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -100,7 +159,7 @@ export default function NewsSection() {
             </svg>
           </button>
 
-          {/* Top-left label "In The News" */}
+          {/* Top-left label */}
           <div className="absolute left-5 top-5 z-20 -translate-y-1/2 rounded-md bg-white px-6 py-3 text-[14px] font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
             In The News
           </div>
@@ -111,53 +170,65 @@ export default function NewsSection() {
 }
 
 function NewsSlide({ slide }) {
+  const imgUrl = toImgUrl(slide?.image);
+
+  // ✅ adjust route if your page is different
+  const href = `/news-room/${slide?.slug}`;
+
   return (
     <div className="w-full shrink-0">
-      {/* Fixed height wrapper for consistent layout */}
       <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
         {/* LEFT IMAGE */}
         <div className="relative min-h-[240px] md:min-h-[360px]">
-          <Image
-            src={slide.image}
-            alt={slide.title}
-            fill
-            priority
-            className="object-cover"
-          />
+          {imgUrl ? (
+            <Image
+              src={imgUrl}
+              alt={slide?.title || "News"}
+              fill
+              priority
+              className="object-cover"
+            />
+          ) : null}
 
-          {/* Soft overlay for nicer contrast */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent" />
         </div>
 
         {/* RIGHT CONTENT */}
         <div className="relative bg-[#eaf3ff] px-6 py-10 sm:px-10">
-          {/* pointer/triangle like screenshot */}
+          {/* pointer/triangle */}
           <div className="hidden md:block absolute left-0 top-10 -translate-x-full">
             <div className="h-0 w-0 border-y-[14px] border-y-transparent border-r-[18px] border-r-[#eaf3ff]" />
           </div>
 
           <div className="max-w-xl">
             <div className="text-[12px] font-semibold tracking-widest text-blue-600">
-              {slide.tag}
+              NEWS
             </div>
 
             <h3 className="mt-5 text-[22px] font-semibold leading-snug text-blue-600 sm:text-[24px]">
-              {slide.title}
+              {slide?.title}
             </h3>
 
             <div className="mt-6 flex gap-4">
-              {/* left accent line */}
               <div className="mt-1 h-auto w-[3px] rounded-full bg-yellow-400" />
               <p className="text-[14px] leading-7 text-slate-700">
-                {slide.excerpt}
+                {clampText(slide?.summary, 260)}
               </p>
             </div>
 
-            {/* Optional CTA */}
-            {/* <div className="mt-8">
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-[13px] font-semibold text-white shadow-sm cursor-pointer"
+            <div className="mt-6 flex items-center gap-3 text-xs text-slate-600">
+              <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
+                {slide?.postDate}
+              </span>
+              <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
+                {slide?.visited ?? 0} views
+              </span>
+            </div>
+
+            <div className="mt-8">
+              <Link
+                href={href}
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-[13px] font-semibold text-white shadow-sm cursor-pointer hover:bg-blue-700"
               >
                 Read More
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -169,8 +240,8 @@ function NewsSlide({ slide }) {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
-            </div> */}
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -193,6 +264,29 @@ function Dots({ count, activeIndex, onDot }) {
           aria-label={`Go to slide ${i + 1}`}
         />
       ))}
+    </div>
+  );
+}
+
+function NewsSkeleton() {
+  return (
+    <div className="w-full shrink-0">
+      <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
+        <div className="min-h-[240px] md:min-h-[360px] animate-pulse bg-slate-200" />
+        <div className="bg-[#eaf3ff] px-6 py-10 sm:px-10">
+          <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
+          <div className="mt-5 h-6 w-5/6 animate-pulse rounded bg-slate-200" />
+          <div className="mt-3 h-6 w-4/6 animate-pulse rounded bg-slate-200" />
+          <div className="mt-6 flex gap-4">
+            <div className="h-20 w-[3px] rounded-full bg-yellow-300" />
+            <div className="flex-1 space-y-3">
+              <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-11/12 animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-10/12 animate-pulse rounded bg-slate-200" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

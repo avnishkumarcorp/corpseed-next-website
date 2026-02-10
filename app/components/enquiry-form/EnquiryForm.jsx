@@ -4,10 +4,6 @@ import React, { useMemo, useRef, useState } from "react";
 import { Phone, ShieldCheck } from "lucide-react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
 
-function cn(...s) {
-  return s.filter(Boolean).join(" ");
-}
-
 /* ---------------- MODAL HELPERS ---------------- */
 
 function Backdrop({ open, onClose, children }) {

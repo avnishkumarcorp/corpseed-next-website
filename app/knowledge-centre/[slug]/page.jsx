@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
+import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
@@ -211,44 +212,6 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
   );
 }
 
-function ContactCta() {
-  return (
-    <Card className="overflow-hidden">
-      <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
-        <p className="text-sm font-semibold text-slate-900">
-          Book a free consultation
-        </p>
-        <p className="mt-1 text-xs text-slate-500">
-          Get help from an expert. It&apos;s quick and free.
-        </p>
-      </div>
-
-      <div className="px-5 py-5">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            placeholder="Name"
-            className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none focus:border-blue-600"
-          />
-          <input
-            placeholder="Mobile"
-            className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none focus:border-blue-600"
-          />
-        </div>
-
-        <button
-          type="button"
-          className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
-        >
-          Submit
-        </button>
-
-        <p className="mt-3 text-xs text-slate-500">
-          (Hook this button to your lead API later.)
-        </p>
-      </div>
-    </Card>
-  );
-}
 
 /** ✅ SEO from API */
 export async function generateMetadata({ params }) {
@@ -412,7 +375,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
 
                 {/* Replace “Blog Contact Form” marker with CTA */}
                 <div className="mt-8">
-                  <ContactCta />
+                  <EnquiryOtpInline/>
                 </div>
 
                 {/* Mobile share */}

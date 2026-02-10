@@ -66,3 +66,39 @@ export async function getProductBySlug(slug) {
     return null;
   }
 }
+
+
+
+export async function getLatestProducts() {
+  if (!API_BASE) {
+    console.error("NEXT_PUBLIC_API_BASE_URL is missing");
+    return [];
+  }
+
+  const url = `${API_BASE}/api/products/latest`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      console.error(
+        "getLatestProducts API Error:",
+        res.status,
+        res.statusText,
+        txt,
+      );
+      return [];
+    }
+
+    const json = await safeJson(res);
+    return Array.isArray(json) ? json : [];
+  } catch (e) {
+    console.error("getLatestProducts error:", e);
+    return [];
+  }
+}

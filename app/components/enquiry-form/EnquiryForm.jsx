@@ -30,6 +30,7 @@ function Modal({ title, subtitle, onClose, children }) {
         <button
           onClick={onClose}
           className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 cursor-pointer"
+          type="button"
         >
           ✕
         </button>
@@ -52,6 +53,7 @@ function OTPInput({ value, onChange, length = 4 }) {
           ref={(el) => (refs.current[i] = el)}
           value={value[i] || ""}
           inputMode="numeric"
+          autoComplete="one-time-code"
           maxLength={1}
           onChange={(e) => {
             const v = e.target.value.replace(/\D/g, "");
@@ -74,6 +76,13 @@ function OTPInput({ value, onChange, length = 4 }) {
 
 /* ---------------- MAIN COMPONENT ---------------- */
 
+const isValidEmail = (email) => {
+  const v = String(email || "").trim();
+  if (!v) return false;
+  // simple, practical email regex
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+};
+
 export default function EnquiryForm({ serviceName }) {
   const [form, setForm] = useState({
     name: "",
@@ -86,7 +95,16 @@ export default function EnquiryForm({ serviceName }) {
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("idle"); // idle | otp | success
   const [loading, setLoading] = useState(false);
+
+  // ✅ global banner error (your existing)
   const [error, setError] = useState("");
+
+  // ✅ field-level errors
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    mobile: "",
+  });
+
   const [resData, setResData] = useState(null);
 
   const cleanMobile = useMemo(
@@ -94,21 +112,60 @@ export default function EnquiryForm({ serviceName }) {
     [form.mobile]
   );
 
-  const onChange = (e) =>
-    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const onChange = (e) => {
+    setError(""); // clear banner error while typing
+
+    const { name, value } = e.target;
+
+    // ✅ mobile: numbers only + max 10 digits
+    if (name === "mobile") {
+      const digits = value.replace(/\D/g, "").slice(0, 10);
+      setForm((p) => ({ ...p, mobile: digits }));
+      setFieldErrors((p) => ({ ...p, mobile: "" }));
+      return;
+    }
+
+    // normal fields
+    setForm((p) => ({ ...p, [name]: value }));
+
+    // clear field errors on edit
+    if (name === "email") setFieldErrors((p) => ({ ...p, email: "" }));
+  };
+
+  const validateFields = () => {
+    const next = { email: "", mobile: "" };
+    let ok = true;
+
+    if (!isValidEmail(form.email)) {
+      next.email = "Please enter a valid email address.";
+      ok = false;
+    }
+
+    if (cleanMobile.length !== 10) {
+      next.mobile = "Enter valid 10 digit mobile number.";
+      ok = false;
+    }
+
+    setFieldErrors(next);
+    return ok;
+  };
 
   /* -------- SUBMIT FORM (SEND OTP) -------- */
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name.trim()) return setError("Name is required.");
-    if (cleanMobile.length !== 10)
-      return setError("Enter valid 10 digit mobile number.");
+    if (!form.name.trim()) {
+      setError("Name is required.");
+      return;
+    }
+
+    // ✅ validate email + mobile (field-level)
+    const ok = validateFields();
+    if (!ok) return;
 
     setError("");
     setLoading(true);
 
-    // ✅ Send all fields (only name+mobile required by API)
     const res = await sendOtp({
       name: form.name,
       mobile: cleanMobile,
@@ -120,7 +177,6 @@ export default function EnquiryForm({ serviceName }) {
     setLoading(false);
 
     if (!res.ok) {
-      // backend might return json or text
       try {
         const j = JSON.parse(res.data || "{}");
         setError(j?.message || "Failed to send OTP. Try again.");
@@ -130,7 +186,6 @@ export default function EnquiryForm({ serviceName }) {
       return;
     }
 
-    // backend returns text/json (your previous code parses)
     try {
       setResData(JSON.parse(res.data));
     } catch {
@@ -158,8 +213,8 @@ export default function EnquiryForm({ serviceName }) {
 
     if (res.status === 200) {
       setStep("success");
-      // ✅ reset form
       setForm({ name: "", email: "", mobile: "", location: "", message: "" });
+      setFieldErrors({ email: "", mobile: "" });
       setOtp("");
       setResData(null);
     } else {
@@ -186,42 +241,66 @@ export default function EnquiryForm({ serviceName }) {
             />
           </div>
 
+          {/* ✅ Email with validation */}
           <div>
-            <label className="text-xs font-semibold text-gray-600">
-              Email*
-            </label>
+            <label className="text-xs font-semibold text-gray-600">Email*</label>
             <input
               name="email"
               type="email"
               value={form.email}
               onChange={onChange}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+              onBlur={() => {
+                if (!form.email) return;
+                setFieldErrors((p) => ({
+                  ...p,
+                  email: isValidEmail(form.email)
+                    ? ""
+                    : "Please enter a valid email address.",
+                }));
+              }}
+              className={[
+                "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500",
+                fieldErrors.email ? "border-red-300 focus:border-red-500" : "border-gray-300",
+              ].join(" ")}
               placeholder="Please enter your email id"
               required
             />
+            {fieldErrors.email ? (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+            ) : null}
           </div>
 
+          {/* ✅ Mobile numbers only */}
           <div>
-            <label className="text-xs font-semibold text-gray-600">
-              Mobile*
-            </label>
-            <div className="mt-1 flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 focus-within:border-blue-500">
+            <label className="text-xs font-semibold text-gray-600">Mobile*</label>
+
+            <div
+              className={[
+                "mt-1 flex items-center gap-2 rounded-lg border px-3 py-2 focus-within:border-blue-500",
+                fieldErrors.mobile ? "border-red-300 focus-within:border-red-500" : "border-gray-300",
+              ].join(" ")}
+            >
               <Phone className="h-4 w-4 text-gray-500" />
               <input
                 name="mobile"
                 value={form.mobile}
                 onChange={onChange}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
                 className="w-full text-sm outline-none"
-                placeholder="+91 Phone"
+                placeholder="Phone"
                 required
               />
             </div>
+
+            {fieldErrors.mobile ? (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors.mobile}</p>
+            ) : null}
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-600">
-              Location*
-            </label>
+            <label className="text-xs font-semibold text-gray-600">Location*</label>
             <input
               name="location"
               value={form.location}
@@ -231,19 +310,6 @@ export default function EnquiryForm({ serviceName }) {
               required
             />
           </div>
-
-          {/* optional message (if you want) */}
-          {/* <div>
-            <label className="text-xs font-semibold text-gray-600">Message</label>
-            <textarea
-              name="message"
-              value={form.message}
-              onChange={onChange}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
-              placeholder="Write message..."
-              rows={3}
-            />
-          </div> */}
 
           {error && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
@@ -262,14 +328,13 @@ export default function EnquiryForm({ serviceName }) {
           <div className="flex items-start gap-2 text-xs text-gray-500">
             <ShieldCheck className="mt-0.5 h-4 w-4 text-green-600" />
             <p>
-              Your details are safe with us. By submitting you agree to our
-              Terms & Privacy Policy.
+              Your details are safe with us. By submitting you agree to our Terms & Privacy Policy.
             </p>
           </div>
         </form>
       </div>
 
-      {/* ===== OTP MODAL ===== */}
+      {/* OTP MODAL */}
       <Backdrop open={step === "otp"} onClose={() => setStep("idle")}>
         <Modal
           title="Verify OTP"
@@ -289,6 +354,7 @@ export default function EnquiryForm({ serviceName }) {
               onClick={handleVerify}
               disabled={loading}
               className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer disabled:opacity-60"
+              type="button"
             >
               {loading ? "Verifying..." : "Verify OTP"}
             </button>
@@ -296,7 +362,7 @@ export default function EnquiryForm({ serviceName }) {
         </Modal>
       </Backdrop>
 
-      {/* ===== SUCCESS MODAL ===== */}
+      {/* SUCCESS MODAL */}
       <Backdrop open={step === "success"} onClose={() => setStep("idle")}>
         <Modal
           title="Enquiry Received!"

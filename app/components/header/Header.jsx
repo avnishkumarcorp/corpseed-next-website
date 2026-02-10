@@ -177,6 +177,7 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
   }, [open]);
 
   // Fetch on query
+  // Fetch on query
   useEffect(() => {
     if (!open) return;
 
@@ -197,10 +198,10 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
         setLoading(true);
         setErr("");
 
-        const url = `${baseUrl}/search/service-industry-blog/${encodeURIComponent(
-          query,
-        )}`;
+        // ✅ SAME AS HERO SEARCH (proxy)
+        const url = `/api/search/service-industry-blog/${encodeURIComponent(query)}`;
         const res = await fetch(url, { signal: controller.signal });
+
         if (!res.ok) throw new Error(`Search failed: ${res.status}`);
         const json = await res.json();
         setApiData(json);
@@ -214,7 +215,7 @@ const FullWidthSearchPanel = React.memo(function FullWidthSearchPanel({
     })();
 
     return () => controller.abort();
-  }, [dq, open, baseUrl]);
+  }, [dq, open]);
 
   const groups = useMemo(() => normalizeGroups(apiData), [apiData]);
 
@@ -703,13 +704,6 @@ function MobileSearchInline({ baseUrl, onNavigate }) {
       return;
     }
 
-    if (!baseUrl) {
-      setErr("Search base URL is missing.");
-      setApiData(null);
-      setLoading(false);
-      return;
-    }
-
     if (abortRef.current) abortRef.current.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -719,10 +713,10 @@ function MobileSearchInline({ baseUrl, onNavigate }) {
         setLoading(true);
         setErr("");
 
-        const url = `${baseUrl}/search/service-industry-blog/${encodeURIComponent(
-          query,
-        )}`;
+        // ✅ SAME AS HERO SEARCH (proxy)
+        const url = `/api/search/service-industry-blog/${encodeURIComponent(query)}`;
         const res = await fetch(url, { signal: controller.signal });
+
         if (!res.ok) throw new Error(`Search failed: ${res.status}`);
         const json = await res.json();
         setApiData(json);
@@ -736,7 +730,7 @@ function MobileSearchInline({ baseUrl, onNavigate }) {
     })();
 
     return () => controller.abort();
-  }, [dq, baseUrl]);
+  }, [dq]);
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm mb-4">
@@ -856,7 +850,12 @@ function MobileMenuSection({ title, children, open, onToggle }) {
           open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         ].join(" ")}
       >
-        <div className="overflow-hidden px-4 pb-4" style={{marginBottom:'4px'}}>{children}</div>
+        <div
+          className="overflow-hidden px-4 pb-4"
+          style={{ marginBottom: "4px" }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -893,7 +892,10 @@ function MobileCategoryAccordion({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 overflow-hidden" style={{margin:"4px 0px"}} >
+    <div
+      className="rounded-2xl border border-slate-200 overflow-hidden"
+      style={{ margin: "4px 0px" }}
+    >
       <button
         type="button"
         onClick={onToggle}
@@ -925,7 +927,7 @@ function MobileCategoryAccordion({
               ))}
             </ul>
           ) : isGroupObject(value) ? (
-            <div className="space-y-3" style={{paddingBottom:"4px"}}>
+            <div className="space-y-3" style={{ paddingBottom: "4px" }}>
               {Object.keys(value || {}).map((groupTitle) =>
                 renderGroup(groupTitle, value[groupTitle]),
               )}
@@ -1048,7 +1050,7 @@ function MobileDrawer({ open, onClose, menuMap, loading, baseUrl, navItems }) {
               }}
               className="rounded-xl  px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
             >
-               ✕
+              ✕
             </button>
           </div>
 
@@ -1083,8 +1085,6 @@ function MobileDrawer({ open, onClose, menuMap, loading, baseUrl, navItems }) {
 
           {/* ✅ Top navigation tabs (ALWAYS visible like desktop) */}
           <div className="mt-4 rounded-2xl overflow-hidden">
-
-
             <div className="p-2 my-1">
               {navItems.map((nav) => {
                 const item = menuMap?.[nav.key];
@@ -1096,7 +1096,7 @@ function MobileDrawer({ open, onClose, menuMap, loading, baseUrl, navItems }) {
                     key={nav.key}
                     id={`mobile-section-${nav.key}`}
                     className="scroll-mt-28"
-                    style={{margin:"3px 0px"}}
+                    style={{ margin: "3px 0px" }}
                   >
                     <MobileMenuSection
                       title={nav.label}
@@ -1126,8 +1126,6 @@ function MobileDrawer({ open, onClose, menuMap, loading, baseUrl, navItems }) {
               })}
             </div>
           </div>
-
-
 
           {/* Footer */}
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">

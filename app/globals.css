@@ -5694,3 +5694,100 @@ li {
   margin-bottom: 0.5rem !important;
   font-weight: 500 !important;
 }
+
+
+
+
+
+
+/* Root */
+.antdDrawerRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.antdDrawerRoot.isOpen {
+  pointer-events: auto;
+}
+
+/* Mask */
+.antdDrawerMask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+.antdDrawerRoot.isOpen .antdDrawerMask {
+  opacity: 1;
+}
+
+/* wrapper aligned right */
+.antdDrawerWrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center; /* ✅ vertically center */
+  padding: 12px;
+}
+
+
+/* ✅ PANEL: fit to form content (NOT full height) */
+.antdDrawerPanelFit {
+  width: 420px;                 /* same like screenshot */
+  max-width: 92vw;              /* mobile safe */
+  height: auto;                 /* fit content */
+  max-height: calc(100vh - 24px); /* avoid overflow */
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  border-radius: 10px;
+  overflow: hidden;
+
+  /* AntD-like slide */
+  transform: translate3d(120%, 0, 0);
+  transition: transform 300ms cubic-bezier(0.215, 0.61, 0.355, 1);
+  will-change: transform;
+}
+
+.antdDrawerRoot.isOpen .antdDrawerPanelFit {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Header */
+.antdDrawerHeaderFit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+
+.antdDrawerTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.antdDrawerCloseBtn {
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.antdDrawerCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ✅ Body scrolls only if content is taller than max-height */
+.antdDrawerBodyFit {
+  padding: 16px;
+  max-height: calc(100vh - 24px - 49px); /* viewport - padding - header */
+  overflow-y: auto;
+}

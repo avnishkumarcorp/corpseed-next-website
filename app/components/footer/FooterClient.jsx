@@ -5,6 +5,46 @@ import Image from "next/image";
 import Link from "next/link";
 import footerLogo from "../../assets/logo-footer.png";
 
+function LinkedInIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 24V7h5v17H0zM7 7h4.8v2.3h.1c.7-1.3 2.4-2.7 5-2.7 5.3 0 6.3 3.5 6.3 8V24h-5v-7.8c0-1.9 0-4.3-2.6-4.3-2.6 0-3 2-3 4.1V24H7V7z" />
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M22.68 0H1.32C.59 0 0 .59 0 1.32v21.36C0 23.41.59 24 1.32 24h11.5v-9.3H9.69V11.1h3.13V8.4c0-3.1 1.9-4.8 4.67-4.8 1.33 0 2.47.1 2.8.14v3.24h-1.92c-1.5 0-1.8.71-1.8 1.76v2.3h3.6l-.47 3.6h-3.13V24h6.14c.73 0 1.32-.59 1.32-1.32V1.32C24 .59 23.41 0 22.68 0z" />
+    </svg>
+  );
+}
+
+function YouTubeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M23.5 6.2s-.2-1.6-.8-2.3c-.8-.8-1.7-.8-2.1-.9C17.5 2.7 12 2.7 12 2.7s-5.5 0-8.6.3c-.4.1-1.3.1-2.1.9-.6.7-.8 2.3-.8 2.3S0 8 0 9.8v1.4c0 1.8.2 3.6.2 3.6s.2 1.6.8 2.3c.8.8 1.9.8 2.4.9 1.7.2 7.1.3 7.1.3s5.5 0 8.6-.3c.4-.1 1.3-.1 2.1-.9.6-.7.8-2.3.8-2.3s.2-1.8.2-3.6V9.8c0-1.8-.2-3.6-.2-3.6zM9.5 14.8V7.9l6.2 3.4-6.2 3.5z" />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.9.2 2.4.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.5.3 1.2.4 2.4.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.9-.4 2.4-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.5.2-1.2.3-2.4.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.9-.2-2.4-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.5-.3-1.2-.4-2.4-.1-1.2-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-1.2.2-1.9.4-2.4.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.5-.2 1.2-.3 2.4-.4 1.2-.1 1.6-.1 4.8-.1zM12 6.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm5.6-9.9a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6z" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.9 2H22l-7.5 8.6L23 22h-6.2l-4.9-6.4L6.3 22H2l7.9-9.1L1 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L7.2 3.9H5.4L17.8 20z" />
+    </svg>
+  );
+}
+
 const ABOUT_US_COL = {
   title: "About Us",
   links: [
@@ -55,75 +95,50 @@ export default function FooterClient({ data }) {
       <div className="border-b border-slate-200">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           {/* Follow us */}
-          <div className="flex items-center gap-3">
-            <span className="text-[18px] font-medium text-slate-900">
+          <div className="flex items-center gap-3 text-slate-500">
+            <span className="mr-2 text-sm font-medium text-slate-700">
               Follow Us :
             </span>
 
-            <div className="flex items-center gap-0 text-slate-600">
-              <SocialIcon label="LinkedIn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6.94 6.5A2.44 2.44 0 1 1 7 2.5a2.44 2.44 0 0 1-.06 4z"
-                    fill="currentColor"
-                  />
-                  <path d="M4.5 21V9h4v12h-4z" fill="currentColor" />
-                  <path
-                    d="M13 9c2.5 0 4.5 1.6 4.5 5.2V21h-4v-6c0-1.6-.6-2.6-2-2.6-1.1 0-1.7.7-2 1.4-.1.2-.1.6-.1 1V21h-4s.1-10.7 0-12h4v1.7C10 9.8 11.2 9 13 9z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </SocialIcon>
+            <SocialIcon
+              label="LinkedIn"
+              href="https://in.linkedin.com/company/corpseed"
+              className="hover:text-[#0A66C2]"
+            >
+              <LinkedInIcon />
+            </SocialIcon>
 
-              <SocialIcon label="Facebook">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M13.5 22v-9h3l.5-3h-3.5V8.2c0-.8.3-1.2 1.3-1.2H17V4.2c-.5-.1-1.6-.2-3-.2-2.8 0-4.5 1.7-4.5 4.7V10H7v3h2.5v9h4z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </SocialIcon>
+            <SocialIcon
+              label="Facebook"
+              href="https://www.facebook.com/CorpseedGroup"
+              className="hover:text-[#1877F2]"
+            >
+              <FacebookIcon />
+            </SocialIcon>
 
-              <SocialIcon label="YouTube">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M21 8.2s-.2-1.6-.8-2.3c-.8-.8-1.7-.8-2.1-.9C15.1 4.7 12 4.7 12 4.7h0s-3.1 0-6.1.3c-.4.1-1.3.1-2.1.9C3.2 6.6 3 8.2 3 8.2S2.7 10 2.7 11.8v.9C2.7 14.4 3 16.2 3 16.2s.2 1.6.8 2.3c.8.8 1.9.8 2.4.9 1.7.2 5.8.3 5.8.3s3.1 0 6.1-.3c.4-.1 1.3-.1 2.1-.9.6-.7.8-2.3.8-2.3s.3-1.8.3-3.6v-.9c0-1.8-.3-3.6-.3-3.6z"
-                    fill="currentColor"
-                  />
-                  <path d="M10.4 15.3v-6l5.6 3-5.6 3z" fill="#fff" />
-                </svg>
-              </SocialIcon>
+            <SocialIcon
+              label="YouTube"
+              href="https://www.youtube.com/@CorpSeed"
+              className="hover:text-[#FF0000]"
+            >
+              <YouTubeIcon />
+            </SocialIcon>
 
-              <SocialIcon label="Instagram">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M17.5 6.5h.01"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </SocialIcon>
+            <SocialIcon
+              label="Instagram"
+              href="https://www.instagram.com/corpseed/"
+              className="hover:text-[#E1306C]"
+            >
+              <InstagramIcon />
+            </SocialIcon>
 
-              <SocialIcon label="Twitter">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M20.5 7.1c.01.2.01.4.01.6 0 6.4-4.8 13.8-13.8 13.8-2.7 0-5.3-.8-7.5-2.2.4.1.9.1 1.3.1 2.2 0 4.2-.8 5.8-2.1-2.1-.1-3.8-1.4-4.4-3.3.3.1.7.1 1 .1.4 0 .8-.1 1.1-.1-2.1-.4-3.7-2.2-3.7-4.4v-.1c.6.4 1.4.6 2.2.7-1.2-.9-2-2.1-2-3.6 0-.8.2-1.6.6-2.2 2.4 2.9 6 4.9 10.1 5.1-.1-.4-.1-.8-.1-1.2 0-2.6 2.1-4.6 4.6-4.6 1.3 0 2.5.6 3.4 1.4.9-.2 1.7-.5 2.5-.9-.3.9-.9 1.7-1.7 2.2.8-.1 1.6-.3 2.3-.6-.5.8-1.1 1.5-1.8 2.1z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </SocialIcon>
-            </div>
+            <SocialIcon
+              label="X"
+              href="https://x.com/corpseed"
+              className="hover:text-black"
+            >
+              <XIcon />
+            </SocialIcon>
           </div>
 
           {/* Subscribe */}
@@ -242,14 +257,28 @@ export default function FooterClient({ data }) {
   );
 }
 
-function SocialIcon({ children, label }) {
+
+export function SocialIcon({ label, href, className = "", children }) {
   return (
-    <a
-      href="#"
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       aria-label={label}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:text-slate-900 cursor-pointer"
+      title={label}
+      className={`
+        inline-flex items-center justify-center
+        w-9 h-9
+        rounded-full
+        border border-slate-200
+        bg-white
+        transition-all duration-200
+        hover:bg-slate-50 hover:shadow-sm
+        ${className}
+      `}
+      style={{ cursor: "pointer" }}
     >
       {children}
-    </a>
+    </Link>
   );
 }

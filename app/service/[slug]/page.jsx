@@ -6,6 +6,7 @@ import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
 import ServiceContent from "../ServiceContent";
 import { getServiceData } from "./serviceData";
 import ServiceFaqs from "../ServiceFaqs";
+import ServiceSlugClient from "./ServiceSlugClient";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -155,21 +156,9 @@ export default async function ServicePage({ params }) {
 
       <ServiceFaqs faqs={data?.service?.serviceFaqs} />
 
-      <section className="border-t border-gray-200 bg-gray-50">
+      <section className="md:hidden border-t border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-lg font-semibold">
-                Need help choosing the right option?
-              </p>
-              <p className="text-sm text-gray-600">
-                Our experts will guide you based on your business and location.
-              </p>
-            </div>
-            <button className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer">
-              Get Free Consultation
-            </button>
-          </div>
+          <ServiceSlugClient/>
         </div>
       </section>
     </div>

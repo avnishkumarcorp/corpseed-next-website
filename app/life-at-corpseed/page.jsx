@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import banner from '../assets/corpseed-banner.webp'
+import banner from "../assets/corpseed-banner.webp";
 import {
   Play,
   ArrowRight,
@@ -9,69 +9,49 @@ import {
   Quote,
   ChevronDown,
 } from "lucide-react";
+import { getLifeAtCorpseed } from "../lib/life-at-corpseed";
 
-export const metadata = {
-  title: "Life at Corpseed | Corpseed",
-  description:
-    "Discover careers, culture, and people shaping the future at Corpseed. Meet the #PeopleOfCorpseed and explore our communities.",
-};
+// ✅ dynamic SEO from API
+export async function generateMetadata() {
+  const data = await getLifeAtCorpseed();
 
-const peopleStories = [
-  {
-    title: "Leading the Charge: Head of Digital Marketing",
-    desc: "Driving growth through data-driven insights and creative strategy.",
-    tags: ["#DigitalMarketing", "#MarketingExperts", "#SocialMedia"],
-    image:
-      "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/8492765481Meet-Our-Head-of-Digital-Marketing-shamshad-alam-corpseed.webp",
-    reverse: false,
-  },
-  {
-    title: "Empowering Medical Device Innovation",
-    desc: "Navigating complex regulatory landscapes with confidence.",
-    tags: ["#Regulatory", "#MedicalDevice", "#Compliance"],
-    image:
-      "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/3192311537Charul_Gaur_Corpseed.webp",
-    reverse: true,
-  },
-  {
-    title: "Turning Regulatory Hurdles into Growth",
-    desc: "Strategic guidance that transforms ideas into scalable businesses.",
-    tags: ["#BusinessAdvisory", "#Environment", "#Compliance"],
-    image:
-      "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/3138773948Ganesh_Jha_Corpseed.jpeg",
-    reverse: false,
-  },
-  {
-    title: "Finance Leadership Beyond Numbers",
-    desc: "Empowering teams and aligning strategy with growth vision.",
-    tags: ["#Finance", "#Leadership", "#Accounts"],
-    image:
-      "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/1522579334Praveen_Kumar_Mishra_Corpseed.jfif",
-    reverse: true,
-  },
-];
+  return {
+    title: data?.title || "Life at Corpseed | Corpseed",
+    description:
+      data?.metaDescription ||
+      "Discover careers, culture, and people shaping the future at Corpseed.",
+    keywords: data?.metaKeyword || "",
+  };
+}
 
-const communities = [
-  {
-    title: "Diversity & Inclusion",
-    desc: "We celebrate differences in culture, thought, and experience.",
-    image:
-      "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/aerial-view-business-team_(1).jpg",
-  },
-  {
-    title: "Company Culture",
-    desc: "Our values define how we work, collaborate, and grow.",
-    image: "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/SM_(226).jpg",
-  },
-];
+export default async function LifeAtCorpseedPage() {
+  const data = await getLifeAtCorpseed();
 
-export default function LifeAtCorpseedPage() {
+  const peopleStories = (data?.lifeUsers || []).map((u, idx) => ({
+    id: u.id,
+    title: u.title,
+    slug: u.slug,
+    desc: u.summary,
+    tags: (u.categories || []).map((x) =>
+      x?.startsWith("#") ? x : `#${x}`
+    ),
+    image: u.pictureName,
+    reverse: idx % 2 === 1,
+  }));
+
+  const communities = (data?.blogs || []).map((b) => ({
+    id: b.id,
+    title: b.title,
+    slug: b.slug,
+    desc: b.summary,
+    image: b.image,
+  }));
+
   return (
     <main className="bg-white text-slate-800">
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-gray-300">
         <div className="relative h-[60vh] min-h-[420px] w-full">
-          {/* Banner */}
           <Image
             src={banner}
             alt="Corpseed Office"
@@ -80,10 +60,8 @@ export default function LifeAtCorpseedPage() {
             className="object-cover object-center"
             sizes="100vw"
           />
-          {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />
 
-          {/* Content */}
           <div className="absolute inset-0">
             <div className="max-w-7xl mx-auto px-6 h-full flex items-end pb-10 md:pb-14">
               <div className="max-w-3xl">
@@ -163,13 +141,19 @@ export default function LifeAtCorpseedPage() {
             </div>
           </div>
 
-          <div className="space-y-8">
-            {peopleStories.map((item) => (
-              <StoryRow key={item.title} item={item} />
-            ))}
-          </div>
+          {peopleStories.length === 0 ? (
+            <div className="rounded-2xl border border-gray-300 bg-white p-8 text-center text-gray-600">
+              No stories available right now.
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {peopleStories.map((item) => (
+                <StoryRow key={item.id} item={item} />
+              ))}
+            </div>
+          )}
 
-          {/* LOAD MORE */}
+          {/* LOAD MORE (placeholder) */}
           <div className="flex justify-center pt-10">
             <button className="px-8 py-3 rounded-xl border border-gray-300 bg-white hover:bg-slate-50 transition font-semibold cursor-pointer">
               Load More
@@ -191,11 +175,17 @@ export default function LifeAtCorpseedPage() {
             </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {communities.map((c) => (
-              <CommunityCard key={c.title} item={c} />
-            ))}
-          </div>
+          {communities.length === 0 ? (
+            <div className="mt-8 rounded-2xl border border-gray-300 bg-white p-8 text-center text-gray-600">
+              No community blogs available right now.
+            </div>
+          ) : (
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {communities.map((c) => (
+                <CommunityCard key={c.id} item={c} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </main>
@@ -206,9 +196,7 @@ export default function LifeAtCorpseedPage() {
 
 function StoryRow({ item }) {
   return (
-    <div
-      className={`grid grid-cols-1 lg:grid-cols-12 gap-6 items-center rounded-2xl border border-gray-300 bg-white shadow-sm overflow-hidden`}
-    >
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center rounded-2xl border border-gray-300 bg-white shadow-sm overflow-hidden">
       {/* Image */}
       <div
         className={`relative h-[260px] sm:h-[320px] lg:h-[360px] ${
@@ -249,9 +237,12 @@ function StoryRow({ item }) {
         </div>
 
         <div className="mt-6">
-          <button className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline cursor-pointer">
+          <Link
+            href={`/life-at-corpseed/${item.slug}`}
+            className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline cursor-pointer"
+          >
             Learn More <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>
@@ -278,9 +269,12 @@ function CommunityCard({ item }) {
         <p className="mt-2 text-gray-600 leading-relaxed">{item.desc}</p>
 
         <div className="mt-5">
-          <button className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline cursor-pointer">
+          <Link
+            href={`/blogs/${item.slug}`}
+            className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline cursor-pointer"
+          >
             Learn More <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>

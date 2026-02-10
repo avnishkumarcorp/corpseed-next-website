@@ -192,7 +192,7 @@ export default function ConsultNowModal({
         </div>
 
         {/* body */}
-        <div className="px-6 py-5">
+        <div className="px-6 py-5 max-h-[70vh] overflow-auto" style={{maxHeight:"60vh",overflow:'auto'}}>
           {err ? (
             <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {err}
@@ -200,7 +200,7 @@ export default function ConsultNowModal({
           ) : null}
 
           {step === 1 ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2" >
               <Input
                 label="Full Name"
                 required

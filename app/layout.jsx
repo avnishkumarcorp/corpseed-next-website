@@ -3,6 +3,7 @@ import Footer from "./components/footer/Footer";
 import "./globals.css";
 import HeaderWrapper from "./components/header/HeaderWrapper";
 import WhatsAppFloat from "./components/WhatsAppFloat";
+import MobileStickyFooter from "./components/mobile/MobileStickyFooter";
 
 export const metadata = {
   title: "Corpseed",
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
           <HeaderWrapper />
           {/* Middle content changes by route */}
           <main className="flex-1">{children}</main>
+          <MobileStickyFooter />
           <Footer />
           <WhatsAppFloat
             phone="917558640644"

@@ -1,6 +1,9 @@
+"use client";
 import { Star } from "lucide-react";
 import VideoPopup from "../components/VideoPopup";
 import EnquiryOtpFlow from "../components/otp/EnquiryOtpFlow";
+import ConsultNowModal from "../components/ConsultNowModal";
+import { useState } from "react";
 
 export default function ServiceHero({
   title,
@@ -10,6 +13,8 @@ export default function ServiceHero({
   videoText = "Watch Overview",
   videoUrl = "/videos/corpseed-intro.mp4",
 }) {
+  const [consultOpen, setConsultOpen] = useState(false);
+
   return (
     <section className="relative overflow-hidden border-b border-gray-200">
       {/* subtle gradient backdrop */}
@@ -82,7 +87,10 @@ export default function ServiceHero({
                 </p>
               </div>
 
-              <button className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer">
+              <button
+                onClick={() => setConsultOpen(true)}
+                className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
+              >
                 Get Free Consultation
               </button>
 
@@ -91,6 +99,12 @@ export default function ServiceHero({
               </p>
             </div>
             <EnquiryOtpFlow triggerText="Get Free Consultation" />
+
+            <ConsultNowModal
+              open={consultOpen}
+              onClose={() => setConsultOpen(false)}
+              title="Consult Now"
+            />
           </div>
         </div>
       </div>

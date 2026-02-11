@@ -226,7 +226,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                             src={b.image}
                             alt={b.title || "Blog"}
                             fill
-                            className="object-cover"
+                            className="object-contain p-2" // ✅ no crop + little padding
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
                         </div>
@@ -339,7 +339,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                       categorySlug: c.slug,
                       tag,
                     })}`;
-console.log("dsjhgsjgjhgj",href,c.slug)
+                    console.log("dsjhgsjgjhgj", href, c.slug);
                     return (
                       <Link
                         key={c.id}
@@ -409,7 +409,7 @@ console.log("dsjhgsjgjhgj",href,c.slug)
                             src={x.image}
                             alt={x.title || "Top article"}
                             fill
-                            className="object-cover"
+                            className="object-contain p-1" // ✅ no crop
                             sizes="80px"
                           />
                         </div>

@@ -87,8 +87,9 @@ export default function NewsSection({ data }) {
           </div>
 
           {/* dots */}
+          {/* dots (hide on mobile) */}
           {!loading && slides.length > 1 ? (
-            <div className="pointer-events-auto absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
+            <div className="pointer-events-auto absolute bottom-5 left-1/2 z-20 -translate-x-1/2 hidden md:block">
               <Dots count={slides.length} activeIndex={index} onDot={goTo} />
             </div>
           ) : null}

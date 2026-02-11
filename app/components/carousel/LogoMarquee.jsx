@@ -15,28 +15,28 @@ const CLIENTS_CACHE = {
 const hashClients = (arr) => {
   try {
     return JSON.stringify(
-      (arr || []).map((x) => [x?.id, x?.uuid, x?.name, x?.slug, x?.image]),
+      (arr || []).map((x) => [x?.id, x?.uuid, x?.name, x?.slug, x?.image, x?.imageURL, x?.imageUrl]),
     );
   } catch {
     return String(Date.now());
   }
 };
 
-async function fetchClientsOnce(apiUrl, signal) {
+async function fetchClientsOnce(apiUrl) {
   if (CLIENTS_CACHE.data) return CLIENTS_CACHE.data;
   if (CLIENTS_CACHE.promise) return CLIENTS_CACHE.promise;
 
   CLIENTS_CACHE.promise = (async () => {
-    // ✅ same-origin request (no CORS)
     const proxyUrl = `/api/proxy/clients?apiUrl=${encodeURIComponent(apiUrl)}`;
 
-    const res = await fetch(proxyUrl, { signal, cache: "no-store" });
+    // ✅ don't attach AbortController to a shared cached request
+    const res = await fetch(proxyUrl, { cache: "no-store" });
 
     if (!res.ok) throw new Error(`API failed: ${res.status}`);
 
     const json = await res.json();
+    const arr = Array.isArray(json?.data) ? json.data : Array.isArray(json) ? json : json?.data || [];
 
-    const arr = Array.isArray(json) ? json : json?.data || [];
     CLIENTS_CACHE.data = Array.isArray(arr) ? arr : [];
     CLIENTS_CACHE.error = null;
     CLIENTS_CACHE.ts = Date.now();
@@ -85,6 +85,37 @@ function TooltipPortal({ open, text, anchorRect }) {
   );
 }
 
+// ✅ robust image builder (supports absolute urls, "/path", or filename)
+function buildLogoSrc(it, imageBaseUrl) {
+  const raw = String(
+    it?.imageURL ??
+      it?.imageUrl ??
+      it?.logoUrl ??
+      it?.image ??
+      ""
+  ).trim();
+
+  if (!raw) return "";
+
+  // already absolute
+  if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+
+  // protocol-relative like //domain.com/a.webp
+  if (raw.startsWith("//")) return `https:${raw}`;
+
+  // domain without protocol: corpseed-main.s3....com/path
+  if (/^[a-z0-9.-]+\.[a-z]{2,}\/.+/i.test(raw)) return `https://${raw}`;
+
+  // starts with slash: /corpseed/a.webp
+  if (raw.startsWith("/")) {
+    return `${imageBaseUrl.replace(/\/$/, "")}${raw}`;
+  }
+
+  // filename: ACCORD.webp
+  return `${imageBaseUrl.replace(/\/$/, "")}/${raw}`;
+}
+
+
 export default function LogoMarquee({
   apiUrl = "api/customer/clients",
   imageBaseUrl = "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed",
@@ -94,7 +125,7 @@ export default function LogoMarquee({
   itemWidth = 140,
   speed = 60,
 }) {
-  const [loading, setLoading] = useState(!CLIENTS_CACHE.data);
+  const [loading, setLoading] = useState(!CLIENTS_CACHE.data && !CLIENTS_CACHE.promise);
   const [clients, setClients] = useState(CLIENTS_CACHE.data || []);
   const lastHashRef = useRef(hashClients(CLIENTS_CACHE.data || []));
 
@@ -124,48 +155,67 @@ export default function LogoMarquee({
     startOffset: 0,
   });
 
-  // ------------------ Fetch inside component (once) ------------------
-  useEffect(() => {
-    let mounted = true;
-    const controller = new AbortController();
-
-    if (CLIENTS_CACHE.data) {
-      setLoading(false);
-      return () => controller.abort();
+  const applyClientsToState = (data) => {
+    const nextHash = hashClients(data);
+    if (nextHash !== lastHashRef.current) {
+      lastHashRef.current = nextHash;
+      setClients(Array.isArray(data) ? data : []);
     }
+  };
 
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await fetchClientsOnce(apiUrl, controller.signal);
+  // ✅ ALWAYS sync from cache/promise (prevents empty state race on route changes)
+useEffect(() => {
+  let mounted = true;
+
+  (async () => {
+    try {
+      // ✅ if cache already exists, sync it
+      if (CLIENTS_CACHE.data) {
         if (!mounted) return;
-
-        const nextHash = hashClients(data);
-        if (nextHash !== lastHashRef.current) {
-          lastHashRef.current = nextHash;
-          setClients(data);
-        }
-
+        applyClientsToState(CLIENTS_CACHE.data);
         setLoading(false);
-      } catch (e) {
-        if (e?.name !== "AbortError") console.error("LogoMarquee:", e);
-        if (mounted) setLoading(false);
+        return;
       }
-    })();
 
-    return () => {
-      mounted = false;
-      controller.abort();
-    };
-  }, [apiUrl]);
+      setLoading(true);
+
+      // ✅ await in-flight promise OR start fetch
+      let data;
+      try {
+        data = CLIENTS_CACHE.promise
+          ? await CLIENTS_CACHE.promise
+          : await fetchClientsOnce(apiUrl);
+      } catch (e) {
+        // ✅ if it failed, try ONE retry (helps flaky mounts)
+        data = await fetchClientsOnce(apiUrl);
+      }
+
+      if (!mounted) return;
+      applyClientsToState(data);
+      setLoading(false);
+    } catch (e) {
+      console.error("LogoMarquee:", e);
+      if (mounted) setLoading(false);
+    }
+  })();
+
+  return () => {
+    mounted = false;
+  };
+}, [apiUrl]);
+
 
   // ------------------ Normalize for rendering ------------------
   const normalizedItems = useMemo(() => {
     return (clients || [])
       .filter(Boolean)
       .map((it) => {
-        const src = it?.imageURL ? it.imageURL : "";
-        const href = it?.slug && linkPrefix ? `${linkPrefix}${it.slug}` : "";
+        const src = buildLogoSrc(it, imageBaseUrl);
+
+        // link
+        const slug = (it?.slug || "").toString().trim();
+        const href = slug && linkPrefix ? `${linkPrefix}${slug}` : "";
+
         return {
           key: it?.uuid || it?.id || src,
           name: it?.name || "Logo",
@@ -177,7 +227,7 @@ export default function LogoMarquee({
   }, [clients, imageBaseUrl, linkPrefix]);
 
   const doubled = useMemo(
-    () => [...normalizedItems, ...normalizedItems],
+    () => (normalizedItems.length ? [...normalizedItems, ...normalizedItems] : []),
     [normalizedItems],
   );
 
@@ -194,7 +244,7 @@ export default function LogoMarquee({
 
   // ------------------ Tooltip helpers ------------------
   const showTip = (e, name) => {
-    pauseNow(); // ✅ stop exactly at hover
+    pauseNow(); // stop exactly at hover
     const rect = e.currentTarget.getBoundingClientRect();
     setTipText(name);
     setTipRect(rect);
@@ -207,20 +257,6 @@ export default function LogoMarquee({
     resumeNow();
   };
 
-  // Keep tooltip position updated while paused (or while arrow nudges)
-  useEffect(() => {
-    if (!tipOpen) return;
-
-    let raf = 0;
-    const loop = () => {
-      // If element moved due to layout/resize, we can’t re-find it reliably
-      // But we can keep the last rect. Optionally update on scroll/resize:
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [tipOpen]);
-
   // ------------------ Measure width of ONE set (half track) ------------------
   useEffect(() => {
     const track = trackRef.current;
@@ -230,7 +266,6 @@ export default function LogoMarquee({
       const total = track.scrollWidth; // doubled width
       singleWidthRef.current = total / 2 || 0;
 
-      // keep offset in range and apply transform
       const W = singleWidthRef.current;
       if (W > 0) {
         offsetRef.current = ((offsetRef.current % W) + W) % W;
@@ -323,7 +358,6 @@ export default function LogoMarquee({
     offsetRef.current = ((offsetRef.current % W) + W) % W;
     track.style.transform = `translate3d(${-offsetRef.current}px,0,0)`;
 
-    // if tooltip is open, close it (avoid wrong position)
     if (tipOpen) {
       setTipOpen(false);
       setTipRect(null);
@@ -339,7 +373,7 @@ export default function LogoMarquee({
       <button
         type="button"
         onClick={() => {
-          setDir(-1); // move right
+          setDir(-1);
           nudge(-1);
         }}
         aria-label="Scroll left"
@@ -351,7 +385,7 @@ export default function LogoMarquee({
       <button
         type="button"
         onClick={() => {
-          setDir(1); // move left
+          setDir(1);
           nudge(1);
         }}
         aria-label="Scroll right"
@@ -373,13 +407,9 @@ export default function LogoMarquee({
         <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent" />
 
         {loading && normalizedItems.length === 0 ? (
-          <div className="py-4 text-center text-sm text-gray-500">
-            Loading logos...
-          </div>
+          <div className="py-4 text-center text-sm text-gray-500">Loading logos...</div>
         ) : normalizedItems.length === 0 ? (
-          <div className="py-4 text-center text-sm text-gray-500">
-            No logos found.
-          </div>
+          <div className="py-4 text-center text-sm text-gray-500">No logos found.</div>
         ) : (
           <div
             ref={trackRef}
@@ -390,10 +420,7 @@ export default function LogoMarquee({
               const key = `${item.key}-${idx}`;
 
               const content = (
-                <div
-                  className="relative flex items-center justify-center"
-                  style={{ minWidth: itemWidth }}
-                >
+                <div className="relative flex items-center justify-center" style={{ minWidth: itemWidth }}>
                   <div
                     className="relative cursor-pointer"
                     onMouseEnter={(e) => showTip(e, item.name)}
@@ -434,7 +461,6 @@ export default function LogoMarquee({
         )}
       </div>
 
-      {/* Tooltip rendered outside overflow-hidden wrapper */}
       <TooltipPortal open={tipOpen} text={tipText} anchorRect={tipRect} />
     </div>
   );

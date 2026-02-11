@@ -1,18 +1,23 @@
 export async function getHeaderMenu() {
   try {
-    // call your Next API (same origin)
-    const res = await fetch("/api/header-menu", {
+    const upstream = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/menu/dynamic`;
+
+    const res = await fetch(upstream, {
       method: "GET",
       headers: { Accept: "application/json" },
       cache: "no-store",
     });
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      console.error("getHeaderMenu failed:", res.status, res.statusText, t);
+      return [];
+    }
 
-    const json = await res.json();
-    return Array.isArray(json?.data) ? json.data : [];
-  } catch (err) {
-    console.error("getHeaderMenu error:", err);
+    const data = await res.json();
+    return Array.isArray(data) ? data : data?.data ?? [];
+  } catch (e) {
+    console.error("getHeaderMenu error:", e);
     return [];
   }
 }

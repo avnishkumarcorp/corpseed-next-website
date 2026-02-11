@@ -337,8 +337,8 @@ export default function ContactUsClient({ data }) {
 
         {/* FOOT LINKS */}
         <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <HelpCard text="Have questions?" linkText="FAQs" href="/partner" />
-          <HelpCard text="For job opportunities" linkText="Open roles" href="/partner" />
+          <HelpCard text="Have questions?" linkText="FAQs" href="/faq" />
+          <HelpCard text="For job opportunities" linkText="Open roles" href="/join-our-team" />
           <HelpCard text="For business partnerships" linkText="Forum" href="/partner" />
         </div>
       </section>

@@ -76,7 +76,9 @@ export default function LatestProductsSection({ data = [] }) {
             className={[
               "absolute left-[-50px] top-1/2 z-20 hidden -translate-y-1/2 md:flex",
               "h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              items.length <= perViewDesktop ? "opacity-40 cursor-not-allowed" : "",
+              items.length <= perViewDesktop
+                ? "opacity-40 cursor-not-allowed"
+                : "",
             ].join(" ")}
             aria-label="Previous products"
           >
@@ -99,7 +101,9 @@ export default function LatestProductsSection({ data = [] }) {
             className={[
               "absolute right-[-50px] top-1/2 z-20 hidden -translate-y-1/2 md:flex",
               "h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              items.length <= perViewDesktop ? "opacity-40 cursor-not-allowed" : "",
+              items.length <= perViewDesktop
+                ? "opacity-40 cursor-not-allowed"
+                : "",
             ].join(" ")}
             aria-label="Next products"
           >
@@ -123,7 +127,10 @@ export default function LatestProductsSection({ data = [] }) {
               }}
             >
               {items.map((p) => (
-                <div key={p?.id || p?.slug} className="w-full shrink-0 px-3 md:w-1/5">
+                <div
+                  key={p?.id || p?.slug}
+                  className="w-full shrink-0 px-3 md:w-1/5"
+                >
                   <ProductCard item={p} />
                 </div>
               ))}
@@ -131,8 +138,9 @@ export default function LatestProductsSection({ data = [] }) {
           </div>
 
           {/* Dots */}
+          {/* Dots (hide on mobile) */}
           {items.length > perViewDesktop ? (
-            <div className="mt-6 flex items-center justify-center gap-2">
+            <div className="mt-6 hidden md:flex items-center justify-center gap-2">
               {Array.from({ length: dotsCount }).map((_, i) => (
                 <button
                   key={i}

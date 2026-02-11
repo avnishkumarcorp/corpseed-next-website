@@ -221,8 +221,9 @@ export default function LatestArticlesSection({
           </div>
 
           {/* Dots */}
+          {/* Dots (hide on mobile) */}
           {!loading && items.length > perView ? (
-            <div className="mt-6 flex items-center justify-center gap-2">
+            <div className="mt-6 hidden md:flex items-center justify-center gap-2">
               {Array.from({ length: dotsCount }).map((_, i) => (
                 <button
                   key={i}

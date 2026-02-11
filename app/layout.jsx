@@ -18,10 +18,12 @@ export const metadata = {
     "msvalidate.01": "6FE373E64B7D16AE4CC9FA10A4FCA067",
     "google-site-verification": "xay8w1fZXMUiEkwyejtBYvYYOCsKKki9Ha_6xg3fAog",
     "facebook-domain-verification": "f3x050wlknq32peot77xkc2eviz6z6",
-    // Permissions-Policy is not a standard "meta" key in metadata API,
-    // but we can output it via "other" with httpEquiv below in <head>.
   },
 };
+
+const ADS_ID = "AW-804992554";
+// ✅ If you have GA4, put it here. Example: "G-XXXXXXXXXX"
+const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID; // set in env or hardcode
 
 export default function RootLayout({ children }) {
   return (
@@ -29,10 +31,10 @@ export default function RootLayout({ children }) {
       <head>
         <meta httpEquiv="Permissions-Policy" content="interest-cohort=()" />
       </head>
+
       <body className="min-h-screen bg-white text-gray-900">
         <div className="flex min-h-screen flex-col">
           <HeaderWrapper />
-          {/* Middle content changes by route */}
           <main className="flex-1">{children}</main>
           <MobileStickyFooter />
           <Footer />
@@ -41,6 +43,8 @@ export default function RootLayout({ children }) {
             message="Welcome to Corpseed. Please type your query, and we shall provide immediate assistance."
           />
         </div>
+
+        {/* ✅ Facebook Pixel - keep as afterInteractive */}
         <Script id="fb-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
@@ -60,36 +64,28 @@ fbq('init','2066838230073662');fbq('track','PageView');`}
           />
         </noscript>
 
-        {/* Google Analytics (UA) */}
+        {/* ✅ Load gtag.js only ONCE (pick one ID for src) */}
         <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=UA-136513064-1"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID || ADS_ID}`}
           strategy="afterInteractive"
         />
-        <Script id="ga-ua" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
+
+        {/* ✅ Configure GA4 + Ads (no duplicate gtag.js) */}
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config','UA-136513064-1');`}
-        </Script>
 
-        {/* Google Ads */}
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=AW-804992554"
-          strategy="afterInteractive"
-        />
-        <Script id="gads" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config','AW-804992554');
+${GA4_ID ? `gtag('config', '${GA4_ID}', { send_page_view: true });` : ""}
 
+gtag('config', '${ADS_ID}');
 window.gtag_report_conversion = function(url){
   var callback = function(){ if(typeof(url) != 'undefined'){ window.location = url; } };
-  gtag('event','conversion',{'send_to':'AW-804992554/7K8VCM6g0bIDEKrs7P8C','event_callback':callback});
+  gtag('event','conversion',{'send_to':'${ADS_ID}/7K8VCM6g0bIDEKrs7P8C','event_callback':callback});
   return false;
-};`}
+};
+          `}
         </Script>
       </body>
     </html>

@@ -1,12 +1,5 @@
-import CardCarousel from "./components/carousel/CardCarousel";
-import LogoMarquee from "./components/carousel/LogoMarquee";
-import ComplianceUpdateSection from "./components/home/sections/ComplianceUpdateSection";
 import HomeHeroSection from "./components/home/sections/HomeHeroSection";
-import LatestArticlesSection from "./components/home/sections/LatestArticleSection";
-import LatestProductsSection from "./components/home/sections/LatestProductsSection";
-import NewsSection from "./components/home/sections/NewsSection";
-import OurSupportSection from "./components/home/sections/OurSupportSection";
-import VirtualMeetingSection from "./components/home/sections/VirtualMeetingSection";
+import HomeClientSections from "./components/home/HomeClientSections";
 
 import { getHomeTestData } from "./lib/home";
 import { getLatestBlogs } from "./lib/knowledgeCentre";
@@ -48,24 +41,25 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  const homeData = await getHomeTestData();
-  const newsData =await getLatestNews()
-  const latestBlogs = await getLatestBlogs();
-  const products = await getLatestProducts();
+  const [homeData, newsData, latestBlogs, products] = await Promise.all([
+    getHomeTestData(),
+    getLatestNews(),
+    getLatestBlogs(),
+    getLatestProducts(),
+  ]);
 
   return (
     <>
+      {/* ✅ Keep Hero in server for best LCP */}
       <HomeHeroSection data={homeData} />
-      <section className="mx-auto max-w-7xl px-4 py-10">
-        <LogoMarquee speed={60} />
-      </section>
-      <CardCarousel data={homeData} />
-      <ComplianceUpdateSection data={homeData} />
-      <VirtualMeetingSection data={homeData} />
-      <OurSupportSection data={homeData} />
-      <NewsSection data={newsData} />
-      <LatestArticlesSection data={latestBlogs} />
-      <LatestProductsSection data={products} />
+
+      {/* ✅ Everything else client-lazy */}
+      <HomeClientSections
+        homeData={homeData}
+        newsData={newsData}
+        latestBlogs={latestBlogs}
+        products={products}
+      />
     </>
   );
 }

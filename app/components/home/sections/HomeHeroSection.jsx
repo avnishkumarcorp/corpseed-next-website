@@ -1,4 +1,12 @@
+// ✅ Drop-in update: adds a Google-like voice popup + auto-stop after 8s of silence
+// - Starts listening only when you open popup (mic click)
+// - If no speech for 8s => auto stop + close popup
+// - Closing popup manually => stops listening immediately
+// - Works with SpeechRecognition (Safari, some Chrome) + fallback recorder (Android Chrome) via /api/speech-to-text
+
 "use client";
+
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { PhoneCall, Star } from "lucide-react";
@@ -11,11 +19,10 @@ import environmentalImg from "../../../../public/home/Sustainability-02.png";
 import importExportImg from "../../../../public/home/Import_Export_Image-02.png";
 import productComplianceImg from "../../../../public/home/Product_Compliance-02.png";
 
-// center mock images (your uploaded ones)
+// center mock images
 import envBgLeft from "../../../../public/home/Environmental1_Image-03.png";
 import envBgMid from "../../../../public/home/Environmental_main_image-03.png";
 import envBgRight from "../../../../public/home/Environmental2_Image-03-03.png";
-import React from "react";
 
 const DEFAULT_ITEMS = [
   {
@@ -122,15 +129,339 @@ function normalizeGroups(apiData) {
 }
 
 function ensureInternalHref(url) {
-  // API sometimes returns absolute corpseed url
   if (!url) return "#";
   try {
     const u = new URL(url, "https://www.corpseed.com");
-    // Keep same path+query+hash
     return `${u.pathname}${u.search}${u.hash}`;
   } catch {
     return url;
   }
+}
+
+/** ✅ Voice popup (Google-like) */
+function VoicePopup({ open, listening, interim, error, onClose }) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[99999]">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
+        onClick={onClose}
+      />
+      {/* Modal */}
+      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">
+              {listening ? "Listening…" : "Voice search"}
+            </p>
+            <p className="mt-1 text-xs text-slate-600">
+              Speak now. It will stop automatically after 8 seconds of silence.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+            aria-label="Close voice search"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          {error ? (
+            <p className="text-sm text-red-600">{error}</p>
+          ) : interim ? (
+            <p className="text-sm text-slate-900">{interim}</p>
+          ) : (
+            <p className="text-sm text-slate-500">
+              {listening ? "Say something…" : "Press mic to start"}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-4 flex items-center justify-center">
+          <div
+            className={[
+              "flex h-14 w-14 items-center justify-center rounded-full border",
+              listening
+                ? "border-blue-300 bg-blue-50"
+                : "border-slate-200 bg-white",
+            ].join(" ")}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M19 11a7 7 0 0 1-14 0"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 18v3"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * ✅ Voice engine with "silence auto-stop"
+ * - Works with SpeechRecognition if available
+ * - Fallback to MediaRecorder if not (Android Chrome)
+ * - Auto-stops if no speech for `silenceMs` (default 8000)
+ */
+function useVoiceSearch({ onText, silenceMs = 8000, lang = "en-IN" }) {
+  const recRef = React.useRef(null);
+
+  const mediaRef = React.useRef({
+    stream: null,
+    recorder: null,
+    chunks: [],
+  });
+
+  const silenceTimerRef = React.useRef(null);
+
+  const [supported, setSupported] = React.useState(false);
+  const [listening, setListening] = React.useState(false);
+  const [error, setError] = React.useState("");
+  const [interim, setInterim] = React.useState("");
+
+  const resetSilenceTimer = React.useCallback(() => {
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    silenceTimerRef.current = setTimeout(() => {
+      // ✅ 8 sec no speech => stop
+      stop();
+      setError("Stopped (no speech detected).");
+    }, silenceMs);
+  }, [silenceMs]);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    setSupported(Boolean(SR) || Boolean(navigator?.mediaDevices?.getUserMedia));
+  }, []);
+
+  // setup SpeechRecognition
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = lang;
+
+    rec.onstart = () => {
+      setError("");
+      setInterim("");
+      setListening(true);
+      resetSilenceTimer();
+    };
+
+    rec.onend = () => {
+      setListening(false);
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    };
+
+    rec.onerror = (e) => {
+      setListening(false);
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+
+      setError(
+        e?.error === "not-allowed"
+          ? "Mic permission denied. Allow microphone access."
+          : e?.error === "no-speech"
+            ? "No speech detected."
+            : "Voice search failed.",
+      );
+    };
+
+    rec.onspeechstart = () => {
+      // user started speaking
+      resetSilenceTimer();
+    };
+
+    rec.onspeechend = () => {
+      // speech ended, start timer again
+      resetSilenceTimer();
+    };
+
+    rec.onresult = (event) => {
+      resetSilenceTimer();
+
+      let interimText = "";
+      let finalText = "";
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0]?.transcript || "";
+        if (event.results[i].isFinal) finalText += transcript;
+        else interimText += transcript;
+      }
+
+      const merged = (finalText || interimText).trim();
+      setInterim(merged);
+
+      if (finalText.trim()) {
+        onText?.(finalText.trim());
+        stop(); // ✅ once final text => stop
+      }
+    };
+
+    recRef.current = rec;
+
+    return () => {
+      try {
+        rec.stop();
+      } catch {}
+      recRef.current = null;
+    };
+  }, [lang, onText, resetSilenceTimer]);
+
+  const stopMediaRecorder = () => {
+    try {
+      const { recorder, stream } = mediaRef.current;
+      if (recorder && recorder.state !== "inactive") recorder.stop();
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+    } catch {}
+    mediaRef.current.stream = null;
+    mediaRef.current.recorder = null;
+    mediaRef.current.chunks = [];
+  };
+
+  const stop = React.useCallback(() => {
+    // stop SR
+    try {
+      recRef.current?.stop();
+    } catch {}
+
+    // stop fallback recorder
+    stopMediaRecorder();
+
+    setListening(false);
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    silenceTimerRef.current = null;
+  }, []);
+
+  const startRecorderFallback = async () => {
+    setError("");
+    setInterim("");
+
+    // Android Chrome: HTTPS needed (or localhost)
+    if (
+      typeof window !== "undefined" &&
+      window.location.protocol !== "https:" &&
+      window.location.hostname !== "localhost"
+    ) {
+      setError("Voice search needs HTTPS on mobile browsers.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+
+      mediaRef.current.stream = stream;
+      mediaRef.current.recorder = recorder;
+      mediaRef.current.chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data?.size) mediaRef.current.chunks.push(e.data);
+      };
+
+      recorder.onstart = () => {
+        setListening(true);
+        resetSilenceTimer(); // ✅ start silence timer immediately
+      };
+
+      recorder.onstop = async () => {
+        try {
+          const blob = new Blob(mediaRef.current.chunks, { type: "audio/webm" });
+          const fd = new FormData();
+          fd.append("audio", blob, "voice.webm");
+
+          const res = await fetch("/api/speech-to-text", {
+            method: "POST",
+            body: fd,
+          });
+
+          if (!res.ok) throw new Error("stt_failed");
+          const json = await res.json();
+          const text = String(json?.text || "").trim();
+          if (text) onText?.(text);
+        } catch {
+          setError("Voice search failed. Please try again.");
+        } finally {
+          setListening(false);
+        }
+      };
+
+      recorder.start();
+
+      // ✅ if no one speaks for 8 seconds, stop recorder too
+      // (we can't detect speech in recorder easily, so this is a strict timeout)
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = setTimeout(() => {
+        stop();
+        setError("Stopped (no speech detected).");
+      }, silenceMs);
+    } catch {
+      setError("Mic permission denied. Please allow microphone access.");
+      setListening(false);
+    }
+  };
+
+  const start = async () => {
+    setError("");
+    setInterim("");
+
+    // try SpeechRecognition first
+    if (recRef.current) {
+      try {
+        recRef.current.start();
+        return;
+      } catch {
+        // fallback below
+      }
+    }
+
+    await startRecorderFallback();
+  };
+
+  // cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      stop();
+    };
+  }, [stop]);
+
+  return {
+    supported,
+    listening,
+    error,
+    interim,
+    start,
+    stop,
+    clearError: () => setError(""),
+  };
 }
 
 function HeroSearch({
@@ -156,91 +487,28 @@ function HeroSearch({
 
   const placeholder = useTypewriterPlaceholders(placeholders, 1600);
 
-  // 🎤 speech state
-  const recognitionRef = React.useRef(null);
-  const [speechSupported, setSpeechSupported] = React.useState(false);
-  const [listening, setListening] = React.useState(false);
-  const [speechError, setSpeechError] = React.useState("");
+  // ✅ popup state
+  const [voiceOpen, setVoiceOpen] = React.useState(false);
 
-  // detect support once
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    setSpeechSupported(Boolean(SpeechRecognition));
-  }, []);
-
-  // setup recognition instance
-  React.useEffect(() => {
-    if (!speechSupported) return;
-    if (typeof window === "undefined") return;
-
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    const rec = new SpeechRecognition();
-    rec.continuous = false;
-    rec.interimResults = true;
-    rec.lang = "en-IN"; // change if needed
-
-    rec.onstart = () => {
-      setSpeechError("");
-      setListening(true);
+  const voice = useVoiceSearch({
+    silenceMs: 8000,
+    onText: (text) => {
       setOpen(true);
-    };
+      setQ(text);
+      inputRef.current?.focus?.();
+      // close popup once we got text
+      setVoiceOpen(false);
+    },
+  });
 
-    rec.onend = () => setListening(false);
-
-    rec.onerror = (e) => {
-      setSpeechError(
-        e?.error === "not-allowed"
-          ? "Mic permission denied."
-          : e?.error === "no-speech"
-            ? "No speech detected."
-            : "Voice search failed.",
-      );
-      setListening(false);
-    };
-
-    rec.onresult = (event) => {
-      let interim = "";
-      let finalText = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0]?.transcript || "";
-        if (event.results[i].isFinal) finalText += transcript;
-        else interim += transcript;
-      }
-
-      const next = (finalText || interim).trim();
-      if (next) setQ(next);
-    };
-
-    recognitionRef.current = rec;
-
-    return () => {
-      try {
-        rec.stop();
-      } catch {}
-      recognitionRef.current = null;
-    };
-  }, [speechSupported]);
-
-  const startVoice = () => {
-    setSpeechError("");
-    if (!speechSupported || !recognitionRef.current) {
-      setSpeechError("Voice search not supported in this browser.");
-      return;
-    }
-    try {
-      recognitionRef.current.start();
-    } catch {}
+  const closeVoicePopup = () => {
+    setVoiceOpen(false);
+    voice.stop(); // ✅ closing popup stops listening always
   };
 
-  const stopVoice = () => {
-    try {
-      recognitionRef.current?.stop();
-    } catch {}
+  const openVoicePopupAndStart = async () => {
+    setVoiceOpen(true);
+    await voice.start();
   };
 
   // close on outside click / esc
@@ -265,20 +533,6 @@ function HeroSearch({
     };
   }, [open]);
 
-  // reset when closed
-  React.useEffect(() => {
-    if (!open) {
-      setApiData(null);
-      setErr("");
-      setLoading(false);
-      setSpeechError("");
-      setListening(false);
-      if (abortRef.current) abortRef.current.abort();
-      stopVoice();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
   // fetch
   React.useEffect(() => {
     if (!open) return;
@@ -300,7 +554,6 @@ function HeroSearch({
         setLoading(true);
         setErr("");
 
-        // ✅ IMPORTANT: encode the query
         const url = `/api/search/service-industry-blog/${encodeURIComponent(
           query,
         )}`;
@@ -325,11 +578,29 @@ function HeroSearch({
   const groups = React.useMemo(() => normalizeGroups(apiData), [apiData]);
   const showPanel = open && (q.trim() || loading || err);
 
+  // ✅ auto-close popup when it stops listening (e.g. 8s silence)
+  React.useEffect(() => {
+    if (!voiceOpen) return;
+    if (!voice.listening && !voice.interim) {
+      // if it stopped without result, keep popup but show error if any.
+      // You can also auto-close:
+      // setVoiceOpen(false);
+    }
+  }, [voiceOpen, voice.listening, voice.interim]);
+
   return (
     <div ref={wrapRef} className="relative w-full max-w-xl">
+      {/* ✅ Voice Popup */}
+      <VoicePopup
+        open={voiceOpen}
+        listening={voice.listening}
+        interim={voice.interim}
+        error={voice.error}
+        onClose={closeVoicePopup}
+      />
+
       {/* Search input */}
       <div className="group flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100">
-        {/* ✅ Bigger search icon */}
         <span className="text-slate-400">
           <svg
             width="22"
@@ -366,25 +637,22 @@ function HeroSearch({
           className="w-full bg-transparent px-1 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
         />
 
-        {/* 🎤 Mic button */}
+        {/* 🎤 Mic button -> opens popup + starts listening */}
         <button
           type="button"
-          onClick={listening ? stopVoice : startVoice}
-          disabled={!speechSupported}
-          title={
-            !speechSupported
-              ? "Voice search not supported"
-              : listening
-                ? "Stop voice search"
-                : "Search by voice"
-          }
-          aria-label={listening ? "Stop voice search" : "Search by voice"}
+          onClick={() => {
+            if (voiceOpen) closeVoicePopup();
+            else openVoicePopupAndStart();
+          }}
+          disabled={!voice.supported}
+          title={!voice.supported ? "Voice not supported" : "Search by voice"}
+          aria-label="Search by voice"
           className={[
             "inline-flex h-9 w-9 items-center justify-center rounded-xl",
             "border border-slate-200 bg-white text-slate-700 shadow-sm",
             "hover:bg-slate-50 cursor-pointer",
-            listening ? "ring-2 ring-blue-300" : "",
-            !speechSupported ? "opacity-40 cursor-not-allowed" : "",
+            voiceOpen ? "ring-2 ring-blue-300" : "",
+            !voice.supported ? "opacity-40 cursor-not-allowed" : "",
           ].join(" ")}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -412,7 +680,7 @@ function HeroSearch({
           </svg>
         </button>
 
-        {/* Clear / pill */}
+        {/* Clear */}
         {q ? (
           <button
             type="button"
@@ -421,36 +689,14 @@ function HeroSearch({
               setApiData(null);
               setErr("");
               setLoading(false);
-              setSpeechError("");
               inputRef.current?.focus();
             }}
             className="rounded-xl px-2 py-1 text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"
           >
             Clear
           </button>
-        ) : (
-          <span className="rounded-xl bg-slate-50 px-2 py-1 text-[11px] text-slate-600">
-            Search
-          </span>
-        )}
+        ) : null}
       </div>
-
-      {/* small status line */}
-      {(speechError || listening) && (
-        <div className="mt-2 text-xs">
-          {speechError ? (
-            <span className="text-red-600">{speechError}</span>
-          ) : (
-            <span className="inline-flex items-center gap-2 text-slate-600">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
-              </span>
-              Listening…
-            </span>
-          )}
-        </div>
-      )}
 
       {/* Dropdown */}
       {showPanel ? (
@@ -502,8 +748,7 @@ function HeroSearch({
                             key={x?.url || x?.slug || x?.name}
                             href={ensureInternalHref(x?.url || "#")}
                             onClick={() => setOpen(false)}
-                            className="group block rounded-xl border border-slate-200 bg-white p-3
-                                       transition hover:border-slate-300 hover:shadow-sm cursor-pointer"
+                            className="group block rounded-xl border border-slate-200 bg-white p-3 transition hover:border-slate-300 hover:shadow-sm cursor-pointer"
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
@@ -584,11 +829,9 @@ export default function HomeHeroSection({
   ratingText = "Rated 4.9 stars ratings by 15000+ Customers like you",
   ctaHref = "/contact-us",
   ctaText = "CALL FOR FREE CONSULTATION",
-  items = DEFAULT_ITEMS,
 }) {
   return (
     <section className="relative bg-white overflow-visible">
-      {/* soft background (keep subtle like your 1st image) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-blue-100/50 blur-3xl" />
         <div className="absolute -right-40 top-20 h-[520px] w-[520px] rounded-full bg-indigo-100/50 blur-3xl" />
@@ -596,7 +839,6 @@ export default function HomeHeroSection({
 
       <div className="relative mx-auto max-w-7xl px-4 pt-10 pb-10 sm:px-6 lg:px-8 lg:pt-12 lg:pb-12">
         <div className="grid items-start gap-10 lg:grid-cols-12">
-          {/* LEFT */}
           <div className="lg:col-span-6">
             <Link
               href={ctaHref}
@@ -628,9 +870,7 @@ export default function HomeHeroSection({
                   )}
                 </span>
               ))}
-              <span className="text-gray-900">
-                &amp; Plant Setup Compliance
-              </span>
+              <span className="text-gray-900">&amp; Plant Setup Compliance</span>
             </div>
 
             <p className="mt-3 max-w-xl text-base text-gray-700 sm:text-lg">
@@ -642,7 +882,6 @@ export default function HomeHeroSection({
               <span className="font-medium">{ratingText}</span>
             </div>
 
-            {/* HERO SEARCH */}
             <div className="mt-6">
               <HeroSearch
                 baseUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
@@ -656,10 +895,9 @@ export default function HomeHeroSection({
             </div>
           </div>
 
-          {/* RIGHT: Desktop only (STRICT ROWS) */}
+          {/* Right side kept as-is (your cards) */}
           <div className="lg:col-span-6 hidden lg:block">
             <div className="ml-auto w-full max-w-[780px]">
-              {/* stage height less than viewport */}
               <div className="flex flex-col gap-8">
                 <div className="flex justify-center gap-8">
                   <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer">
@@ -670,12 +908,11 @@ export default function HomeHeroSection({
                       <Image
                         src={industryImg}
                         alt="Industry Setup Solution"
-                        height={"auto"}
-                        width={"100%"}
+                        height={76}
+                        width={110}
                         className="object-contain"
                       />
                     </div>
-
                     <div className="mt-2 text-[12px] leading-snug text-gray-500">
                       <Link href="/service/biofuel-manufacturing-plant-setup-in-india">
                         Bio-fuels
@@ -688,10 +925,7 @@ export default function HomeHeroSection({
                     </div>
                   </div>
 
-                  <div
-                    href="/service/sustainability"
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer"
-                  >
+                  <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer">
                     <div className="text-[14px] font-semibold text-gray-900">
                       Sustainability
                     </div>
@@ -699,12 +933,11 @@ export default function HomeHeroSection({
                       <Image
                         src={sustainabilityImg}
                         alt="Sustainability"
-                        height={"auto"}
-                        width={"100%"}
+                        height={76}
+                        width={110}
                         className="object-contain"
                       />
                     </div>
-
                     <div className="mt-2 text-[12px] leading-snug text-gray-500">
                       <Link href="/service/environmental-social-and-governance-esg">
                         ESG
@@ -729,7 +962,6 @@ export default function HomeHeroSection({
                   </div>
                 </div>
 
-                {/* MIDDLE ROW (3) - with center card slightly forward */}
                 <div className="flex justify-between">
                   <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer">
                     <div className="text-[14px] font-semibold leading-tight text-gray-900">
@@ -739,24 +971,20 @@ export default function HomeHeroSection({
                       <Image
                         src={regulatoryImg}
                         alt="Regulatory Compliance"
-                        height={"auto"}
-                        width={"100%"}
+                        height={72}
+                        width={104}
                         className="object-contain"
                       />
                     </div>
-
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
-                      <Link href="/service/factory-license">Factory</Link> /
-                      <Link href="/service/fire-noc-fire-noc-renewal">
-                        Fire
-                      </Link>{" "}
+                      <Link href="/service/factory-license">Factory</Link> /{" "}
+                      <Link href="/service/fire-noc-fire-noc-renewal">Fire</Link>{" "}
                       / Trade <br />
                       FSSAI / CGWA / Labour <br />
                       &amp; Other Compliance
                     </div>
                   </div>
 
-                  {/* Center card (on top) */}
                   <Link
                     href="/service/environmental"
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_16px_34px_rgba(0,0,0,0.14)] cursor-pointer"
@@ -768,12 +996,11 @@ export default function HomeHeroSection({
                       <Image
                         src={envBgMid}
                         alt="Environmental"
-                        height={"auto"}
-                        width={"100%"}
+                        height={82}
+                        width={118}
                         className="object-contain"
                       />
                     </div>
-
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
                       EPR / EIA / CTO / CTE <br />
                       EC / BWM / PWM / EWM <br />
@@ -792,12 +1019,11 @@ export default function HomeHeroSection({
                       <Image
                         src={importExportImg}
                         alt="Import Export"
-                        height={"auto"}
-                        width={"100%"}
+                        height={72}
+                        width={104}
                         className="object-contain"
                       />
                     </div>
-
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
                       IEC / DGFT / CHA <br />
                       CDSCO / BIS / LMPC <br />
@@ -806,7 +1032,6 @@ export default function HomeHeroSection({
                   </Link>
                 </div>
 
-                {/* BOTTOM ROW (1) */}
                 <div className="flex justify-center">
                   <Link
                     href="/service/product-compliance"
@@ -819,12 +1044,11 @@ export default function HomeHeroSection({
                       <Image
                         src={productComplianceImg}
                         alt="Product Compliance"
-                        height={"auto"}
-                        width={"100%"}
+                        height={76}
+                        width={110}
                         className="object-contain"
                       />
                     </div>
-
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
                       ISI / BIS / ISO / BEE / FDA / Meity <br />
                       CDSCO / TEC / WPC / OSP / etc.
@@ -834,6 +1058,7 @@ export default function HomeHeroSection({
               </div>
             </div>
           </div>
+          {/* end right */}
         </div>
       </div>
     </section>

@@ -9,7 +9,7 @@ export default function MobileStickyFooter() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const phoneNumber = "917558640644";
+  const phoneNumber = "919311255283";
 
   const handleCall = () => {
     window.location.href = `tel:+${phoneNumber}`;

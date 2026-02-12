@@ -1,13 +1,19 @@
 // app/products/ProductsCatalogue.jsx
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ArrowRight } from "lucide-react";
 
 import ProductsControls from "./ProductsControls";
-import ConsultNowModal from "../components/ConsultNowModal";
 import TalkToExpertCard from "../service/TalkToExpertCard";
+
+// ✅ Lazy-load modal JS (loads only when user opens)
+const ConsultNowModal = dynamic(() => import("../components/ConsultNowModal"), {
+  ssr: false,
+});
 
 function clampText(text, n = 140) {
   const t = String(text || "").trim();
@@ -25,6 +31,67 @@ function buildHref({ page, size, filter, q }) {
 
   return `/products?${sp.toString()}`;
 }
+
+// ✅ safe image url (handles absolute + relative)
+function toImgUrl(image) {
+  const img = String(image || "").trim();
+  if (!img) return "";
+  if (img.startsWith("http://") || img.startsWith("https://")) return img;
+  return `https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/${img}`;
+}
+
+// ✅ Memoized card so modal open/close doesn't rerender all cards
+const ProductCard = React.memo(function ProductCard({ p, idx }) {
+  const imgUrl = toImgUrl(p?.image || p?.img || p?.thumbnail);
+  const href = `/products/${p?.slug || ""}`;
+
+  return (
+    <Link
+      href={href}
+      // ✅ prefetch only first few to reduce bandwidth
+      prefetch={idx < 6}
+      className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition cursor-pointer"
+    >
+      {/* Image */}
+      <div className="relative h-[170px] w-full bg-slate-50">
+        {imgUrl ? (
+          <Image
+            src={imgUrl}
+            alt={p?.title || p?.name || "Product"}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.03]"
+            // ✅ only above-fold images priority
+            priority={idx < 2}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
+            No image
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-base font-semibold text-gray-900 line-clamp-2">
+            {p?.title || p?.name}
+          </h3>
+          <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700">
+            Popular
+          </span>
+        </div>
+
+        <p className="mt-3 text-sm text-gray-600">{clampText(p?.summary, 160)}</p>
+
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-xs text-gray-500">{p?.serviceName || "Corpseed"}</span>
+          <span className="text-sm font-semibold text-blue-600">Explore more →</span>
+        </div>
+      </div>
+    </Link>
+  );
+});
 
 export default function ProductsCatalogue({ data, page, size, filter, q }) {
   const [consultOpen, setConsultOpen] = useState(false);
@@ -81,7 +148,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
               </div>
             </div>
 
-            {/* ✅ Controls */}
+            {/* Controls */}
             <div className="mt-6">
               <ProductsControls
                 initialFilter={initialFilter}
@@ -142,7 +209,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                     })}
                   </div>
 
-                  {/* ✅ CTA */}
+                  {/* CTA */}
                   <div className="mt-4">
                     <TalkToExpertCard onClick={() => setConsultOpen(true)} />
                   </div>
@@ -182,40 +249,12 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
 
               {/* cards */}
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {visibleProducts.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/products/${p.slug}`}
-                    className="group rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition cursor-pointer"
-                  >
-                    <div className="p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="text-base font-semibold text-gray-900 line-clamp-2">
-                          {p.title || p.name}
-                        </h3>
-                        <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700">
-                          Popular
-                        </span>
-                      </div>
-
-                      <p className="mt-3 text-sm text-gray-600">
-                        {clampText(p.summary, 160)}
-                      </p>
-
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
-                          {p.serviceName || "Corpseed"}
-                        </span>
-                        <span className="text-sm font-semibold text-blue-600">
-                          Explore more →
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
+                {visibleProducts.map((p, idx) => (
+                  <ProductCard key={p?.id || p?.slug || idx} p={p} idx={idx} />
                 ))}
               </div>
 
-              {/* ✅ no results (especially for q-search) */}
+              {/* no results */}
               {normalizedQ && !visibleProducts.length ? (
                 <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
                   <p className="text-base font-semibold text-gray-900">
@@ -228,7 +267,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                 </div>
               ) : null}
 
-              {/* pagination (kept as-is) */}
+              {/* pagination */}
               <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
                 <Link
                   href={buildHref({
@@ -272,7 +311,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                 </Link>
               </div>
 
-              {/* ✅ small note (optional) */}
+              {/* note */}
               {normalizedQ ? (
                 <p className="mt-3 text-center text-[12px] text-gray-500">
                   Note: search results are refined on the client because the API

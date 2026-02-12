@@ -75,14 +75,14 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                     </button>
                   ))}
 
-                  <div className="mt-6 rounded-xl bg-slate-50 p-4">
+                  {/* <div className="mt-6 rounded-xl bg-slate-50 p-4">
                     <p className="text-sm text-slate-700 leading-6">
                       Corpseed helps clients create long-term value for all stakeholders.
                     </p>
                     <button className="mt-4 inline-flex items-center justify-center rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white cursor-pointer">
                       Explore
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               )}
             </div>

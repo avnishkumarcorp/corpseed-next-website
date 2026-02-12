@@ -16,6 +16,7 @@ import {
 import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
+import FeedbackBox from "@/app/components/FeedbackBox";
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
@@ -417,19 +418,21 @@ export default async function KnowledgeCentreSlugPage({ params }) {
 
             {/* Feedback */}
             {apiData?.feedback ? (
-              <Card>
-                <div className="p-5 sm:p-7">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Give us your feedback
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    {apiData?.feedback?.ratingValue || "Thanks!"}
-                    {apiData?.feedback?.comment
-                      ? ` • ${apiData.feedback.comment}`
-                      : ""}
-                  </p>
-                </div>
-              </Card>
+              // <Card>
+              //   <div className="p-5 sm:p-7">
+              //     <p className="text-sm font-semibold text-slate-900">
+              //       Give us your feedback
+              //     </p>
+              //     <p className="mt-1 text-sm text-slate-600">
+              //       {apiData?.feedback?.ratingValue || "Thanks!"}
+              //       {apiData?.feedback?.comment
+              //         ? ` • ${apiData.feedback.comment}`
+              //         : ""}
+              //     </p>
+              //   </div>
+              // </Card>
+              <FeedbackBox/>
+
             ) : null}
 
             {/* Related blogs */}

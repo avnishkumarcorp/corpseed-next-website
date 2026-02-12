@@ -18,7 +18,6 @@ import {
 import SafeHtml from "@/app/components/SafeHtml";
 import { getNewsBySlug } from "@/app/lib/newsRoom";
 
-
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
   return String(v);
@@ -181,13 +180,13 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
             href={`${basePath}/${x.slug}`}
             className="group flex gap-3 px-5 py-4 hover:bg-slate-50 cursor-pointer"
           >
-            <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+            <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-white">
               {x.image ? (
                 <Image
                   src={x.image}
                   alt={safeText(x.title)}
                   fill
-                  className="object-cover"
+                  className="object-contain p-2"
                   sizes="80px"
                 />
               ) : null}
@@ -254,14 +253,14 @@ export default async function NewsRoomSlugPage({ params }) {
           {/* ✅ IMAGE LEFT + TEXT RIGHT */}
           <div className="mt-4 grid gap-6 lg:grid-cols-[.7fr_1.3fr] lg:items-center">
             {/* LEFT image */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-              <div className="relative h-[200px] w-full sm:h-[240px]">
+            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="relative h-[220px] w-full sm:h-[260px]">
                 <Image
                   src={item.image}
                   alt={safeText(item.title)}
                   fill
                   priority
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 520px"
                 />
               </div>

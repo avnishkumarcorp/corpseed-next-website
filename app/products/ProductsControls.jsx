@@ -1,23 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
-export default function ProductsControls({
-  initialFilter = "",
-  services = [],
-  size = 20,
-}) {
+export default function ProductsControls({ initialFilter = "", services = [], size = 20 }) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
+  const spStr = sp.toString();
 
-  // mode controls whether the input writes to q or filter
-  const [mode, setMode] = useState("q"); // "q" | "filter"
+  const [isPending, startTransition] = useTransition();
+  const [mode, setMode] = useState("q");
   const [value, setValue] = useState(initialFilter || "");
 
-  // Keep input synced with URL changes (sidebar click etc.)
   useEffect(() => {
     const urlQ = (sp.get("q") || "").trim();
     const urlFilter = (sp.get("filter") || "").trim();
@@ -27,51 +23,49 @@ export default function ProductsControls({
       setValue(urlQ);
       return;
     }
-
     if (urlFilter) {
       setMode("filter");
       setValue(urlFilter);
       return;
     }
-
     setMode("q");
     setValue("");
-  }, [sp]);
+  }, [spStr]); // ✅
 
   const quickChips = useMemo(() => (services || []).slice(0, 6), [services]);
 
-  // Debounce push to URL
   useEffect(() => {
     const t = setTimeout(() => {
-      const next = new URLSearchParams(sp.toString());
+      const next = new URLSearchParams(spStr);
       next.set("page", "1");
       next.set("size", String(size));
 
       const v = (value || "").trim();
 
-      // ✅ clear both if empty
       if (!v) {
         next.delete("q");
         next.delete("filter");
-        router.push(`${pathname}?${next.toString()}`);
+        startTransition(() => {
+          router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+        });
         return;
       }
 
       if (mode === "q") {
-        // ✅ typing search -> q
         next.set("q", v);
         next.delete("filter");
       } else {
-        // ✅ chip/service filter -> filter
         next.set("filter", v);
         next.delete("q");
       }
 
-      router.push(`${pathname}?${next.toString()}`);
+      startTransition(() => {
+        router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+      });
     }, 450);
 
     return () => clearTimeout(t);
-  }, [value, mode, sp, router, pathname, size]);
+  }, [value, mode, spStr, router, pathname, size, startTransition]);
 
   const clearAll = () => {
     setMode("q");
@@ -87,16 +81,14 @@ export default function ProductsControls({
             <input
               value={value}
               onChange={(e) => {
-                setMode("q"); // ✅ typing always becomes q-search
+                setMode("q");
                 setValue(e.target.value);
               }}
               placeholder="Search products (e.g., BIS, EPR, Certification...)"
               className="w-full rounded-2xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-sm text-gray-900 outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50"
             />
-            {mode === "filter" && value ? (
-              <div className="mt-2 text-[11px] text-gray-500">
-                Filtering by service: <span className="font-semibold">{value}</span>
-              </div>
+            {isPending ? (
+              <div className="mt-2 text-[11px] text-gray-500">Updating…</div>
             ) : null}
           </div>
         </div>
@@ -116,11 +108,10 @@ export default function ProductsControls({
                 key={s?.id || s?.slug}
                 type="button"
                 onClick={() => {
-                  setMode("filter"); // ✅ chip = filter
+                  setMode("filter");
                   setValue(s?.serviceName || "");
                 }}
                 className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 cursor-pointer"
-                title={s?.serviceName}
               >
                 {s?.serviceName}
               </button>

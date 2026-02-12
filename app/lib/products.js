@@ -10,13 +10,16 @@ async function safeJson(res) {
   }
 }
 
-export async function getProductsPage({ page = 1, size = 20, filter = "", q = "" }) {
+export async function getProductsPage({
+  page = 1,
+  size = 20,
+  filter = "",
+  q = "",
+}) {
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("size", String(size));
 
-  // your API says "filter" is used for search too
-  // so if q exists, prefer q; else use filter
   const finalFilter = (q || filter || "").trim();
   params.set("filter", finalFilter);
 
@@ -26,16 +29,22 @@ export async function getProductsPage({ page = 1, size = 20, filter = "", q = ""
     const res = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      // ✅ allow caching + revalidate
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {
       const txt = await res.text().catch(() => "");
-      console.error("getProductsPage API Error:", res.status, res.statusText, txt);
+      console.error(
+        "getProductsPage API Error:",
+        res.status,
+        res.statusText,
+        txt,
+      );
       return null;
     }
 
-    return await safeJson(res);
+    return await res.json();
   } catch (e) {
     console.error("getProductsPage error:", e);
     return null;
@@ -56,7 +65,12 @@ export async function getProductBySlug(slug) {
 
     if (!res.ok) {
       const txt = await res.text().catch(() => "");
-      console.error("getProductBySlug API Error:", res.status, res.statusText, txt);
+      console.error(
+        "getProductBySlug API Error:",
+        res.status,
+        res.statusText,
+        txt,
+      );
       return null;
     }
 
@@ -66,8 +80,6 @@ export async function getProductBySlug(slug) {
     return null;
   }
 }
-
-
 
 export async function getLatestProducts() {
   if (!API_BASE) {

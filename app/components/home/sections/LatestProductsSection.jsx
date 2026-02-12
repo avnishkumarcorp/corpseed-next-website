@@ -12,16 +12,31 @@ function toImgUrl(image) {
   return `https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/${img}`;
 }
 
+// ✅ responsive per-view: mobile 1, sm 2, md 3, lg+ 5
+function getPerView(width) {
+  if (width < 640) return 1; // <sm
+  if (width < 768) return 2; // sm
+  if (width < 1024) return 3; // md
+  return 5; // lg+
+}
+
 export default function LatestProductsSection({ data = [] }) {
   const items = Array.isArray(data) ? data : [];
 
   const [index, setIndex] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
+  const [perView, setPerView] = React.useState(5);
 
-  // ✅ keep same as your old design (desktop 5 cards)
-  const perViewDesktop = 5;
+  // ✅ detect current breakpoint width on client
+  React.useEffect(() => {
+    const update = () => setPerView(getPerView(window.innerWidth));
+    update();
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
-  const maxIndex = Math.max(0, items.length - perViewDesktop);
+  // ✅ recompute based on perView (fix mobile sliding)
+  const maxIndex = Math.max(0, items.length - perView);
   const canPrev = index > 0;
   const canNext = index < maxIndex;
 
@@ -30,24 +45,24 @@ export default function LatestProductsSection({ data = [] }) {
     setIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
   }, [maxIndex]);
 
-  const prev = () => {
+  const prev = React.useCallback(() => {
     if (maxIndex <= 0) return;
-    setIndex((p) => (p <= 0 ? maxIndex : Math.max(0, p - 1)));
-  };
+    setIndex((p) => (p <= 0 ? maxIndex : p - 1));
+  }, [maxIndex]);
 
-  // ✅ autoplay only if enough items
+  // ✅ autoplay only if enough items for current viewport
   React.useEffect(() => {
     if (paused) return;
-    if (items.length <= perViewDesktop) return;
+    if (items.length <= perView) return;
 
     const id = setInterval(() => next(), 3000);
     return () => clearInterval(id);
-  }, [paused, next, items.length]);
+  }, [paused, next, items.length, perView]);
 
-  // ✅ if parent data changes, reset index
+  // ✅ reset / clamp index when data or perView changes
   React.useEffect(() => {
-    setIndex(0);
-  }, [items.length]);
+    setIndex((prev) => Math.min(prev, maxIndex));
+  }, [items.length, perView, maxIndex]);
 
   const dotsCount = Math.max(1, maxIndex + 1);
 
@@ -68,15 +83,15 @@ export default function LatestProductsSection({ data = [] }) {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          {/* Left Arrow */}
+          {/* Left Arrow (desktop only like your old UI) */}
           <button
             type="button"
             onClick={prev}
-            disabled={items.length <= perViewDesktop}
+            disabled={!canPrev || items.length <= perView}
             className={[
               "absolute left-[-50px] top-1/2 z-20 hidden -translate-y-1/2 md:flex",
               "h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              items.length <= perViewDesktop
+              !canPrev || items.length <= perView
                 ? "opacity-40 cursor-not-allowed"
                 : "",
             ].join(" ")}
@@ -93,15 +108,15 @@ export default function LatestProductsSection({ data = [] }) {
             </svg>
           </button>
 
-          {/* Right Arrow */}
+          {/* Right Arrow (desktop only) */}
           <button
             type="button"
             onClick={next}
-            disabled={items.length <= perViewDesktop}
+            disabled={!canNext || items.length <= perView}
             className={[
               "absolute right-[-50px] top-1/2 z-20 hidden -translate-y-1/2 md:flex",
               "h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              items.length <= perViewDesktop
+              !canNext || items.length <= perView
                 ? "opacity-40 cursor-not-allowed"
                 : "",
             ].join(" ")}
@@ -123,13 +138,18 @@ export default function LatestProductsSection({ data = [] }) {
             <div
               className="flex transition-transform duration-700 ease-in-out"
               style={{
-                transform: `translateX(-${index * (100 / perViewDesktop)}%)`,
+                // ✅ this is the key fix
+                transform: `translateX(-${index * (100 / perView)}%)`,
               }}
             >
               {items.map((p) => (
                 <div
                   key={p?.id || p?.slug}
-                  className="w-full shrink-0 px-3 md:w-1/5"
+                  className="shrink-0 px-3"
+                  style={{
+                    // ✅ each card takes exactly 1/perView width
+                    flexBasis: `${100 / perView}%`,
+                  }}
                 >
                   <ProductCard item={p} />
                 </div>
@@ -137,9 +157,8 @@ export default function LatestProductsSection({ data = [] }) {
             </div>
           </div>
 
-          {/* Dots */}
-          {/* Dots (hide on mobile) */}
-          {items.length > perViewDesktop ? (
+          {/* Dots (hide on mobile like before) */}
+          {items.length > perView ? (
             <div className="mt-6 hidden md:flex items-center justify-center gap-2">
               {Array.from({ length: dotsCount }).map((_, i) => (
                 <button

@@ -1,6 +1,6 @@
 // app/products/page.jsx
-import { getProductsPage } from "../lib/products";
 import ProductsCatalogue from "./ProductsCatalogue";
+import { getProductsPageCached } from "../lib/products.cached";
 
 export async function generateMetadata({ searchParams }) {
   const sp = await searchParams;
@@ -9,7 +9,7 @@ export async function generateMetadata({ searchParams }) {
   const filter = sp?.filter || "";
   const q = sp?.q || "";
 
-  const data = await getProductsPage({ page, size, filter, q });
+  const data = await getProductsPageCached({ page, size, filter, q });
 
   const title = data?.title || "Corpseed | All Products";
   const description =
@@ -31,21 +31,14 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function ProductsPage({ searchParams }) {
   const sp = await searchParams;
-
   const page = Number(sp?.page || 1);
   const size = Number(sp?.size || 20);
   const filter = sp?.filter || "";
   const q = sp?.q || "";
 
-  const data = await getProductsPage({ page, size, filter, q });
+  const data = await getProductsPageCached({ page, size, filter, q });
 
   return (
-    <ProductsCatalogue
-      data={data}
-      page={page}
-      size={size}
-      filter={filter}
-      q={q}
-    />
+    <ProductsCatalogue data={data} page={page} size={size} filter={filter} q={q} />
   );
 }

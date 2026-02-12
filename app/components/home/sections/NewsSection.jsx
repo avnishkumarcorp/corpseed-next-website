@@ -206,7 +206,7 @@ function NewsSlide({ slide }) {
               </span>
             </div>
 
-            <div className="mt-8">
+            {/* <div className="mt-8">
               <Link
                 href={href}
                 className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-[13px] font-semibold text-white shadow-sm cursor-pointer hover:bg-blue-700"
@@ -222,7 +222,7 @@ function NewsSlide({ slide }) {
                   />
                 </svg>
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

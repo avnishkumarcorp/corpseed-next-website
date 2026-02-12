@@ -425,13 +425,10 @@ export default function HomeHeroSection({
 
             <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
               {categories.map((c, idx) => (
-                <span key={c.href} className="flex items-center">
-                  <Link
-                    href={c.href}
-                    className="font-medium text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
-                  >
+                <span  className="flex items-center">
+                    <div className="font-medium text-blue-600  ">   
                     {c.label}
-                  </Link>
+                    </div>
                   {idx !== categories.length - 1 && (
                     <span className="mx-2 text-gray-300">|</span>
                   )}

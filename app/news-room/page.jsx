@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Search } from "lucide-react";
-import { getNewsList, getNewsRoomList } from "../lib/newsRoom";
+import { getNewsRoomList } from "../lib/newsRoom";
 
 
 function Card({ children, className = "" }) {
@@ -113,6 +113,7 @@ export async function generateMetadata({ searchParams }) {
     alternates: { canonical: "/news-room" },
   };
 }
+console.log("getNewsRoomList",getNewsRoomList )
 
 export default async function NewsRoomPage({ searchParams }) {
   const { page, size, q, categorySlug } = await searchParams;
@@ -401,7 +402,26 @@ export default async function NewsRoomPage({ searchParams }) {
                 </div>
               </Card>
 
-
+              {/* Follow us (same style placeholder) */}
+              {/* <Card className="p-5">
+                <p className="text-sm font-semibold text-slate-900">
+                  Follow us
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600">
+                    f
+                  </span>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600">
+                    in
+                  </span>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600">
+                    yt
+                  </span>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600">
+                    ig
+                  </span>
+                </div>
+              </Card> */}
             </div>
           </aside>
         </div>

@@ -879,7 +879,7 @@ export default function HomeHeroSection({
   ctaText = "CALL FOR FREE CONSULTATION",
 }) {
   return (
-    <section className="relative bg-white overflow-visible">
+    <section className="relative bg-white overflow-x-hidden">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-blue-100/50 blur-3xl" />
         <div className="absolute -right-40 top-20 h-[520px] w-[520px] rounded-full bg-indigo-100/50 blur-3xl" />

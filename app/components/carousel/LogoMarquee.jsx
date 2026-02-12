@@ -404,7 +404,7 @@ export default function LogoMarquee({
 
       <div
         ref={viewportRef}
-        className="relative overflow-hidden rounded-xl border border-gray-200 bg-white px-12 py-4"
+        className="relative overflow-hidden rounded-xl bg-white px-12 py-4"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

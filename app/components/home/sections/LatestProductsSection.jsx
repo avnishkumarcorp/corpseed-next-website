@@ -158,7 +158,7 @@ export default function LatestProductsSection({ data = [] }) {
           </div>
 
           {/* Dots (hide on mobile like before) */}
-          {items.length > perView ? (
+          {/* {items.length > perView ? (
             <div className="mt-6 hidden md:flex items-center justify-center gap-2">
               {Array.from({ length: dotsCount }).map((_, i) => (
                 <button
@@ -173,7 +173,7 @@ export default function LatestProductsSection({ data = [] }) {
                 />
               ))}
             </div>
-          ) : null}
+          ) : null} */}
 
           {/* Empty */}
           {!items.length ? (

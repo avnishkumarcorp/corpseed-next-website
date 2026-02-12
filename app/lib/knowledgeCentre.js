@@ -1,19 +1,26 @@
+// app/lib/knowledgeCentre.js (or wherever this function is)
+
 export async function getKnowledgeCentreList({
   page = 1,
+  size = 20,
   q = "",
-  categorySlug = "",
+  filter = "", // ✅ correct
   tag = "",
-}) {
+} = {}) {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const url = new URL(`${base}/api/updated-knowledge-centre`);
 
-  if (page) url.searchParams.set("page", String(page));
-  if (q) url.searchParams.set("q", q);
-  if (categorySlug) url.searchParams.set("categorySlug", categorySlug);
-  if (tag) url.searchParams.set("tag", tag);
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("size", String(size));
+  if (q) url.searchParams.set("q", String(q));
+  if (filter) url.searchParams.set("filter", String(filter)); // ✅ correct
+  if (tag) url.searchParams.set("tag", String(tag));
 
+  // ✅ TEMP (for debugging): disable caching so you can confirm it updates instantly
+  // After confirming, change to `next: { revalidate: 60 }`
   const res = await fetch(url.toString(), {
-    next: { revalidate: 60 },
+    cache: "no-store",
+    // next: { revalidate: 60 },
   });
 
   if (!res.ok) {
@@ -33,6 +40,8 @@ export async function getKnowledgeCentreList({
 
   return res.json();
 }
+
+
 
 export async function getKnowledgeCentreBySlug(slug) {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL;

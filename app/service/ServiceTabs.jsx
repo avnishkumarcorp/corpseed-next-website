@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 function slugify(str) {
   return String(str || "")
@@ -12,15 +12,40 @@ function slugify(str) {
 
 export default function ServiceTabs({ tabs = [] }) {
   const scrollerRef = useRef(null);
-  const [activeId, setActiveId] = useState(tabs?.[0]?.tabName ? slugify(tabs[0].tabName) : "");
 
   const mapped = useMemo(
-    () => tabs.map((t) => ({ ...t, id: t.id || slugify(t.tabName) })),
-    [tabs]
+    () =>
+      tabs.map((t) => ({
+        ...t,
+        id: t.id || slugify(t.title || t.tabName),
+        tabName: t.tabName || t.title,
+      })),
+    [tabs],
   );
 
+  const [activeId, setActiveId] = useState(mapped?.[0]?.id || "");
+
+  // ✅ Lock observer updates briefly after click
+  const lockRef = useRef({ until: 0, id: "" });
+  const lockMs = 900; // smooth scroll time window
+
   useEffect(() => {
-    // Observe sections to update active tab on scroll
+    if (!mapped.length) return;
+    setActiveId((prev) => prev || mapped[0].id);
+  }, [mapped]);
+
+  const scrollToSection = useCallback((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const offset = 140;
+    const y = el.getBoundingClientRect().top + window.scrollY - offset;
+
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }, []);
+
+  // ✅ Scroll-spy (IntersectionObserver)
+  useEffect(() => {
     const sections = mapped
       .map((t) => document.getElementById(t.id))
       .filter(Boolean);
@@ -29,37 +54,62 @@ export default function ServiceTabs({ tabs = [] }) {
 
     const obs = new IntersectionObserver(
       (entries) => {
-        // pick the most visible entry
+        // ✅ if we are in "click lock" window, do not override active tab
+        if (Date.now() < lockRef.current.until) return;
+
         const visible = entries
           .filter((e) => e.isIntersecting)
-          .sort((a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0))[0];
+          .sort(
+            (a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0),
+          )[0];
 
         if (visible?.target?.id) setActiveId(visible.target.id);
       },
       {
         root: null,
-        // tune this so the active tab changes nicely
-        rootMargin: "-30% 0px -60% 0px",
-        threshold: [0.1, 0.2, 0.3, 0.4],
-      }
+        // ✅ slightly better margins (less "previous section stays active")
+        rootMargin: "-25% 0px -65% 0px",
+        threshold: [0.08, 0.15, 0.22, 0.3],
+      },
     );
 
     sections.forEach((s) => obs.observe(s));
     return () => obs.disconnect();
   }, [mapped]);
 
-const scrollTo = (id) => {
-  const el = document.getElementById(id);
-  if (!el) return;
+  // ✅ arrows only when overflow exists
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
 
-  // adjust this number based on your sticky header + tabs height
-  const offset = 140;
+  const updateArrows = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const left = el.scrollLeft;
+    setCanLeft(left > 2);
+    setCanRight(left < max - 2);
+  }, []);
 
-  const y = el.getBoundingClientRect().top + window.scrollY - offset;
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
 
-  window.scrollTo({ top: y, behavior: "smooth" });
-};
+    updateArrows();
 
+    const onScroll = () => updateArrows();
+    el.addEventListener("scroll", onScroll, { passive: true });
+
+    const ro = new ResizeObserver(() => updateArrows());
+    ro.observe(el);
+
+    window.addEventListener("resize", updateArrows);
+
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      ro.disconnect();
+      window.removeEventListener("resize", updateArrows);
+    };
+  }, [updateArrows, mapped]);
 
   const nudge = (dir) => {
     const el = scrollerRef.current;
@@ -67,49 +117,97 @@ const scrollTo = (id) => {
     el.scrollBy({ left: dir * 260, behavior: "smooth" });
   };
 
+  const onTabClick = (id) => {
+    // ✅ lock + set active immediately
+    lockRef.current = { until: Date.now() + lockMs, id };
+    setActiveId(id);
+
+    // keep clicked tab visible
+    const strip = scrollerRef.current;
+    const btn = strip?.querySelector?.(`[data-tab-id="${id}"]`);
+    btn?.scrollIntoView?.({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+
+    scrollToSection(id);
+
+    // ✅ ensure active stays after smooth scroll ends
+    window.setTimeout(() => {
+      setActiveId(id);
+    }, lockMs);
+  };
+
   return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={() => nudge(-1)}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-white hover:bg-gray-50 cursor-pointer"
-        type="button"
-        aria-label="Scroll left"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
+    <div className="w-full">
+      <div className="flex w-full items-center gap-2">
+        <button
+          type="button"
+          onClick={() => nudge(-1)}
+          disabled={!canLeft}
+          aria-label="Scroll left"
+          className={[
+            "inline-flex h-9 w-9 items-center justify-center cursor-pointer",
+            "text-slate-600 hover:text-blue-600",
+            "disabled:opacity-30 disabled:cursor-not-allowed",
+          ].join(" ")}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
 
-      <div
-        ref={scrollerRef}
-        className="no-scrollbar flex flex-1 items-center gap-2 overflow-x-auto"
-      >
-        {mapped.map((t) => {
-          const isActive = activeId === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => scrollTo(t.id)}
-              className={[
-                "whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition cursor-pointer",
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
-              ].join(" ")}
-              type="button"
-            >
-              {t.tabName}
-            </button>
-          );
-        })}
+        <div ref={scrollerRef} className="no-scrollbar flex-1 overflow-x-auto">
+          {/* ✅ full-width base line for tab strip */}
+          <div className="relative">
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-slate-200" />
+
+            <div className="flex w-full min-w-max md:min-w-0 md:w-full">
+              {mapped.map((t) => {
+                const isActive = activeId === t.id;
+
+                return (
+                  <button
+                    key={t.id}
+                    data-tab-id={t.id}
+                    type="button"
+                    onClick={() => onTabClick(t.id)}
+                    className={[
+                      "group relative px-5 py-3 text-sm font-semibold cursor-pointer transition",
+                      "text-slate-700 hover:text-blue-600 whitespace-nowrap",
+                      "md:flex-1 md:px-0 md:text-center",
+                    ].join(" ")}
+                  >
+                    {/* ✅ Text */}
+                    <span className="relative inline-block">{t.tabName}</span>
+
+                    {/* ✅ underline area (reserved for ALL tabs) */}
+                    <span
+                      className={[
+                        "pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] transition",
+                        isActive ? "bg-blue-600" : "bg-transparent",
+                      ].join(" ")}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => nudge(1)}
+          disabled={!canRight}
+          aria-label="Scroll right"
+          className={[
+            "inline-flex h-9 w-9 items-center justify-center cursor-pointer",
+            "text-slate-600 hover:text-blue-600",
+            "disabled:opacity-30 disabled:cursor-not-allowed",
+          ].join(" ")}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
       </div>
-
-      <button
-        onClick={() => nudge(1)}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-white hover:bg-gray-50 cursor-pointer"
-        type="button"
-        aria-label="Scroll right"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </button>
     </div>
   );
 }

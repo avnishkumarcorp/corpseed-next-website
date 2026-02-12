@@ -2,25 +2,40 @@
 export async function getServiceBySlug(slug) {
   if (!slug) return null;
 
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customer/service/${encodeURIComponent(slug)}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        // ✅ cache response and revalidate periodically
-        next: { revalidate: 3600 }, // 1 hour (set what you want)
-      }
-    );
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const url = `${base}/api/customer/service/${encodeURIComponent(slug)}`;
 
-    if (!res.ok) return null;
+  // Optional: abort slow requests (prevents hanging SSR)
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 12000); // 12s
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+
+      // ✅ caches on server and revalidates
+      next: { revalidate: 3600, tags: [`service:${slug}`] },
+
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      // helpful debug without crashing
+      // const text = await res.text().catch(() => "");
+      // console.error("getServiceBySlug failed:", res.status, text);
+      return null;
+    }
 
     return await res.json();
   } catch (err) {
     console.error("getServiceBySlug error:", err);
     return null;
+  } finally {
+    clearTimeout(t);
   }
 }
+
 
 
 

@@ -17,6 +17,7 @@ import {
 
 import SafeHtml from "@/app/components/SafeHtml";
 import { getNewsBySlug } from "@/app/lib/newsRoom";
+import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
@@ -65,7 +66,7 @@ function splitTocAndBody(html = "") {
 function SocialRail({ pageUrl, title }) {
   return (
     <div className="hidden lg:block">
-      <div className="sticky top-28">
+      <div className="sticky top-28 -translate-x-2">
         <div className="flex flex-col items-center gap-3">
           <div
             className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm"
@@ -125,9 +126,7 @@ function TocCard({ tocHtml }) {
   return (
     <Card className="overflow-hidden">
       <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
-        <p className="text-sm font-semibold text-slate-900">
-          Table of Contents
-        </p>
+        <p className="text-sm font-semibold text-slate-900">Table of Contents</p>
         <p className="mt-1 text-xs text-slate-500">Jump to sections</p>
       </div>
 
@@ -180,13 +179,13 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
             href={`${basePath}/${x.slug}`}
             className="group flex gap-3 px-5 py-4 hover:bg-slate-50 cursor-pointer"
           >
-            <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
               {x.image ? (
                 <Image
                   src={x.image}
                   alt={safeText(x.title)}
                   fill
-                  className="object-contain p-2"
+                  className="object-cover" // ✅ remove padding + fill nicely
                   sizes="80px"
                 />
               ) : null}
@@ -239,10 +238,10 @@ export default async function NewsRoomSlugPage({ params }) {
   const item = apiData.news;
   const author = apiData.author || null;
 
-  // ✅ Share URL (use your real domain in production)
+  // ✅ Share URL
   const pageUrl = `https://www.corpseed.com/news-room/${item.slug}`;
 
-  // ✅ TOC split from description
+  // ✅ TOC split
   const { tocHtml, bodyHtml } = splitTocAndBody(item.description || "");
 
   return (
@@ -250,18 +249,18 @@ export default async function NewsRoomSlugPage({ params }) {
       {/* HERO */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          {/* ✅ IMAGE LEFT + TEXT RIGHT */}
-          <div className="mt-4 grid gap-6 lg:grid-cols-[.7fr_1.3fr] lg:items-center">
-            {/* LEFT image */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="relative h-[220px] w-full sm:h-[260px]">
+          {/* ✅ IMAGE LEFT + TEXT RIGHT (top aligned) */}
+          <div className="mt-4 grid gap-8 lg:grid-cols-[1.45fr_1.05fr] lg:items-start">
+            {/* LEFT image (no padding, no extra space) */}
+            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+              <div className="relative h-[260px] w-full sm:h-[320px]">
                 <Image
                   src={item.image}
                   alt={safeText(item.title)}
                   fill
                   priority
-                  className="object-contain"
-                  sizes="(max-width: 1024px) 100vw, 520px"
+                  className="object-cover" // ✅ remove empty padding space
+                  sizes="(max-width: 1024px) 100vw, 700px"
                 />
               </div>
             </div>
@@ -272,11 +271,11 @@ export default async function NewsRoomSlugPage({ params }) {
                 {item.title}
               </h1>
 
-              <p className="mt-2 max-w-3xl text-sm text-slate-600">
+              <p className="mt-3 max-w-3xl text-sm text-slate-600">
                 {apiData?.metaDescription || item.summary}
               </p>
 
-              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
+              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
                 {item.postDate ? (
                   <span className="inline-flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
@@ -309,108 +308,109 @@ export default async function NewsRoomSlugPage({ params }) {
         </div>
       </section>
 
-      {/* CONTENT */}
+      {/* CONTENT (same fix: don't let social rail push content) */}
       <section className="py-8 md:py-10">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-12">
-          {/* Social rail */}
-          <div className="lg:col-span-1">
-            <SocialRail pageUrl={pageUrl} title={item.title} />
-          </div>
-
-          {/* Main */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Article */}
-            <Card className="overflow-hidden">
-              <div className="p-5 sm:p-7">
-                <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
-                  <SafeHtml html={bodyHtml} />
-                </div>
-
-                {/* Mobile share */}
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
-                  <p className="text-sm font-semibold text-slate-900">Share</p>
-                  <div className="flex items-center gap-2">
-                    <a
-                      className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                        pageUrl,
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="Facebook"
-                      title="Facebook"
-                    >
-                      <Facebook className="h-5 w-5" />
-                    </a>
-                    <a
-                      className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                        pageUrl,
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="LinkedIn"
-                      title="LinkedIn"
-                    >
-                      <Linkedin className="h-5 w-5" />
-                    </a>
-                    <a
-                      className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                      href={`mailto:?subject=${encodeURIComponent(
-                        item.title,
-                      )}&body=${encodeURIComponent(pageUrl)}`}
-                      aria-label="Email"
-                      title="Email"
-                    >
-                      <Mail className="h-5 w-5" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <aside className="lg:col-span-4 space-y-6">
-            <div className="lg:sticky lg:top-24 space-y-6">
-              {/* TOC */}
-              <TocCard tocHtml={tocHtml} />
-
-              {/* News blocks */}
-              <ListCard
-                title="Top News"
-                badge="Trending"
-                icon={Newspaper}
-                items={apiData?.topNews || []}
-                basePath="/news-room"
-              />
-
-              <ListCard
-                title="Latest News"
-                badge="Fresh updates"
-                icon={Newspaper}
-                items={apiData?.latestNews || []}
-                basePath="/news-room"
-              />
-
-              {/* Blogs blocks */}
-              <ListCard
-                title="Top Articles"
-                badge="Most visited"
-                icon={BookOpen}
-                items={apiData?.topBlogs || []}
-                basePath="/knowledge-centre"
-              />
-
-              <ListCard
-                title="Latest Articles"
-                badge="Recently published"
-                icon={BookOpen}
-                items={apiData?.latestBlogs || []}
-                basePath="/knowledge-centre"
-              />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="relative">
+            {/* Social rail overlay (shift left) */}
+            <div className="hidden lg:block absolute left-0 top-0 -translate-x-16">
+              <SocialRail pageUrl={pageUrl} title={item.title} />
             </div>
-          </aside>
+
+            {/* Main + Sidebar */}
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_420px]">
+              {/* Main */}
+              <div className="space-y-6">
+                <Card className="overflow-hidden">
+                  <div className="p-5 sm:p-7">
+                    <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
+                      <SafeHtmlShadow html={bodyHtml} />
+                    </div>
+
+                    {/* Mobile share */}
+                    <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
+                      <p className="text-sm font-semibold text-slate-900">Share</p>
+                      <div className="flex items-center gap-2">
+                        <a
+                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
+                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                            pageUrl,
+                          )}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label="Facebook"
+                          title="Facebook"
+                        >
+                          <Facebook className="h-5 w-5" />
+                        </a>
+                        <a
+                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
+                          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                            pageUrl,
+                          )}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label="LinkedIn"
+                          title="LinkedIn"
+                        >
+                          <Linkedin className="h-5 w-5" />
+                        </a>
+                        <a
+                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
+                          href={`mailto:?subject=${encodeURIComponent(
+                            item.title,
+                          )}&body=${encodeURIComponent(pageUrl)}`}
+                          aria-label="Email"
+                          title="Email"
+                        >
+                          <Mail className="h-5 w-5" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Sidebar */}
+              <aside className="space-y-6">
+                <div className="lg:sticky lg:top-24 space-y-6">
+                  <TocCard tocHtml={tocHtml} />
+
+                  <ListCard
+                    title="Top News"
+                    badge="Trending"
+                    icon={Newspaper}
+                    items={apiData?.topNews || []}
+                    basePath="/news-room"
+                  />
+
+                  <ListCard
+                    title="Latest News"
+                    badge="Fresh updates"
+                    icon={Newspaper}
+                    items={apiData?.latestNews || []}
+                    basePath="/news-room"
+                  />
+
+                  <ListCard
+                    title="Top Articles"
+                    badge="Most visited"
+                    icon={BookOpen}
+                    items={apiData?.topBlogs || []}
+                    basePath="/knowledge-centre"
+                  />
+
+                  <ListCard
+                    title="Latest Articles"
+                    badge="Recently published"
+                    icon={BookOpen}
+                    items={apiData?.latestBlogs || []}
+                    basePath="/knowledge-centre"
+                  />
+                </div>
+              </aside>
+            </div>
+          </div>
         </div>
       </section>
 

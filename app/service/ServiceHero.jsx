@@ -1,5 +1,5 @@
 "use client";
-import { Star } from "lucide-react";
+import { Phone, Star } from "lucide-react";
 import VideoPopup from "../components/VideoPopup";
 import EnquiryOtpFlow from "../components/otp/EnquiryOtpFlow";
 import ConsultNowModal from "../components/ConsultNowModal";
@@ -71,15 +71,15 @@ export default function ServiceHero({
 
           {/* Right highlight card */}
           <div className="lg:col-span-4">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="bg-white p-5 shadow-sm">
               <p className="text-sm font-semibold text-gray-900">
                 Why wait? Start now!
               </p>
               <p className="mt-2 text-sm text-gray-600">We’re available 24/7</p>
 
-              <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 flex gap-1.5">
+                <Phone className="h-5 w-5" />
                 <p className="text-sm text-gray-700">
-                  Call{" "}
                   <span className="font-semibold text-blue-600">
                     7558640644
                   </span>{" "}
@@ -87,12 +87,12 @@ export default function ServiceHero({
                 </p>
               </div>
 
-              <button
+              {/* <button
                 onClick={() => setConsultOpen(true)}
                 className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
               >
                 Get Free Consultation
-              </button>
+              </button> */}
 
               <p className="mt-3 text-xs text-gray-500">
                 By continuing, you agree to Terms & Privacy Policy.

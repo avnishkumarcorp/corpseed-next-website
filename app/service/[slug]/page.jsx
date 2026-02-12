@@ -1,22 +1,64 @@
 // app/service/[slug]/page.js
+import { notFound } from "next/navigation";
+import Script from "next/script";
+import nextDynamic from "next/dynamic";
+
 import ServiceHero from "../ServiceHero";
 import ServiceTabs from "../ServiceTabs";
-import LogoMarquee from "@/app/components/carousel/LogoMarquee";
-import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
 import ServiceContent from "../ServiceContent";
-import { getServiceData } from "./serviceData";
 import ServiceFaqs from "../ServiceFaqs";
 import ServiceSlugClient from "./ServiceSlugClient";
+import { getServiceData } from "./serviceData";
+import StepsTimelineSection from "../StepsTimelineSection";
+
+// ✅ Route-level caching
+export const revalidate = 3600;
+export const dynamic = "force-static";
+
+// ✅ If these are heavy client components, lazy-load them.
+// If LogoMarquee / EnquiryForm are server components, remove dynamic() and import normally.
+const LogoMarquee = nextDynamic(
+  () => import("@/app/components/carousel/LogoMarquee"),
+  {
+    ssr: true,
+    loading: () => <div className="h-10" />,
+  },
+);
+
+const EnquiryForm = nextDynamic(
+  () => import("@/app/components/enquiry-form/EnquiryForm"),
+  {
+    ssr: true,
+    loading: () => (
+      <div className="rounded-2xl border border-gray-200 p-4">
+        Loading form…
+      </div>
+    ),
+  },
+);
+
+function jsonLdString(obj) {
+  // safer + smaller (removes undefined)
+  return JSON.stringify(obj, (_, v) => (v === undefined ? undefined : v));
+}
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getServiceData(slug);
 
-  const title = data?.service?.seoTitle || data?.service?.title || "Service";
+  if (!data?.service) {
+    return {
+      title: "Service - Corpseed",
+      description: "Corpseed service details and enquiry.",
+      alternates: { canonical: `/service/${slug}` },
+    };
+  }
+
+  const title = data.service.seoTitle || data.service.title || "Service";
   const description =
-    data?.service?.seoDescription ||
-    data?.service?.metaDescription ||
-    data?.service?.summary ||
+    data.service.seoDescription ||
+    data.service.metaDescription ||
+    data.service.summary ||
     "Corpseed service details and enquiry.";
 
   return {
@@ -31,13 +73,13 @@ export async function generateMetadata({ params }) {
       type: "website",
       images: [
         {
-          url: data?.service?.ogImageWebp || "/assets/images/corpseed.webp",
+          url: data.service.ogImageWebp || "/assets/images/corpseed.webp",
           width: 1200,
           height: 630,
           type: "image/webp",
         },
         {
-          url: data?.service?.ogImagePng || "/assets/images/logo.png",
+          url: data.service.ogImagePng || "/assets/images/logo.png",
           width: 1200,
           height: 630,
           type: "image/png",
@@ -46,31 +88,25 @@ export async function generateMetadata({ params }) {
     },
   };
 }
-function JsonLd({ data }) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
-}
 
 export default async function ServicePage({ params }) {
   const { slug } = await params;
   const data = await getServiceData(slug);
 
-  if (!data) return null;
+  if (!data?.service) notFound();
 
-  // Build schema objects (example; map from your API fields)
+  const service = data.service;
+
+  // ✅ Keep JSON-LD small (avoid huge HTML in schema)
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
-    name: "Corpseed",
+    name: service.title || "Corpseed",
     image: "https://www.corpseed.com/assets/img/logo.webp",
     description:
-      data?.service?.seoDescription ||
-      data?.service?.metaDescription ||
-      data?.service?.summary ||
+      service.seoDescription ||
+      service.metaDescription ||
+      service.summary ||
       "",
     aggregateRating: {
       "@type": "AggregateRating",
@@ -93,38 +129,61 @@ export default async function ServicePage({ params }) {
       },
       {
         "@type": "ListItem",
-        position: 3,
-        name: data?.service?.title,
+        position: 2, // ✅ fix
+        name: service.title || "Service",
         item: `https://www.corpseed.com/service/${slug}`,
       },
     ],
   };
 
-  // If you have FAQs in data, map them:
-  const faqSchema = data?.service?.faqs?.length
-    ? {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: data.service.faqs.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answerHtml || f.answer },
-        })),
-      }
-    : null;
+  const faqList = Array.isArray(service.faqs) ? service.faqs : [];
+  const faqSchema =
+    faqList.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqList.map((f) => ({
+            "@type": "Question",
+            name: String(f?.question || "").trim(),
+            acceptedAnswer: {
+              "@type": "Answer",
+              // ✅ strip heavy html if present (schema can be plain text)
+              text: String(f?.answer || f?.answerHtml || "")
+                .replace(/<[^>]*>/g, "")
+                .trim(),
+            },
+          })),
+        }
+      : null;
 
   return (
     <div className="bg-white text-gray-900">
-      {/* JSON-LD scripts */}
-      <JsonLd data={productSchema} />
-      <JsonLd data={breadcrumbSchema} />
-      {faqSchema ? <JsonLd data={faqSchema} /> : null}
+      {/* ✅ JSON-LD via next/script */}
+      <Script
+        id="ld-product"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: jsonLdString(productSchema) }}
+      />
+      <Script
+        id="ld-breadcrumb"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbSchema) }}
+      />
+      {faqSchema ? (
+        <Script
+          id="ld-faq"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{ __html: jsonLdString(faqSchema) }}
+        />
+      ) : null}
 
-      {/* Your existing UI */}
       <ServiceHero
-        title={data?.service?.title}
-        summary={data?.service?.summary}
-        videoUrl={data?.service?.videoUrl || "/videos/corpseed-intro.mp4"}
+        title={service.title}
+        summary={service.summary}
+        videoUrl={service.videoUrl || "/videos/corpseed-intro.mp4"}
         badgeText="INCLUDES FREE SUPPORT"
         ratingText="Rated 4.9 by 74,861+ customers globally"
         videoText="Click to Watch & Know More"
@@ -137,28 +196,35 @@ export default async function ServicePage({ params }) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">
+<<<<<<< Updated upstream
             <div className="sticky top-[72px] z-10 -mx-4 border-b border-gray-200 bg-white/80 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
               <ServiceTabs tabs={data?.service?.serviceDetails} />
+=======
+            <div className="sticky top-[72px] z-30 -mx-4 bg-white/80 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+              <ServiceTabs tabs={service.serviceDetails} />
+>>>>>>> Stashed changes
             </div>
 
             <div className="py-6">
-              <ServiceContent tabs={data?.service?.serviceDetails} />
+              <ServiceContent tabs={service.serviceDetails} />
             </div>
+
+            <StepsTimelineSection />
           </div>
 
           <div className="lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
-              <EnquiryForm serviceName={data?.service?.title} />
+              <EnquiryForm serviceName={service.title} />
             </div>
           </div>
         </div>
       </div>
 
-      <ServiceFaqs faqs={data?.service?.serviceFaqs} />
+      <ServiceFaqs faqs={service.serviceFaqs} />
 
       <section className="md:hidden border-t border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <ServiceSlugClient/>
+          <ServiceSlugClient />
         </div>
       </section>
     </div>

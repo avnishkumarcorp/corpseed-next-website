@@ -10,7 +10,7 @@ function slugify(str) {
 export default function ServiceContent({ tabs = [] }) {
   const mapped = tabs.map((t) => ({
     ...t,
-    id: t?.id || slugify(t?.title),
+    id: t.id || slugify(t.title || t.tabName),
   }));
 
   return (
@@ -18,9 +18,7 @@ export default function ServiceContent({ tabs = [] }) {
       {mapped.map((t, i) => (
         <div key={t.id}>
           {/* Divider (not for first section) */}
-          {i !== 0 && (
-            <div className="my-4 border-t border-gray-200" />
-          )}
+          {i !== 0 && <div className="my-4 border-t border-gray-200" />}
 
           <section id={t.id} className="scroll-mt-[140px]">
             <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">

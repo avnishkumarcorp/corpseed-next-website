@@ -1,6 +1,6 @@
 // app/service/[slug]/serviceData.js
-import { getServiceBySlug } from "@/app/lib/service";
 import { cache } from "react";
+import { getServiceBySlug } from "@/app/lib/service";
 
 export const getServiceData = cache(async (slug) => {
   return getServiceBySlug(slug);

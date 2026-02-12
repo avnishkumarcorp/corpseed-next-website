@@ -30,20 +30,13 @@ function buildQueryString(next) {
   const params = new URLSearchParams();
   if (next.page) params.set("page", String(next.page));
   if (next.q) params.set("q", String(next.q));
-  if (next.categorySlug) params.set("categorySlug", String(next.categorySlug));
+  if (next.filter) params.set("filter", String(next.filter));
   if (next.tag) params.set("tag", String(next.tag));
   const qs = params.toString();
   return qs ? `?${qs}` : "";
 }
 
-function Pagination({
-  currentPage,
-  totalPages,
-  pageNumbers,
-  q,
-  categorySlug,
-  tag,
-}) {
+function Pagination({ currentPage, totalPages, pageNumbers, q, filter, tag }) {
   const pages =
     Array.isArray(pageNumbers) && pageNumbers.length
       ? pageNumbers
@@ -56,7 +49,7 @@ function Pagination({
   );
 
   const mkHref = (page) =>
-    `/knowledge-centre${buildQueryString({ page, q, categorySlug, tag })}`;
+    `/knowledge-centre${buildQueryString({ page, q, filter, tag })}`;
 
   return (
     <div className="mt-10 flex flex-wrap items-center gap-2">
@@ -103,13 +96,15 @@ function Pagination({
 
 /** ✅ SEO from API */
 export async function generateMetadata({ searchParams }) {
+  // ✅ IMPORTANT: searchParams is a Promise in Next 15+
   const sp = await searchParams;
+
   const page = Number(sp?.page || 1);
   const q = sp?.q || "";
-  const categorySlug = sp?.categorySlug || "";
+  const filter = sp?.filter || "";
   const tag = sp?.tag || "";
 
-  const data = await getKnowledgeCentreList({ page, q, categorySlug, tag });
+  const data = await getKnowledgeCentreList({ page, q, filter, tag });
 
   return {
     title: data?.title || "Corpseed || Knowledge Center",
@@ -120,17 +115,18 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default async function KnowledgeCentrePage({ searchParams }) {
+  // ✅ IMPORTANT: searchParams is a Promise in Next 15+
   const sp = await searchParams;
 
   const currentPage = Number(sp?.page || 1);
   const q = (sp?.q || "").toString();
-  const categorySlug = (sp?.categorySlug || "").toString();
+  const filter = (sp?.filter || "").toString();
   const tag = (sp?.tag || "").toString();
 
   const data = await getKnowledgeCentreList({
     page: currentPage,
     q,
-    categorySlug,
+    filter,
     tag,
   });
 
@@ -167,19 +163,14 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 </p>
               </div>
 
-              {/* ✅ Search (SERVER-safe: GET form, no onSubmit) */}
+              {/* Search (GET form) */}
               <form
                 action="/knowledge-centre"
                 method="GET"
                 className="w-full max-w-xl"
               >
-                {/* preserve filters */}
-                {categorySlug ? (
-                  <input
-                    type="hidden"
-                    name="categorySlug"
-                    value={categorySlug}
-                  />
+                {filter ? (
+                  <input type="hidden" name="filter" value={filter} />
                 ) : null}
                 {tag ? <input type="hidden" name="tag" value={tag} /> : null}
                 <input type="hidden" name="page" value="1" />
@@ -210,8 +201,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                   No blogs found.
                 </p>
                 <p className="mt-2 text-sm text-slate-600">
-                  Try changing search or filters. If API is returning empty
-                  data, it will show here.
+                  Try changing search or filters.
                 </p>
               </Card>
             ) : (
@@ -219,14 +209,14 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 {blogs.map((b) => {
                   const href = `/knowledge-centre/${b.slug}`;
                   return (
-                    <Card key={b.id} className="overflow-hidden">
+                    <Card key={b.id ?? b.slug} className="overflow-hidden">
                       <Link href={href} className="block cursor-pointer">
-                        <div className="relative aspect-[16/9] w-full bg-slate-50">
+                        <div className="relative aspect-[16/9] w-full overflow-hidden bg-white">
                           <Image
                             src={b.image}
                             alt={b.title || "Blog"}
                             fill
-                            className="object-contain p-2" // ✅ no crop + little padding
+                            className="object-contain p-2" // ✅ no cut
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
                         </div>
@@ -243,10 +233,10 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                         <div className="mt-2 text-xs text-slate-500">
                           {safeDate(b.postDate)}{" "}
                           {b?.visited != null ? (
-                            <span className="text-slate-400">•</span>
-                          ) : null}{" "}
-                          {b?.visited != null ? (
-                            <span>{b.visited} views</span>
+                            <>
+                              <span className="text-slate-400">•</span>{" "}
+                              <span>{b.visited} views</span>
+                            </>
                           ) : null}
                         </div>
 
@@ -274,13 +264,12 @@ export default async function KnowledgeCentrePage({ searchParams }) {
               </div>
             )}
 
-            {/* Pagination */}
             <Pagination
               currentPage={data?.currentPage || currentPage}
               totalPages={totalPages}
               pageNumbers={pageNumbers}
               q={q}
-              categorySlug={categorySlug}
+              filter={filter}
               tag={tag}
             />
           </div>
@@ -289,7 +278,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
           <aside className="lg:col-span-4">
             <div className="space-y-8 lg:sticky lg:top-24">
               {/* Active filters */}
-              {q || categorySlug || tag ? (
+              {q || filter || tag ? (
                 <Card className="p-5">
                   <p className="text-sm font-semibold text-slate-900">
                     Active filters
@@ -300,9 +289,9 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                         Search: {q}
                       </span>
                     ) : null}
-                    {categorySlug ? (
+                    {filter ? (
                       <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">
-                        Category: {categorySlug}
+                        Category: {filter}
                       </span>
                     ) : null}
                     {tag ? (
@@ -336,13 +325,13 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                     const href = `/knowledge-centre${buildQueryString({
                       page: 1,
                       q,
-                      categorySlug: c.slug,
+                      filter: c.slug,
                       tag,
                     })}`;
-                    console.log("dsjhgsjgjhgj", href, c.slug);
+
                     return (
                       <Link
-                        key={c.id}
+                        key={c.id ?? c.slug}
                         href={href}
                         className="flex items-center justify-between px-5 py-4 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
                       >
@@ -368,15 +357,11 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 <p className="text-sm font-semibold text-slate-900">Tags</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {hotTags.map((t) => {
-                    const href = `/knowledge-centre${buildQueryString({
-                      page: 1,
-                      q,
-                      categorySlug,
-                      tag: t.name,
-                    })}`;
+                    const href = `/service/${t.slug}`;
+
                     return (
                       <Link
-                        key={t.id}
+                        key={t.id ?? t.name}
                         href={href}
                         className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 cursor-pointer"
                       >
@@ -400,7 +385,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                     const href = `/knowledge-centre/${x.slug}`;
                     return (
                       <Link
-                        key={x.id}
+                        key={x.id ?? x.slug}
                         href={href}
                         className="flex gap-4 px-5 py-4 hover:bg-slate-50 cursor-pointer"
                       >
@@ -409,7 +394,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                             src={x.image}
                             alt={x.title || "Top article"}
                             fill
-                            className="object-contain p-1" // ✅ no crop
+                            className="object-cover"
                             sizes="80px"
                           />
                         </div>
@@ -434,7 +419,6 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 </div>
               </Card>
 
-              {/* ✅ Callback box (SERVER-safe: no onSubmit; if you want real submit, point action to your API route) */}
               <EnquiryOtpInline />
             </div>
           </aside>

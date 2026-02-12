@@ -139,7 +139,15 @@ function ensureInternalHref(url) {
 }
 
 /** ✅ Voice popup (Google-like) */
-function VoicePopup({ open, listening, interim, error, onClose }) {
+function VoicePopup({
+  open,
+  listening,
+  interim,
+  error,
+  onClose,
+  onMicClick,
+  popupRef,
+}) {
   if (!open) return null;
 
   return (
@@ -147,73 +155,100 @@ function VoicePopup({ open, listening, interim, error, onClose }) {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
-        onClick={onClose}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
       />
+
       {/* Modal */}
-      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-slate-900">
-              {listening ? "Listening…" : "Voice search"}
-            </p>
-            <p className="mt-1 text-xs text-slate-600">
-              Speak now. It will stop automatically after 8 seconds of silence.
-            </p>
+      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 px-2">
+        <div
+          ref={popupRef}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {listening ? "Listening…" : "Voice search"}
+              </p>
+              <p className="mt-1 text-xs text-slate-600">
+                Speak now. It will stop automatically after 8 seconds of
+                silence.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              aria-label="Close voice search"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
-            aria-label="Close voice search"
-          >
-            ✕
-          </button>
-        </div>
 
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-          {error ? (
-            <p className="text-sm text-red-600">{error}</p>
-          ) : interim ? (
-            <p className="text-sm text-slate-900">{interim}</p>
-          ) : (
-            <p className="text-sm text-slate-500">
-              {listening ? "Say something…" : "Press mic to start"}
-            </p>
-          )}
-        </div>
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            {error ? (
+              <p className="text-sm text-red-600">{error}</p>
+            ) : interim ? (
+              <p className="text-sm text-slate-900">{interim}</p>
+            ) : (
+              <p className="text-sm text-slate-500">
+                {listening ? "Say something…" : "Press mic to start"}
+              </p>
+            )}
+          </div>
 
-        <div className="mt-4 flex items-center justify-center">
-          <div
-            className={[
-              "flex h-14 w-14 items-center justify-center rounded-full border",
-              listening
-                ? "border-blue-300 bg-blue-50"
-                : "border-slate-200 bg-white",
-            ].join(" ")}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M19 11a7 7 0 0 1-14 0"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 18v3"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+          {/* ✅ Mic button (THIS was missing) */}
+          <div className="mt-4 flex items-center justify-center">
+            <button
+              type="button"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onMicClick?.();
+              }}
+              className={[
+                "flex h-14 w-14 items-center justify-center rounded-full border cursor-pointer",
+                listening
+                  ? "border-blue-300 bg-blue-50 ring-4 ring-blue-100"
+                  : "border-slate-200 bg-white hover:bg-slate-50",
+              ].join(" ")}
+              aria-label={listening ? "Stop voice" : "Start voice"}
+              title={listening ? "Stop" : "Start"}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M19 11a7 7 0 0 1-14 0"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 18v3"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -394,7 +429,9 @@ function useVoiceSearch({ onText, silenceMs = 8000, lang = "en-IN" }) {
 
       recorder.onstop = async () => {
         try {
-          const blob = new Blob(mediaRef.current.chunks, { type: "audio/webm" });
+          const blob = new Blob(mediaRef.current.chunks, {
+            type: "audio/webm",
+          });
           const fd = new FormData();
           fd.append("audio", blob, "voice.webm");
 
@@ -476,6 +513,7 @@ function HeroSearch({
   const wrapRef = React.useRef(null);
   const inputRef = React.useRef(null);
   const abortRef = React.useRef(null);
+  const popupRef = React.useRef(null);
 
   const [open, setOpen] = React.useState(false);
   const [q, setQ] = React.useState("");
@@ -518,20 +556,23 @@ function HeroSearch({
     const onKey = (e) => {
       if (e.key === "Escape") setOpen(false);
     };
+
     const onMouse = (e) => {
+      // ✅ if popup open and click is inside popup -> do nothing
+      if (voiceOpen && popupRef.current?.contains(e.target)) return;
+
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
         setOpen(false);
       }
     };
 
     document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onMouse);
-
+    document.addEventListener("mousedown", onMouse, true); // ✅ capture
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onMouse);
+      document.removeEventListener("mousedown", onMouse, true);
     };
-  }, [open]);
+  }, [open, voiceOpen]);
 
   // fetch
   React.useEffect(() => {
@@ -597,6 +638,11 @@ function HeroSearch({
         interim={voice.interim}
         error={voice.error}
         onClose={closeVoicePopup}
+        popupRef={popupRef}
+        onMicClick={() => {
+          if (voice.listening) voice.stop();
+          else voice.start();
+        }}
       />
 
       {/* Search input */}
@@ -870,7 +916,9 @@ export default function HomeHeroSection({
                   )}
                 </span>
               ))}
-              <span className="text-gray-900">&amp; Plant Setup Compliance</span>
+              <span className="text-gray-900">
+                &amp; Plant Setup Compliance
+              </span>
             </div>
 
             <p className="mt-3 max-w-xl text-base text-gray-700 sm:text-lg">
@@ -978,7 +1026,9 @@ export default function HomeHeroSection({
                     </div>
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
                       <Link href="/service/factory-license">Factory</Link> /{" "}
-                      <Link href="/service/fire-noc-fire-noc-renewal">Fire</Link>{" "}
+                      <Link href="/service/fire-noc-fire-noc-renewal">
+                        Fire
+                      </Link>{" "}
                       / Trade <br />
                       FSSAI / CGWA / Labour <br />
                       &amp; Other Compliance

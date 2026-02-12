@@ -6,83 +6,68 @@ import Link from "next/link";
 import { normalizeGroups, useDebouncedValue } from "./helpers";
 
 /** ✅ Google-like Voice Popup */
-function VoicePopup({ open, listening, interim, error, onClose }) {
+function VoicePopup({ open, listening, interim, error, onClose, popupRef }) {
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[99999]">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
-        onClick={onClose}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
       />
-      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-slate-900">
-              {listening ? "Listening…" : "Voice search"}
-            </p>
-            <p className="mt-1 text-xs text-slate-600">
-              Speak now. It will stop automatically after 8 seconds of silence.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
-            aria-label="Close voice search"
-          >
-            ✕
-          </button>
-        </div>
+      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 px-2">
+        <div
+          ref={popupRef}
+          onMouseDown={(e) => e.stopPropagation()} // ✅ important
+          onClick={(e) => e.stopPropagation()} // ✅ important
+          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {listening ? "Listening…" : "Voice search"}
+              </p>
+              <p className="mt-1 text-xs text-slate-600">
+                Speak now. It will stop automatically after 8 seconds of
+                silence.
+              </p>
+            </div>
 
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-          {error ? (
-            <p className="text-sm text-red-600">{error}</p>
-          ) : interim ? (
-            <p className="text-sm text-slate-900">{interim}</p>
-          ) : (
-            <p className="text-sm text-slate-500">
-              {listening ? "Say something…" : "Starting…"}
-            </p>
-          )}
-        </div>
-
-        <div className="mt-4 flex items-center justify-center">
-          <div
-            className={[
-              "flex h-14 w-14 items-center justify-center rounded-full border",
-              listening
-                ? "border-blue-300 bg-blue-50"
-                : "border-slate-200 bg-white",
-            ].join(" ")}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M19 11a7 7 0 0 1-14 0"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 18v3"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <button
+              type="button"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              aria-label="Close voice search"
+            >
+              ✕
+            </button>
           </div>
+
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            {error ? (
+              <p className="text-sm text-red-600">{error}</p>
+            ) : interim ? (
+              <p className="text-sm text-slate-900">{interim}</p>
+            ) : (
+              <p className="text-sm text-slate-500">
+                {listening ? "Say something…" : "Starting…"}
+              </p>
+            )}
+          </div>
+
+          {/* NOTE: If you want mic clickable INSIDE popup, make it a button */}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -152,8 +137,8 @@ function useVoiceSearch({ onText, silenceMs = 8000, lang = "en-IN" }) {
         e?.error === "not-allowed"
           ? "Mic permission denied. Please allow microphone access."
           : e?.error === "no-speech"
-          ? "No speech detected."
-          : "Voice search failed."
+            ? "No speech detected."
+            : "Voice search failed.",
       );
     };
 
@@ -212,7 +197,7 @@ function useVoiceSearch({ onText, silenceMs = 8000, lang = "en-IN" }) {
       setListening(false);
       clearSilence();
     },
-    []
+    [],
   );
 
   const startRecorderFallback = async () => {
@@ -252,7 +237,9 @@ function useVoiceSearch({ onText, silenceMs = 8000, lang = "en-IN" }) {
       recorder.onstop = async () => {
         clearSilence();
         try {
-          const blob = new Blob(mediaRef.current.chunks, { type: "audio/webm" });
+          const blob = new Blob(mediaRef.current.chunks, {
+            type: "audio/webm",
+          });
           const fd = new FormData();
           fd.append("audio", blob, "voice.webm");
 
@@ -314,6 +301,8 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
 
   const abortRef = useRef(null);
   const panelRef = useRef(null);
+  const popupRef = useRef(null);
+
   const [mounted, setMounted] = useState(false);
 
   // ✅ voice popup state
@@ -334,17 +323,22 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
     if (!open) return;
 
     const onKey = (e) => e.key === "Escape" && onClose?.();
+
     const onMouse = (e) => {
+      // ✅ if voice popup is open and click is inside popup -> DON'T close panel
+      if (voiceOpen && popupRef.current?.contains(e.target)) return;
+
+      // ✅ normal outside click close for panel
       if (panelRef.current && !panelRef.current.contains(e.target)) onClose?.();
     };
 
     document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onMouse);
+    document.addEventListener("mousedown", onMouse, true); // ✅ capture helps
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onMouse);
+      document.removeEventListener("mousedown", onMouse, true);
     };
-  }, [open, onClose]);
+  }, [open, onClose, voiceOpen]);
 
   // Reset when closed
   useEffect(() => {
@@ -394,7 +388,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
         setErr("");
 
         const url = `/api/search/service-industry-blog/${encodeURIComponent(
-          query
+          query,
         )}`;
         const res = await fetch(url, { signal: controller.signal });
 
@@ -433,6 +427,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
         interim={voice.interim}
         error={voice.error}
         onClose={closeVoicePopup}
+        popupRef={popupRef}
       />
 
       <div className="mx-auto max-w-[92rem] px-4 sm:px-6 lg:px-8">
@@ -463,7 +458,11 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                     else openVoicePopupAndStart();
                   }}
                   disabled={!voice.supported}
-                  title={!voice.supported ? "Voice search not supported" : "Search by voice"}
+                  title={
+                    !voice.supported
+                      ? "Voice search not supported"
+                      : "Search by voice"
+                  }
                   aria-label="Search by voice"
                   className={[
                     "absolute right-3 top-1/2 -translate-y-1/2",
@@ -474,7 +473,13 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                     !voice.supported ? "opacity-40 cursor-not-allowed" : "",
                   ].join(" ")}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
                     <path
                       d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
                       stroke="currentColor"
@@ -553,9 +558,12 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
               </div>
             ) : !q.trim() ? (
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <p className="text-sm font-semibold text-slate-900">Start typing to search</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  Start typing to search
+                </p>
                 <p className="mt-1 text-sm text-slate-600">
-                  We’ll show Services, Knowledge Center, Department Updates, Industries and more.
+                  We’ll show Services, Knowledge Center, Department Updates,
+                  Industries and more.
                 </p>
               </div>
             ) : loading ? (
@@ -593,7 +601,9 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                           >
                             <div className="font-medium">{x?.name}</div>
                             {x?.track ? (
-                              <div className="text-[12px] text-slate-500">{x.track}</div>
+                              <div className="text-[12px] text-slate-500">
+                                {x.track}
+                              </div>
                             ) : null}
                           </Link>
                         </li>
@@ -616,9 +626,12 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
               </div>
             ) : (
               <div className="rounded-2xl border border-slate-200 bg-white p-6">
-                <p className="text-sm font-semibold text-slate-900">No results found.</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  No results found.
+                </p>
                 <p className="mt-1 text-sm text-slate-600">
-                  Try different keywords like <span className="font-semibold">EPR</span>,{" "}
+                  Try different keywords like{" "}
+                  <span className="font-semibold">EPR</span>,{" "}
                   <span className="font-semibold">BIS</span>,{" "}
                   <span className="font-semibold">NOC</span>.
                 </p>
@@ -643,7 +656,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 

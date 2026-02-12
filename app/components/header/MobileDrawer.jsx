@@ -25,7 +25,13 @@ function MicIcon({ active = false }) {
         active ? "border-blue-300 ring-4 ring-blue-100" : "border-slate-200",
       ].join(" ")}
     >
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <svg
+        width="26"
+        height="26"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
         <path
           d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
           stroke="currentColor"
@@ -57,7 +63,7 @@ function VoicePopup({
   listening,
   error,
   onClose,
-  onStop,
+  onMicClick, // ✅ start/stop
   title = "Voice search",
   subtitle = "Speak now. It will stop automatically after 8 seconds of silence.",
 }) {
@@ -65,16 +71,11 @@ function VoicePopup({
 
   return createPortal(
     <div className="fixed inset-0 z-[10000]">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
-        onClick={() => {
-          onStop?.();
-          onClose?.();
-        }}
+        onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="absolute inset-0 flex items-center justify-center px-4">
         <div
           className="w-full max-w-[520px] rounded-2xl bg-white shadow-2xl"
@@ -82,7 +83,9 @@ function VoicePopup({
         >
           <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
             <div>
-              <p className="text-[15px] font-semibold text-slate-900">{title}</p>
+              <p className="text-[15px] font-semibold text-slate-900">
+                {title}
+              </p>
               <p className="mt-1 text-[12px] text-slate-600">{subtitle}</p>
             </div>
 
@@ -90,10 +93,7 @@ function VoicePopup({
               type="button"
               aria-label="Close voice search"
               className="rounded-xl px-2 py-1 text-slate-500 hover:bg-slate-100 cursor-pointer"
-              onClick={() => {
-                onStop?.();
-                onClose?.();
-              }}
+              onClick={onClose}
             >
               ✕
             </button>
@@ -104,7 +104,8 @@ function VoicePopup({
               <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                 {error}
                 <div className="mt-1 text-[12px] text-red-600">
-                  Tip: On Android Chrome, ensure <b>HTTPS</b> and allow Microphone permission for your site.
+                  Tip: On Android Chrome, ensure <b>HTTPS</b> and allow
+                  Microphone permission.
                 </div>
               </div>
             ) : (
@@ -118,36 +119,66 @@ function VoicePopup({
                     Listening…
                   </span>
                 ) : (
-                  "Starting…"
+                  "Tap the mic to start."
                 )}
               </div>
             )}
 
+            {/* ✅ REAL MIC BUTTON (click to start/stop) */}
             <div className="mt-6 flex items-center justify-center">
-              <MicIcon active={listening} />
+              <button
+                type="button"
+                onClick={onMicClick}
+                className={[
+                  "flex h-16 w-16 items-center justify-center rounded-full border bg-white shadow-sm cursor-pointer",
+                  listening
+                    ? "border-blue-300 ring-4 ring-blue-100"
+                    : "border-slate-200 hover:bg-slate-50",
+                ].join(" ")}
+                aria-label={
+                  listening ? "Stop voice search" : "Start voice search"
+                }
+                title={listening ? "Stop" : "Start"}
+              >
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M19 11a7 7 0 0 1-14 0"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 18v3"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
 
-            <div className="mt-6 flex items-center justify-center gap-3">
+            <div className="mt-6 flex items-center justify-center">
               <button
                 type="button"
                 className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-                onClick={() => {
-                  onStop?.();
-                  onClose?.();
-                }}
+                onClick={onClose}
               >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
-                onClick={() => {
-                  onStop?.();
-                  onClose?.();
-                }}
-              >
-                Stop
+                Close
               </button>
             </div>
           </div>
@@ -225,12 +256,12 @@ function useVoiceSearch({ onText, silenceMs = 8000 }) {
         e?.error === "not-allowed"
           ? "Mic permission denied. Allow microphone access."
           : e?.error === "service-not-allowed"
-          ? "Mic blocked by browser. Check site permissions."
-          : e?.error === "no-speech"
-          ? "No speech detected."
-          : e?.error === "network"
-          ? "Voice service unavailable. Check internet."
-          : "Voice search failed.";
+            ? "Mic blocked by browser. Check site permissions."
+            : e?.error === "no-speech"
+              ? "No speech detected."
+              : e?.error === "network"
+                ? "Voice service unavailable. Check internet."
+                : "Voice search failed.";
 
       setError(msg);
       setListening(false);
@@ -279,7 +310,6 @@ function useVoiceSearch({ onText, silenceMs = 8000 }) {
   const start = async () => {
     setError("");
 
-    // ✅ Chrome/Android needs HTTPS (or localhost)
     if (
       typeof window !== "undefined" &&
       window.location.protocol !== "https:" &&
@@ -296,12 +326,12 @@ function useVoiceSearch({ onText, silenceMs = 8000 }) {
       return;
     }
 
-    // ✅ Preflight permission prompt (fixes many Chrome “not-allowed” cases)
+    // ✅ Preflight permission prompt (keep stream alive)
     try {
       if (navigator?.mediaDevices?.getUserMedia) {
-        streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // stop immediately; we only wanted to trigger permission prompt
-        stopTracks();
+        streamRef.current = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
       }
     } catch (e) {
       setError("Mic permission denied. Allow microphone access.");
@@ -309,13 +339,9 @@ function useVoiceSearch({ onText, silenceMs = 8000 }) {
       return;
     }
 
-    setPopupOpen(true);
-
-    // ✅ Must be user gesture (button click)
     try {
       recognitionRef.current.start();
     } catch (e) {
-      // if already running, restart
       try {
         recognitionRef.current.stop();
         recognitionRef.current.start();
@@ -329,7 +355,7 @@ function useVoiceSearch({ onText, silenceMs = 8000 }) {
       recognitionRef.current?.stop();
     } catch {}
     setListening(false);
-    stopTracks();
+    stopTracks(); // ✅ stop mic stream here
   };
 
   const closePopup = () => {
@@ -416,8 +442,8 @@ function MobileSearchInline({ onNavigate }) {
         open={voice.popupOpen}
         listening={voice.listening}
         error={voice.error}
-        onStop={voice.stop}
         onClose={voice.closePopup}
+        onMicClick={voice.listening ? voice.stop : voice.start} // ✅ popup mic controls start/stop
       />
 
       <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm mb-4">
@@ -437,16 +463,21 @@ function MobileSearchInline({ onNavigate }) {
           {/* 🎤 Mic button */}
           <button
             type="button"
-            onClick={voice.listening ? voice.stop : voice.start}
+            onClick={() => {
+              voice.setError("");
+              voice.setPopupOpen(true); // ✅ open popup first
+            }}
             disabled={!voice.supported}
             title={
               !voice.supported
                 ? "Voice search not supported"
                 : voice.listening
-                ? "Stop voice"
-                : "Search by voice"
+                  ? "Stop voice"
+                  : "Search by voice"
             }
-            aria-label={voice.listening ? "Stop voice search" : "Search by voice"}
+            aria-label={
+              voice.listening ? "Stop voice search" : "Search by voice"
+            }
             className={[
               "shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm",
               "text-slate-700 hover:bg-slate-50 cursor-pointer",
@@ -498,10 +529,10 @@ function MobileSearchInline({ onNavigate }) {
           {loading
             ? "Searching…"
             : q.trim()
-            ? groups.length
-              ? `Results for “${q.trim()}”`
-              : `No results for “${q.trim()}”`
-            : "Tip: try “EPR”, “BIS”, “IMEI”, “NOC”…"}
+              ? groups.length
+                ? `Results for “${q.trim()}”`
+                : `No results for “${q.trim()}”`
+              : "Tip: try “EPR”, “BIS”, “IMEI”, “NOC”…"}
         </div>
 
         {err ? (
@@ -523,7 +554,9 @@ function MobileSearchInline({ onNavigate }) {
             {groups.slice(0, 4).map(([groupTitle, list]) => (
               <div key={groupTitle} className="rounded-xl bg-slate-50 p-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-blue-700">{groupTitle}</p>
+                  <p className="text-sm font-semibold text-blue-700">
+                    {groupTitle}
+                  </p>
                   <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-slate-600">
                     {list.length}
                   </span>
@@ -540,7 +573,9 @@ function MobileSearchInline({ onNavigate }) {
                       >
                         <div className="font-medium">{x?.name}</div>
                         {x?.track ? (
-                          <div className="text-[12px] text-slate-500">{x.track}</div>
+                          <div className="text-[12px] text-slate-500">
+                            {x.track}
+                          </div>
                         ) : null}
                       </Link>
                     </li>
@@ -590,7 +625,10 @@ function MobileMenuSection({ title, children, open, onToggle }) {
           open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         ].join(" ")}
       >
-        <div className="overflow-hidden px-4 pb-4" style={{ marginBottom: "4px" }}>
+        <div
+          className="overflow-hidden px-4 pb-4"
+          style={{ marginBottom: "4px" }}
+        >
           {children}
         </div>
       </div>
@@ -598,7 +636,13 @@ function MobileMenuSection({ title, children, open, onToggle }) {
   );
 }
 
-function MobileCategoryAccordion({ categoryTitle, value, onNavigate, open, onToggle }) {
+function MobileCategoryAccordion({
+  categoryTitle,
+  value,
+  onNavigate,
+  open,
+  onToggle,
+}) {
   const renderGroup = (groupTitle, list) => {
     const items = Array.isArray(list) ? list : [];
     const visible = items.slice(0, 6);
@@ -623,7 +667,10 @@ function MobileCategoryAccordion({ categoryTitle, value, onNavigate, open, onTog
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 overflow-hidden" style={{ margin: "4px 0px" }}>
+    <div
+      className="rounded-2xl border border-slate-200 overflow-hidden"
+      style={{ margin: "4px 0px" }}
+    >
       <button
         type="button"
         onClick={onToggle}
@@ -656,7 +703,9 @@ function MobileCategoryAccordion({ categoryTitle, value, onNavigate, open, onTog
             </ul>
           ) : isGroupObject(value) ? (
             <div className="space-y-3" style={{ paddingBottom: "4px" }}>
-              {Object.keys(value || {}).map((groupTitle) => renderGroup(groupTitle, value[groupTitle]))}
+              {Object.keys(value || {}).map((groupTitle) =>
+                renderGroup(groupTitle, value[groupTitle]),
+              )}
             </div>
           ) : (
             <p className="text-sm text-slate-600">No data available.</p>
@@ -695,7 +744,13 @@ function MobileDrawer({ open, onClose, menuMap, loading, navItems }) {
   if (!mounted) return null;
 
   return createPortal(
-    <div className={["fixed inset-0 z-[9999]", open ? "pointer-events-auto" : "pointer-events-none"].join(" ")} aria-hidden={!open}>
+    <div
+      className={[
+        "fixed inset-0 z-[9999]",
+        open ? "pointer-events-auto" : "pointer-events-none",
+      ].join(" ")}
+      aria-hidden={!open}
+    >
       <div
         className={[
           "absolute inset-0 bg-black/40 backdrop-blur-[1px]",
@@ -748,12 +803,22 @@ function MobileDrawer({ open, onClose, menuMap, loading, navItems }) {
         <div className="h-[calc(100%-124px)] overflow-y-auto px-4 pb-8">
           {/* your rest content unchanged */}
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <Link href="/service" onClick={onClose} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 cursor-pointer">
+            <Link
+              href="/service"
+              onClick={onClose}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 cursor-pointer"
+            >
               <p className="text-sm font-semibold text-slate-900">Services</p>
               <p className="mt-1 text-xs text-slate-600">Browse catalogue</p>
             </Link>
-            <Link href="/knowledge-centre" onClick={onClose} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 cursor-pointer">
-              <p className="text-sm font-semibold text-slate-900">Knowledge Centre</p>
+            <Link
+              href="/knowledge-centre"
+              onClick={onClose}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 cursor-pointer"
+            >
+              <p className="text-sm font-semibold text-slate-900">
+                Knowledge Centre
+              </p>
               <p className="mt-1 text-xs text-slate-600">Guides & updates</p>
             </Link>
           </div>
@@ -766,11 +831,18 @@ function MobileDrawer({ open, onClose, menuMap, loading, navItems }) {
                 const sideKeys = Object.keys(categoryMap || {});
 
                 return (
-                  <div key={nav.key} id={`mobile-section-${nav.key}`} className="scroll-mt-28" style={{ margin: "3px 0px" }}>
+                  <div
+                    key={nav.key}
+                    id={`mobile-section-${nav.key}`}
+                    className="scroll-mt-28"
+                    style={{ margin: "3px 0px" }}
+                  >
                     <MobileMenuSection
                       title={nav.label}
                       open={activeNavKey === nav.key}
-                      onToggle={() => setActiveNavKey((k) => (k === nav.key ? null : nav.key))}
+                      onToggle={() =>
+                        setActiveNavKey((k) => (k === nav.key ? null : nav.key))
+                      }
                     >
                       {sideKeys.map((cat) => (
                         <MobileCategoryAccordion
@@ -795,13 +867,25 @@ function MobileDrawer({ open, onClose, menuMap, loading, navItems }) {
           </div>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="text-sm font-semibold text-slate-900">Need help choosing a service?</p>
-            <p className="mt-1 text-sm text-slate-600">Use search above or open the Services catalogue.</p>
+            <p className="text-sm font-semibold text-slate-900">
+              Need help choosing a service?
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              Use search above or open the Services catalogue.
+            </p>
             <div className="mt-3 flex gap-2">
-              <Link href="/service" onClick={onClose} className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer">
+              <Link
+                href="/service"
+                onClick={onClose}
+                className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
+              >
                 Explore Services
               </Link>
-              <Link href="/contact-us" onClick={onClose} className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer">
+              <Link
+                href="/contact-us"
+                onClick={onClose}
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
                 Contact
               </Link>
             </div>

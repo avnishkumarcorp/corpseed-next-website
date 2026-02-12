@@ -425,8 +425,8 @@ export default function HomeHeroSection({
 
             <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
               {categories.map((c, idx) => (
-                <span  className="flex items-center">
-                    <div className="font-medium text-blue-600  ">   
+                <span key={c.href} className="flex items-center">
+                    <div className="font-medium text-blue-600 ">   
                     {c.label}
                     </div>
                   {idx !== categories.length - 1 && (

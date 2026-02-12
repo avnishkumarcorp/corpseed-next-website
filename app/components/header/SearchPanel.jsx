@@ -17,7 +17,104 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
   const panelRef = useRef(null);
   const [mounted, setMounted] = useState(false);
 
+  // 🎤 speech state
+  const recognitionRef = useRef(null);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [speechError, setSpeechError] = useState("");
+
   useEffect(() => setMounted(true), []);
+
+  // Detect speech support once
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    setSpeechSupported(Boolean(SpeechRecognition));
+  }, []);
+
+  // Setup recognition instance
+  useEffect(() => {
+    if (!speechSupported) return;
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const rec = new SpeechRecognition();
+    rec.continuous = false; // one-shot (like google mic)
+    rec.interimResults = true; // live typing
+    rec.lang = "en-IN"; // change if you want hi-IN etc.
+
+    rec.onstart = () => {
+      setSpeechError("");
+      setListening(true);
+    };
+
+    rec.onend = () => {
+      setListening(false);
+    };
+
+    rec.onerror = (e) => {
+      // common: "not-allowed", "no-speech", "network"
+      setSpeechError(
+        e?.error === "not-allowed"
+          ? "Mic permission denied."
+          : e?.error === "no-speech"
+          ? "No speech detected."
+          : "Voice search failed."
+      );
+      setListening(false);
+    };
+
+    rec.onresult = (event) => {
+      // Combine interim + final
+      let interim = "";
+      let finalText = "";
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0]?.transcript || "";
+        if (event.results[i].isFinal) finalText += transcript;
+        else interim += transcript;
+      }
+
+      // Update input live
+      const next = (finalText || interim).trim();
+      if (next) setQ(next);
+    };
+
+    recognitionRef.current = rec;
+
+    return () => {
+      try {
+        rec.onstart = null;
+        rec.onend = null;
+        rec.onresult = null;
+        rec.onerror = null;
+        rec.stop();
+      } catch {}
+      recognitionRef.current = null;
+    };
+  }, [speechSupported]);
+
+  const startVoice = () => {
+    setSpeechError("");
+    if (!speechSupported || !recognitionRef.current) {
+      setSpeechError("Voice search not supported in this browser.");
+      return;
+    }
+    try {
+      recognitionRef.current.start();
+    } catch {
+      // calling start twice throws in some browsers
+    }
+  };
+
+  const stopVoice = () => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {}
+  };
 
   // Close on ESC + outside click
   useEffect(() => {
@@ -43,8 +140,12 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
       setApiData(null);
       setErr("");
       setLoading(false);
+      setSpeechError("");
+      setListening(false);
       if (abortRef.current) abortRef.current.abort();
+      stopVoice();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // Fetch on query
@@ -68,7 +169,9 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
         setLoading(true);
         setErr("");
 
-        const url = `/api/search/service-industry-blog/${encodeURIComponent(query)}`;
+        const url = `/api/search/service-industry-blog/${encodeURIComponent(
+          query
+        )}`;
         const res = await fetch(url, { signal: controller.signal });
 
         if (!res.ok) throw new Error(`Search failed: ${res.status}`);
@@ -114,10 +217,66 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Search services, knowledge, updates… (e.g., IMEI, EPR, BIS)"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm
                              outline-none transition
                              focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
+
+                {/* 🎤 MIC BUTTON */}
+                <button
+                  type="button"
+                  onClick={listening ? stopVoice : startVoice}
+                  disabled={!speechSupported}
+                  title={
+                    !speechSupported
+                      ? "Voice search not supported"
+                      : listening
+                      ? "Stop voice search"
+                      : "Search by voice"
+                  }
+                  aria-label={
+                    listening ? "Stop voice search" : "Search by voice"
+                  }
+                  className={[
+                    "absolute right-3 top-1/2 -translate-y-1/2",
+                    "inline-flex h-9 w-9 items-center justify-center rounded-lg",
+                    "border border-slate-200 bg-white text-slate-700 shadow-sm",
+                    "hover:bg-slate-50 cursor-pointer",
+                    listening ? "ring-2 ring-blue-300" : "",
+                    !speechSupported ? "opacity-40 cursor-not-allowed" : "",
+                  ].join(" ")}
+                >
+                  {/* simple mic icon */}
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M19 11a7 7 0 0 1-14 0"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M12 18v3"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
@@ -140,14 +299,29 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
               </div>
             </div>
 
+            {/* status line */}
             <div className="mt-2 text-xs text-slate-600">
-              {loading
-                ? "Searching…"
-                : q.trim()
-                  ? groups.length
-                    ? `Showing results for “${q.trim()}”`
-                    : `No results found for “${q.trim()}”`
-                  : "Tip: try “IMEI”, “EPR”, “BIS”, “Pollution NOC”…"}
+              {speechError ? (
+                <span className="text-red-600">{speechError}</span>
+              ) : listening ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
+                  </span>
+                  Listening…
+                </span>
+              ) : loading ? (
+                "Searching…"
+              ) : q.trim() ? (
+                groups.length ? (
+                  `Showing results for “${q.trim()}”`
+                ) : (
+                  `No results found for “${q.trim()}”`
+                )
+              ) : (
+                "Tip: try “IMEI”, “EPR”, “BIS”, “Pollution NOC”…"
+              )}
             </div>
           </div>
 
@@ -158,9 +332,12 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
               </div>
             ) : !q.trim() ? (
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <p className="text-sm font-semibold text-slate-900">Start typing to search</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  Start typing to search
+                </p>
                 <p className="mt-1 text-sm text-slate-600">
-                  We’ll show Services, Knowledge Center, Department Updates, Industries and more.
+                  We’ll show Services, Knowledge Center, Department Updates,
+                  Industries and more.
                 </p>
               </div>
             ) : loading ? (
@@ -198,7 +375,9 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                           >
                             <div className="font-medium">{x?.name}</div>
                             {x?.track ? (
-                              <div className="text-[12px] text-slate-500">{x.track}</div>
+                              <div className="text-[12px] text-slate-500">
+                                {x.track}
+                              </div>
                             ) : null}
                           </Link>
                         </li>
@@ -221,9 +400,12 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
               </div>
             ) : (
               <div className="rounded-2xl border border-slate-200 bg-white p-6">
-                <p className="text-sm font-semibold text-slate-900">No results found.</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  No results found.
+                </p>
                 <p className="mt-1 text-sm text-slate-600">
-                  Try different keywords like <span className="font-semibold">EPR</span>,{" "}
+                  Try different keywords like{" "}
+                  <span className="font-semibold">EPR</span>,{" "}
                   <span className="font-semibold">BIS</span>,{" "}
                   <span className="font-semibold">NOC</span>.
                 </p>
@@ -248,6 +430,6 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
         </div>
       </div>
     </div>,
-    document.body,
+    document.body
   );
 }

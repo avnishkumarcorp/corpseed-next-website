@@ -17,6 +17,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import SafeHtml from "../components/SafeHtml";
+import EnquiryForm from "../components/enquiry-form/EnquiryForm";
 
 function Badge({ children }) {
   return (
@@ -360,7 +361,7 @@ export default function PressListClient({ apiData, page, size }) {
           </CardShell>
 
           {/* Schedule callback (static UI) */}
-          <CardShell>
+          {/* <CardShell>
             <div className="p-5">
               <p className="text-lg font-extrabold text-slate-900">
                 Schedule a call back
@@ -406,7 +407,8 @@ export default function PressListClient({ apiData, page, size }) {
                 </p>
               </form>
             </div>
-          </CardShell>
+          </CardShell> */}
+          <EnquiryForm/>
         </aside>
       </div>
     </section>

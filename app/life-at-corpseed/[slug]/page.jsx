@@ -7,9 +7,7 @@ import { getLifeAtCorpseedBySlug } from "@/app/lib/life-at-corpseed";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const data = await getLifeAtCorpseedBySlug(slug);
-
-  console.log("fjhsfjhsfjhsfjhfsjd",data)
+  const data = await getLifeAtCorpseedBySlug(slug)
 
   return {
     title: data?.title || data?.lifeUser?.title || "Life at Corpseed | Corpseed",

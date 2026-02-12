@@ -100,10 +100,7 @@ export default function EnquiryOtpInline({ onVerified }) {
 
   setError("");
   setLoading(true);
-
   const res = await sendOtp({ name, mobile: cleanMobile });
-  console.log("sendOtp res:", JSON?.parse(res?.data));
-
   setLoading(false);
 
   if (!res.ok) {

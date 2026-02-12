@@ -15,7 +15,7 @@ export default function ServiceTabs({ tabs = [] }) {
 
   const mapped = useMemo(
     () =>
-      tabs.map((t) => ({
+      (tabs || []).map((t) => ({
         ...t,
         id: t.id || slugify(t.title || t.tabName),
         tabName: t.tabName || t.title,
@@ -40,7 +40,6 @@ export default function ServiceTabs({ tabs = [] }) {
 
     const offset = 140;
     const y = el.getBoundingClientRect().top + window.scrollY - offset;
-
     window.scrollTo({ top: y, behavior: "smooth" });
   }, []);
 
@@ -67,7 +66,6 @@ export default function ServiceTabs({ tabs = [] }) {
       },
       {
         root: null,
-        // ✅ slightly better margins (less "previous section stays active")
         rootMargin: "-25% 0px -65% 0px",
         threshold: [0.08, 0.15, 0.22, 0.3],
       },
@@ -149,7 +147,8 @@ export default function ServiceTabs({ tabs = [] }) {
           aria-label="Scroll left"
           className={[
             "inline-flex h-9 w-9 items-center justify-center cursor-pointer",
-            "text-slate-600 hover:text-blue-600",
+            "rounded-full border border-slate-200 bg-white shadow-sm",
+            "text-slate-600 hover:text-blue-600 hover:border-blue-200",
             "disabled:opacity-30 disabled:cursor-not-allowed",
           ].join(" ")}
         >
@@ -161,6 +160,7 @@ export default function ServiceTabs({ tabs = [] }) {
           <div className="relative">
             <div className="absolute bottom-0 left-0 right-0 h-px bg-slate-200" />
 
+            {/* ✅ Keep your original underline look + fix spacing */}
             <div className="flex w-full min-w-max md:min-w-0 md:w-full">
               {mapped.map((t) => {
                 const isActive = activeId === t.id;
@@ -172,9 +172,13 @@ export default function ServiceTabs({ tabs = [] }) {
                     type="button"
                     onClick={() => onTabClick(t.id)}
                     className={[
-                      "group relative px-5 py-3 text-sm font-semibold cursor-pointer transition",
-                      "text-slate-700 hover:text-blue-600 whitespace-nowrap",
-                      "md:flex-1 md:px-0 md:text-center",
+                      "group relative cursor-pointer transition",
+                      "whitespace-nowrap text-sm font-semibold",
+                      "text-slate-700 hover:text-blue-600",
+                      // ✅ keep full-width on desktop (like before)
+                      "md:flex-1 md:text-center",
+                      // ✅ IMPORTANT: add padding so labels don't stick together
+                      "px-4 py-3 md:px-6",
                     ].join(" ")}
                   >
                     {/* ✅ Text */}
@@ -201,7 +205,8 @@ export default function ServiceTabs({ tabs = [] }) {
           aria-label="Scroll right"
           className={[
             "inline-flex h-9 w-9 items-center justify-center cursor-pointer",
-            "text-slate-600 hover:text-blue-600",
+            "rounded-full border border-slate-200 bg-white shadow-sm",
+            "text-slate-600 hover:text-blue-600 hover:border-blue-200",
             "disabled:opacity-30 disabled:cursor-not-allowed",
           ].join(" ")}
         >

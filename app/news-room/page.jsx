@@ -113,7 +113,8 @@ export async function generateMetadata({ searchParams }) {
     alternates: { canonical: "/news-room" },
   };
 }
-console.log("getNewsRoomList",getNewsRoomList )
+
+
 
 export default async function NewsRoomPage({ searchParams }) {
   const { page, size, q, categorySlug } = await searchParams;

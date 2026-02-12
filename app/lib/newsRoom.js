@@ -14,9 +14,6 @@ export async function getNewsRoomList({ page = 1, size = 20, q = "", categorySlu
     // news list changes often → keep it fresh
         cache: "no-store",
   });
-
-  console.log("xsghkjgjkgdjk",res)
-
   if (!res.ok) return null;
   return res.json();
 }

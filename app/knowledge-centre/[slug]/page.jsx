@@ -15,12 +15,8 @@ import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 import FeedbackBox from "@/app/components/FeedbackBox";
-<<<<<<< Updated upstream
 import SocialRail from "@/app/components/ShareRailClient"; // ✅ Using external component
 
-=======
-import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
->>>>>>> Stashed changes
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
@@ -67,67 +63,6 @@ function splitTocAndBody(html = "") {
   return { tocHtml, bodyHtml };
 }
 
-<<<<<<< Updated upstream
-=======
-function SocialRail({ pageUrl, title }) {
-  return (
-    <div className="hidden lg:block">
-      <div className="sticky top-28 -translate-x-2">
-        <div className="flex flex-col items-center gap-3">
-          {/* Share (just a non-clickable icon/button style) */}
-          <div
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm"
-            title="Share"
-            aria-label="Share"
-          >
-            <Share2 className="h-5 w-5" />
-          </div>
-
-          <div className="h-px w-8 bg-slate-200" />
-
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              pageUrl,
-            )}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
-            title="Facebook"
-            aria-label="Facebook"
-          >
-            <Facebook className="h-5 w-5" />
-          </a>
-
-          <a
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-              pageUrl,
-            )}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
-            title="LinkedIn"
-            aria-label="LinkedIn"
-          >
-            <Linkedin className="h-5 w-5" />
-          </a>
-
-          <a
-            href={`mailto:?subject=${encodeURIComponent(
-              title,
-            )}&body=${encodeURIComponent(pageUrl)}`}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
-            title="Email"
-            aria-label="Email"
-          >
-            <Mail className="h-5 w-5" />
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
->>>>>>> Stashed changes
 function TocCard({ tocHtml }) {
   if (!tocHtml) return null;
 
@@ -217,14 +152,10 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
   );
 }
 
-<<<<<<< Updated upstream
 
 /* ===============================
    SEO
 ================================= */
-=======
-/** ✅ SEO from API */
->>>>>>> Stashed changes
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getKnowledgeCentreBySlug(slug);
@@ -269,18 +200,11 @@ export default async function KnowledgeCentreSlugPage({ params }) {
       {/* HERO */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-<<<<<<< Updated upstream
 
           <div className="mt-4 grid gap-6 lg:grid-cols-[.7fr_1.3fr] lg:items-center">
 
             <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
               <div className="relative h-[200px] w-full sm:h-[240px]">
-=======
-          <div className="mt-4 grid gap-8 lg:grid-cols-[1.45fr_1.05fr] lg:items-start">
-            {/* LEFT image */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="relative h-[260px] w-full sm:h-[320px]">
->>>>>>> Stashed changes
                 <Image
                   src={blog.image}
                   alt={safeText(blog.title)}
@@ -301,13 +225,8 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                 {apiData?.metaDescription || blog.summary}
               </p>
 
-<<<<<<< Updated upstream
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
                 {blog.postDate && (
-=======
-              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
-                {blog.postDate ? (
->>>>>>> Stashed changes
                   <span className="inline-flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     {formatDate(blog.postDate)}
@@ -336,7 +255,6 @@ export default async function KnowledgeCentreSlugPage({ params }) {
 
       {/* CONTENT */}
       <section className="py-8 md:py-10">
-<<<<<<< Updated upstream
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-12">
 
           {/* ✅ Using SocialRail component */}
@@ -443,158 +361,6 @@ export default async function KnowledgeCentreSlugPage({ params }) {
             </div>
           </aside>
 
-=======
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="relative">
-            {/* ✅ Social rail OVERLAY (doesn't push content) */}
-            <div className="hidden lg:block absolute left-0 top-0 -translate-x-16">
-              <SocialRail pageUrl={pageUrl} title={blog.title} />
-            </div>
-
-            {/* ✅ Main content starts from same left edge as hero */}
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_420px]">
-              {/* Main */}
-              <div className="space-y-6">
-                {/* Article */}
-                <Card className="overflow-hidden">
-                  <div className="p-5 sm:p-7">
-                    <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
-                      <SafeHtmlShadow html={bodyHtml} />
-                    </div>
-
-                    <div className="mt-8">
-                      <EnquiryOtpInline />
-                    </div>
-
-                    {/* Mobile share */}
-                    <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Share
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <a
-                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label="Facebook"
-                          title="Facebook"
-                        >
-                          <Facebook className="h-5 w-5" />
-                        </a>
-                        <a
-                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label="LinkedIn"
-                          title="LinkedIn"
-                        >
-                          <Linkedin className="h-5 w-5" />
-                        </a>
-                        <a
-                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                          href={`mailto:?subject=${encodeURIComponent(blog.title)}&body=${encodeURIComponent(pageUrl)}`}
-                          aria-label="Email"
-                          title="Email"
-                        >
-                          <Mail className="h-5 w-5" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Feedback */}
-                {apiData?.feedback ? <FeedbackBox /> : null}
-
-                {/* Related blogs */}
-                {apiData?.relatedBlogs?.length ? (
-                  <Card>
-                    <div className="border-b border-slate-200 px-5 py-4">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Related articles
-                      </p>
-                    </div>
-
-                    <div className="grid gap-4 p-5 sm:grid-cols-2">
-                      {apiData.relatedBlogs.slice(0, 6).map((x) => (
-                        <Link
-                          key={x.slug}
-                          href={`/knowledge-centre/${x.slug}`}
-                          className="group flex gap-3 rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50 cursor-pointer"
-                        >
-                          <div className="relative h-16 w-20 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
-                            {x.image ? (
-                              <Image
-                                src={x.image}
-                                alt={safeText(x.title)}
-                                fill
-                                className="object-cover"
-                                sizes="120px"
-                              />
-                            ) : null}
-                          </div>
-
-                          <div className="min-w-0">
-                            <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:underline">
-                              {safeText(x.title)}
-                            </p>
-                            <p className="mt-1 text-xs text-slate-500">
-                              {x.postDate ? formatDate(x.postDate) : "Read"}
-                              {typeof x.visited === "number"
-                                ? ` • ${x.visited} views`
-                                : ""}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </Card>
-                ) : null}
-              </div>
-
-              {/* Sidebar */}
-              <aside className="space-y-6">
-                <div className="lg:sticky lg:top-24 space-y-6">
-                  <TocCard tocHtml={tocHtml} />
-
-                  <ListCard
-                    title="Top Articles"
-                    badge="Most visited"
-                    icon={BookOpen}
-                    items={apiData?.topBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
-
-                  <ListCard
-                    title="Latest Articles"
-                    badge="Recently published"
-                    icon={BookOpen}
-                    items={apiData?.latestBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
-
-                  <ListCard
-                    title="Top News"
-                    badge="Trending"
-                    icon={Newspaper}
-                    items={apiData?.topNews || []}
-                    basePath="/news-room"
-                  />
-
-                  <ListCard
-                    title="Latest News"
-                    badge="Fresh updates"
-                    icon={Newspaper}
-                    items={apiData?.latestNews || []}
-                    basePath="/news-room"
-                  />
-                </div>
-              </aside>
-            </div>
-          </div>
->>>>>>> Stashed changes
         </div>
       </section>
     </div>

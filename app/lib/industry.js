@@ -23,7 +23,6 @@ export async function getIndustryBySlug(slug) {
     }
 
     const data = await res.json(); // ✅ read once
-    console.log("service data:", data); // ✅ log actual object
     return data;
   } catch (err) {
     console.error("getServiceBySlug error:", err);

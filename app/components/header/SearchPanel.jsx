@@ -5,6 +5,292 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { normalizeGroups, useDebouncedValue } from "./helpers";
 
+/** ✅ Google-like Voice Popup */
+function VoicePopup({ open, listening, interim, error, onClose, popupRef }) {
+  if (!open) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999]">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      />
+      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 px-2">
+        <div
+          ref={popupRef}
+          onMouseDown={(e) => e.stopPropagation()} // ✅ important
+          onClick={(e) => e.stopPropagation()} // ✅ important
+          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {listening ? "Listening…" : "Voice search"}
+              </p>
+              <p className="mt-1 text-xs text-slate-600">
+                Speak now. It will stop automatically after 8 seconds of
+                silence.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              aria-label="Close voice search"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            {error ? (
+              <p className="text-sm text-red-600">{error}</p>
+            ) : interim ? (
+              <p className="text-sm text-slate-900">{interim}</p>
+            ) : (
+              <p className="text-sm text-slate-500">
+                {listening ? "Say something…" : "Starting…"}
+              </p>
+            )}
+          </div>
+
+          {/* NOTE: If you want mic clickable INSIDE popup, make it a button */}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/**
+ * ✅ Voice engine that works across browsers:
+ * 1) Try WebSpeech SpeechRecognition (Safari + some Chrome desktops)
+ * 2) Fallback: MediaRecorder + /api/speech-to-text (Android Chrome reliable)
+ * Auto-stop if no speech for 8s + always stop when popup closes.
+ */
+function useVoiceSearch({ onText, silenceMs = 8000, lang = "en-IN" }) {
+  const recRef = useRef(null);
+  const silenceTimerRef = useRef(null);
+
+  const mediaRef = useRef({ stream: null, recorder: null, chunks: [] });
+
+  const [supported, setSupported] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [error, setError] = useState("");
+  const [interim, setInterim] = useState("");
+
+  const clearSilence = () => {
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    silenceTimerRef.current = null;
+  };
+
+  const resetSilence = () => {
+    clearSilence();
+    silenceTimerRef.current = setTimeout(() => {
+      stop();
+      setError("Stopped (no speech detected).");
+    }, silenceMs);
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    setSupported(Boolean(SR) || Boolean(navigator?.mediaDevices?.getUserMedia));
+  }, []);
+
+  // setup SpeechRecognition (if available)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = lang;
+
+    rec.onstart = () => {
+      setError("");
+      setInterim("");
+      setListening(true);
+      resetSilence();
+    };
+
+    rec.onend = () => {
+      setListening(false);
+      clearSilence();
+    };
+
+    rec.onerror = (e) => {
+      setListening(false);
+      clearSilence();
+      setError(
+        e?.error === "not-allowed"
+          ? "Mic permission denied. Please allow microphone access."
+          : e?.error === "no-speech"
+            ? "No speech detected."
+            : "Voice search failed.",
+      );
+    };
+
+    rec.onspeechstart = resetSilence;
+    rec.onspeechend = resetSilence;
+
+    rec.onresult = (event) => {
+      resetSilence();
+
+      let interimText = "";
+      let finalText = "";
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0]?.transcript || "";
+        if (event.results[i].isFinal) finalText += t;
+        else interimText += t;
+      }
+
+      const merged = (finalText || interimText).trim();
+      setInterim(merged);
+
+      if (finalText.trim()) {
+        onText?.(finalText.trim());
+        stop();
+      }
+    };
+
+    recRef.current = rec;
+
+    return () => {
+      try {
+        rec.stop();
+      } catch {}
+      recRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const stopMedia = () => {
+    try {
+      const { recorder, stream } = mediaRef.current;
+      if (recorder && recorder.state !== "inactive") recorder.stop();
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+    } catch {}
+    mediaRef.current.stream = null;
+    mediaRef.current.recorder = null;
+    mediaRef.current.chunks = [];
+  };
+
+  const stop = useMemo(
+    () => () => {
+      try {
+        recRef.current?.stop();
+      } catch {}
+      stopMedia();
+      setListening(false);
+      clearSilence();
+    },
+    [],
+  );
+
+  const startRecorderFallback = async () => {
+    setError("");
+    setInterim("");
+
+    // Android Chrome requires HTTPS (or localhost)
+    if (
+      typeof window !== "undefined" &&
+      window.location.protocol !== "https:" &&
+      window.location.hostname !== "localhost"
+    ) {
+      setError("Voice search needs HTTPS on mobile browsers.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+
+      mediaRef.current.stream = stream;
+      mediaRef.current.recorder = recorder;
+      mediaRef.current.chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data?.size) mediaRef.current.chunks.push(e.data);
+      };
+
+      recorder.onstart = () => {
+        setListening(true);
+        setError("");
+        setInterim("");
+        // ✅ strict 8 sec timeout (we can’t detect speech reliably in recorder)
+        resetSilence();
+      };
+
+      recorder.onstop = async () => {
+        clearSilence();
+        try {
+          const blob = new Blob(mediaRef.current.chunks, {
+            type: "audio/webm",
+          });
+          const fd = new FormData();
+          fd.append("audio", blob, "voice.webm");
+
+          const res = await fetch("/api/speech-to-text", {
+            method: "POST",
+            body: fd,
+          });
+
+          if (!res.ok) throw new Error("stt_failed");
+          const json = await res.json();
+          const text = String(json?.text || "").trim();
+          if (text) onText?.(text);
+        } catch {
+          setError("Voice search failed. Please try again.");
+        } finally {
+          setListening(false);
+        }
+      };
+
+      recorder.start();
+    } catch {
+      setError("Mic permission denied. Please allow microphone access.");
+      setListening(false);
+    }
+  };
+
+  const start = async () => {
+    setError("");
+    setInterim("");
+
+    // ✅ Try SpeechRecognition first
+    if (recRef.current) {
+      try {
+        recRef.current.start();
+        return;
+      } catch {
+        // fallback below
+      }
+    }
+
+    // ✅ Fallback for Android Chrome
+    await startRecorderFallback();
+  };
+
+  useEffect(() => {
+    return () => stop();
+  }, [stop]);
+
+  return { supported, listening, error, interim, start, stop, setError };
+}
+
 export default function SearchPanel({ open, onClose, topOffset = 72 }) {
   const [q, setQ] = useState("");
   const dq = useDebouncedValue(q, 250);
@@ -15,123 +301,44 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
 
   const abortRef = useRef(null);
   const panelRef = useRef(null);
+  const popupRef = useRef(null);
+
   const [mounted, setMounted] = useState(false);
 
-  // 🎤 speech state
-  const recognitionRef = useRef(null);
-  const [speechSupported, setSpeechSupported] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [speechError, setSpeechError] = useState("");
+  // ✅ voice popup state
+  const [voiceOpen, setVoiceOpen] = useState(false);
+
+  const voice = useVoiceSearch({
+    silenceMs: 8000,
+    onText: (text) => {
+      setQ(text); // fill search input
+      setVoiceOpen(false);
+    },
+  });
 
   useEffect(() => setMounted(true), []);
-
-  // Detect speech support once
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    setSpeechSupported(Boolean(SpeechRecognition));
-  }, []);
-
-  // Setup recognition instance
-  useEffect(() => {
-    if (!speechSupported) return;
-    if (typeof window === "undefined") return;
-
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    const rec = new SpeechRecognition();
-    rec.continuous = false; // one-shot (like google mic)
-    rec.interimResults = true; // live typing
-    rec.lang = "en-IN"; // change if you want hi-IN etc.
-
-    rec.onstart = () => {
-      setSpeechError("");
-      setListening(true);
-    };
-
-    rec.onend = () => {
-      setListening(false);
-    };
-
-    rec.onerror = (e) => {
-      // common: "not-allowed", "no-speech", "network"
-      setSpeechError(
-        e?.error === "not-allowed"
-          ? "Mic permission denied."
-          : e?.error === "no-speech"
-          ? "No speech detected."
-          : "Voice search failed."
-      );
-      setListening(false);
-    };
-
-    rec.onresult = (event) => {
-      // Combine interim + final
-      let interim = "";
-      let finalText = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0]?.transcript || "";
-        if (event.results[i].isFinal) finalText += transcript;
-        else interim += transcript;
-      }
-
-      // Update input live
-      const next = (finalText || interim).trim();
-      if (next) setQ(next);
-    };
-
-    recognitionRef.current = rec;
-
-    return () => {
-      try {
-        rec.onstart = null;
-        rec.onend = null;
-        rec.onresult = null;
-        rec.onerror = null;
-        rec.stop();
-      } catch {}
-      recognitionRef.current = null;
-    };
-  }, [speechSupported]);
-
-  const startVoice = () => {
-    setSpeechError("");
-    if (!speechSupported || !recognitionRef.current) {
-      setSpeechError("Voice search not supported in this browser.");
-      return;
-    }
-    try {
-      recognitionRef.current.start();
-    } catch {
-      // calling start twice throws in some browsers
-    }
-  };
-
-  const stopVoice = () => {
-    try {
-      recognitionRef.current?.stop();
-    } catch {}
-  };
 
   // Close on ESC + outside click
   useEffect(() => {
     if (!open) return;
 
     const onKey = (e) => e.key === "Escape" && onClose?.();
+
     const onMouse = (e) => {
+      // ✅ if voice popup is open and click is inside popup -> DON'T close panel
+      if (voiceOpen && popupRef.current?.contains(e.target)) return;
+
+      // ✅ normal outside click close for panel
       if (panelRef.current && !panelRef.current.contains(e.target)) onClose?.();
     };
 
     document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onMouse);
+    document.addEventListener("mousedown", onMouse, true); // ✅ capture helps
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onMouse);
+      document.removeEventListener("mousedown", onMouse, true);
     };
-  }, [open, onClose]);
+  }, [open, onClose, voiceOpen]);
 
   // Reset when closed
   useEffect(() => {
@@ -140,13 +347,24 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
       setApiData(null);
       setErr("");
       setLoading(false);
-      setSpeechError("");
-      setListening(false);
-      if (abortRef.current) abortRef.current.abort();
-      stopVoice();
+      abortRef.current?.abort?.();
+      // ✅ stop voice + close popup
+      setVoiceOpen(false);
+      voice.stop();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  const closeVoicePopup = () => {
+    setVoiceOpen(false);
+    voice.stop(); // ✅ ALWAYS stop when popup closes
+  };
+
+  const openVoicePopupAndStart = async () => {
+    voice.setError?.("");
+    setVoiceOpen(true);
+    await voice.start();
+  };
 
   // Fetch on query
   useEffect(() => {
@@ -160,7 +378,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
       return;
     }
 
-    if (abortRef.current) abortRef.current.abort();
+    abortRef.current?.abort?.();
     const controller = new AbortController();
     abortRef.current = controller;
 
@@ -170,7 +388,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
         setErr("");
 
         const url = `/api/search/service-industry-blog/${encodeURIComponent(
-          query
+          query,
         )}`;
         const res = await fetch(url, { signal: controller.signal });
 
@@ -202,6 +420,16 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
       ].join(" ")}
       style={{ top: topOffset }}
     >
+      {/* ✅ Voice Popup */}
+      <VoicePopup
+        open={voiceOpen}
+        listening={voice.listening}
+        interim={voice.interim}
+        error={voice.error}
+        onClose={closeVoicePopup}
+        popupRef={popupRef}
+      />
+
       <div className="mx-auto max-w-[92rem] px-4 sm:px-6 lg:px-8">
         <div
           ref={panelRef}
@@ -222,31 +450,29 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                              focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
 
-                {/* 🎤 MIC BUTTON */}
+                {/* 🎤 MIC BUTTON -> opens popup */}
                 <button
                   type="button"
-                  onClick={listening ? stopVoice : startVoice}
-                  disabled={!speechSupported}
+                  onClick={() => {
+                    if (voiceOpen) closeVoicePopup();
+                    else openVoicePopupAndStart();
+                  }}
+                  disabled={!voice.supported}
                   title={
-                    !speechSupported
+                    !voice.supported
                       ? "Voice search not supported"
-                      : listening
-                      ? "Stop voice search"
                       : "Search by voice"
                   }
-                  aria-label={
-                    listening ? "Stop voice search" : "Search by voice"
-                  }
+                  aria-label="Search by voice"
                   className={[
                     "absolute right-3 top-1/2 -translate-y-1/2",
                     "inline-flex h-9 w-9 items-center justify-center rounded-lg",
                     "border border-slate-200 bg-white text-slate-700 shadow-sm",
                     "hover:bg-slate-50 cursor-pointer",
-                    listening ? "ring-2 ring-blue-300" : "",
-                    !speechSupported ? "opacity-40 cursor-not-allowed" : "",
+                    voiceOpen ? "ring-2 ring-blue-300" : "",
+                    !voice.supported ? "opacity-40 cursor-not-allowed" : "",
                   ].join(" ")}
                 >
-                  {/* simple mic icon */}
                   <svg
                     width="18"
                     height="18"
@@ -301,9 +527,9 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
 
             {/* status line */}
             <div className="mt-2 text-xs text-slate-600">
-              {speechError ? (
-                <span className="text-red-600">{speechError}</span>
-              ) : listening ? (
+              {voice.error ? (
+                <span className="text-red-600">{voice.error}</span>
+              ) : voiceOpen && voice.listening ? (
                 <span className="inline-flex items-center gap-2">
                   <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
@@ -368,7 +594,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                       {list.slice(0, 7).map((x) => (
                         <li key={x?.url || x?.slug || x?.name}>
                           <Link
-                            href={x?.url || "#"}
+                            href={ensureInternalHref(x?.url || "#")}
                             className="block rounded-lg px-2 py-2 text-[13px] leading-5
                                        text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
                             onClick={onClose}
@@ -430,6 +656,16 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
+}
+
+function ensureInternalHref(url) {
+  if (!url) return "#";
+  try {
+    const u = new URL(url, "https://www.corpseed.com");
+    return `${u.pathname}${u.search}${u.hash}`;
+  } catch {
+    return url;
+  }
 }

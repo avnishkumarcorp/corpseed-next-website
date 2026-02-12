@@ -156,6 +156,93 @@ function HeroSearch({
 
   const placeholder = useTypewriterPlaceholders(placeholders, 1600);
 
+  // 🎤 speech state
+  const recognitionRef = React.useRef(null);
+  const [speechSupported, setSpeechSupported] = React.useState(false);
+  const [listening, setListening] = React.useState(false);
+  const [speechError, setSpeechError] = React.useState("");
+
+  // detect support once
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    setSpeechSupported(Boolean(SpeechRecognition));
+  }, []);
+
+  // setup recognition instance
+  React.useEffect(() => {
+    if (!speechSupported) return;
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const rec = new SpeechRecognition();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = "en-IN"; // change if needed
+
+    rec.onstart = () => {
+      setSpeechError("");
+      setListening(true);
+      setOpen(true);
+    };
+
+    rec.onend = () => setListening(false);
+
+    rec.onerror = (e) => {
+      setSpeechError(
+        e?.error === "not-allowed"
+          ? "Mic permission denied."
+          : e?.error === "no-speech"
+            ? "No speech detected."
+            : "Voice search failed.",
+      );
+      setListening(false);
+    };
+
+    rec.onresult = (event) => {
+      let interim = "";
+      let finalText = "";
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0]?.transcript || "";
+        if (event.results[i].isFinal) finalText += transcript;
+        else interim += transcript;
+      }
+
+      const next = (finalText || interim).trim();
+      if (next) setQ(next);
+    };
+
+    recognitionRef.current = rec;
+
+    return () => {
+      try {
+        rec.stop();
+      } catch {}
+      recognitionRef.current = null;
+    };
+  }, [speechSupported]);
+
+  const startVoice = () => {
+    setSpeechError("");
+    if (!speechSupported || !recognitionRef.current) {
+      setSpeechError("Voice search not supported in this browser.");
+      return;
+    }
+    try {
+      recognitionRef.current.start();
+    } catch {}
+  };
+
+  const stopVoice = () => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {}
+  };
+
   // close on outside click / esc
   React.useEffect(() => {
     if (!open) return;
@@ -176,6 +263,20 @@ function HeroSearch({
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onMouse);
     };
+  }, [open]);
+
+  // reset when closed
+  React.useEffect(() => {
+    if (!open) {
+      setApiData(null);
+      setErr("");
+      setLoading(false);
+      setSpeechError("");
+      setListening(false);
+      if (abortRef.current) abortRef.current.abort();
+      stopVoice();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // fetch
@@ -199,9 +300,12 @@ function HeroSearch({
         setLoading(true);
         setErr("");
 
-        const url = `/api/search/service-industry-blog/${q}`;
-        const res = await fetch(url, { signal: controller.signal });
+        // ✅ IMPORTANT: encode the query
+        const url = `/api/search/service-industry-blog/${encodeURIComponent(
+          query,
+        )}`;
 
+        const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) throw new Error(`Search failed: ${res.status}`);
 
         const json = await res.json();
@@ -219,14 +323,36 @@ function HeroSearch({
   }, [dq, open, baseUrl]);
 
   const groups = React.useMemo(() => normalizeGroups(apiData), [apiData]);
-
   const showPanel = open && (q.trim() || loading || err);
 
   return (
     <div ref={wrapRef} className="relative w-full max-w-xl">
       {/* Search input */}
       <div className="group flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100">
-        <span className="text-slate-400">⌕</span>
+        {/* ✅ Bigger search icon */}
+        <span className="text-slate-400">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M21 21l-4.3-4.3"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="7"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        </span>
 
         <input
           ref={inputRef}
@@ -240,6 +366,53 @@ function HeroSearch({
           className="w-full bg-transparent px-1 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
         />
 
+        {/* 🎤 Mic button */}
+        <button
+          type="button"
+          onClick={listening ? stopVoice : startVoice}
+          disabled={!speechSupported}
+          title={
+            !speechSupported
+              ? "Voice search not supported"
+              : listening
+                ? "Stop voice search"
+                : "Search by voice"
+          }
+          aria-label={listening ? "Stop voice search" : "Search by voice"}
+          className={[
+            "inline-flex h-9 w-9 items-center justify-center rounded-xl",
+            "border border-slate-200 bg-white text-slate-700 shadow-sm",
+            "hover:bg-slate-50 cursor-pointer",
+            listening ? "ring-2 ring-blue-300" : "",
+            !speechSupported ? "opacity-40 cursor-not-allowed" : "",
+          ].join(" ")}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M19 11a7 7 0 0 1-14 0"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M12 18v3"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        {/* Clear / pill */}
         {q ? (
           <button
             type="button"
@@ -248,6 +421,7 @@ function HeroSearch({
               setApiData(null);
               setErr("");
               setLoading(false);
+              setSpeechError("");
               inputRef.current?.focus();
             }}
             className="rounded-xl px-2 py-1 text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"
@@ -260,6 +434,23 @@ function HeroSearch({
           </span>
         )}
       </div>
+
+      {/* small status line */}
+      {(speechError || listening) && (
+        <div className="mt-2 text-xs">
+          {speechError ? (
+            <span className="text-red-600">{speechError}</span>
+          ) : (
+            <span className="inline-flex items-center gap-2 text-slate-600">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
+              </span>
+              Listening…
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Dropdown */}
       {showPanel ? (

@@ -15,7 +15,15 @@ const CLIENTS_CACHE = {
 const hashClients = (arr) => {
   try {
     return JSON.stringify(
-      (arr || []).map((x) => [x?.id, x?.uuid, x?.name, x?.slug, x?.image, x?.imageURL, x?.imageUrl]),
+      (arr || []).map((x) => [
+        x?.id,
+        x?.uuid,
+        x?.name,
+        x?.slug,
+        x?.image,
+        x?.imageURL,
+        x?.imageUrl,
+      ]),
     );
   } catch {
     return String(Date.now());
@@ -35,7 +43,11 @@ async function fetchClientsOnce(apiUrl) {
     if (!res.ok) throw new Error(`API failed: ${res.status}`);
 
     const json = await res.json();
-    const arr = Array.isArray(json?.data) ? json.data : Array.isArray(json) ? json : json?.data || [];
+    const arr = Array.isArray(json?.data)
+      ? json.data
+      : Array.isArray(json)
+        ? json
+        : json?.data || [];
 
     CLIENTS_CACHE.data = Array.isArray(arr) ? arr : [];
     CLIENTS_CACHE.error = null;
@@ -49,7 +61,6 @@ async function fetchClientsOnce(apiUrl) {
 
   return CLIENTS_CACHE.promise;
 }
-
 
 /** Tooltip rendered to document.body so it doesn't get clipped by overflow-hidden */
 function TooltipPortal({ open, text, anchorRect }) {
@@ -88,11 +99,7 @@ function TooltipPortal({ open, text, anchorRect }) {
 // ✅ robust image builder (supports absolute urls, "/path", or filename)
 function buildLogoSrc(it, imageBaseUrl) {
   const raw = String(
-    it?.imageURL ??
-      it?.imageUrl ??
-      it?.logoUrl ??
-      it?.image ??
-      ""
+    it?.imageURL ?? it?.imageUrl ?? it?.logoUrl ?? it?.image ?? "",
   ).trim();
 
   if (!raw) return "";
@@ -115,17 +122,18 @@ function buildLogoSrc(it, imageBaseUrl) {
   return `${imageBaseUrl.replace(/\/$/, "")}/${raw}`;
 }
 
-
 export default function LogoMarquee({
   apiUrl = "api/customer/clients",
   imageBaseUrl = "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed",
   linkPrefix = "",
   openInNewTab = false,
   height = 46,
-  itemWidth = 140,
+  itemWidth = 120,
   speed = 60,
 }) {
-  const [loading, setLoading] = useState(!CLIENTS_CACHE.data && !CLIENTS_CACHE.promise);
+  const [loading, setLoading] = useState(
+    !CLIENTS_CACHE.data && !CLIENTS_CACHE.promise,
+  );
   const [clients, setClients] = useState(CLIENTS_CACHE.data || []);
   const lastHashRef = useRef(hashClients(CLIENTS_CACHE.data || []));
 
@@ -164,46 +172,45 @@ export default function LogoMarquee({
   };
 
   // ✅ ALWAYS sync from cache/promise (prevents empty state race on route changes)
-useEffect(() => {
-  let mounted = true;
+  useEffect(() => {
+    let mounted = true;
 
-  (async () => {
-    try {
-      // ✅ if cache already exists, sync it
-      if (CLIENTS_CACHE.data) {
-        if (!mounted) return;
-        applyClientsToState(CLIENTS_CACHE.data);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-
-      // ✅ await in-flight promise OR start fetch
-      let data;
+    (async () => {
       try {
-        data = CLIENTS_CACHE.promise
-          ? await CLIENTS_CACHE.promise
-          : await fetchClientsOnce(apiUrl);
+        // ✅ if cache already exists, sync it
+        if (CLIENTS_CACHE.data) {
+          if (!mounted) return;
+          applyClientsToState(CLIENTS_CACHE.data);
+          setLoading(false);
+          return;
+        }
+
+        setLoading(true);
+
+        // ✅ await in-flight promise OR start fetch
+        let data;
+        try {
+          data = CLIENTS_CACHE.promise
+            ? await CLIENTS_CACHE.promise
+            : await fetchClientsOnce(apiUrl);
+        } catch (e) {
+          // ✅ if it failed, try ONE retry (helps flaky mounts)
+          data = await fetchClientsOnce(apiUrl);
+        }
+
+        if (!mounted) return;
+        applyClientsToState(data);
+        setLoading(false);
       } catch (e) {
-        // ✅ if it failed, try ONE retry (helps flaky mounts)
-        data = await fetchClientsOnce(apiUrl);
+        console.error("LogoMarquee:", e);
+        if (mounted) setLoading(false);
       }
+    })();
 
-      if (!mounted) return;
-      applyClientsToState(data);
-      setLoading(false);
-    } catch (e) {
-      console.error("LogoMarquee:", e);
-      if (mounted) setLoading(false);
-    }
-  })();
-
-  return () => {
-    mounted = false;
-  };
-}, [apiUrl]);
-
+    return () => {
+      mounted = false;
+    };
+  }, [apiUrl]);
 
   // ------------------ Normalize for rendering ------------------
   const normalizedItems = useMemo(() => {
@@ -227,7 +234,8 @@ useEffect(() => {
   }, [clients, imageBaseUrl, linkPrefix]);
 
   const doubled = useMemo(
-    () => (normalizedItems.length ? [...normalizedItems, ...normalizedItems] : []),
+    () =>
+      normalizedItems.length ? [...normalizedItems, ...normalizedItems] : [],
     [normalizedItems],
   );
 
@@ -407,20 +415,27 @@ useEffect(() => {
         <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent" />
 
         {loading && normalizedItems.length === 0 ? (
-          <div className="py-4 text-center text-sm text-gray-500">Loading logos...</div>
+          <div className="py-4 text-center text-sm text-gray-500">
+            Loading logos...
+          </div>
         ) : normalizedItems.length === 0 ? (
-          <div className="py-4 text-center text-sm text-gray-500">No logos found.</div>
+          <div className="py-4 text-center text-sm text-gray-500">
+            No logos found.
+          </div>
         ) : (
           <div
             ref={trackRef}
-            className="flex w-max items-center gap-10 will-change-transform"
+            className="flex w-max items-center gap-4 will-change-transform" // ✅ 16px gap
             style={{ transform: "translate3d(0,0,0)" }}
           >
             {doubled.map((item, idx) => {
               const key = `${item.key}-${idx}`;
 
               const content = (
-                <div className="relative flex items-center justify-center" style={{ minWidth: itemWidth }}>
+                <div
+                  className="relative flex items-center justify-center"
+                  style={{ minWidth: itemWidth }}
+                >
                   <div
                     className="relative cursor-pointer"
                     onMouseEnter={(e) => showTip(e, item.name)}
@@ -436,7 +451,7 @@ useEffect(() => {
                         alt={item.name}
                         fill
                         sizes="(max-width: 768px) 120px, 160px"
-                        className="object-contain max-w-[85%] max-h-[85%]"
+                        className="object-contain max-w-[95%] max-h-[95%]" // ✅ tighter
                       />
                     </div>
                   </div>

@@ -109,7 +109,7 @@ export default function ProductsControls({ initialFilter = "", services = [], si
                 type="button"
                 onClick={() => {
                   setMode("filter");
-                  setValue(s?.serviceName || "");
+                  setValue(s?.slug || "");
                 }}
                 className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 cursor-pointer"
               >

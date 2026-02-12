@@ -182,6 +182,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
 
                     {productServices.map((s) => {
                       const name = String(s?.serviceName || "");
+                      const slug = String(s?.slug || "");
                       const active =
                         appliedFilter?.toLowerCase() === name.toLowerCase();
 
@@ -191,7 +192,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                           href={buildHref({
                             page: 1,
                             size,
-                            filter: name,
+                            filter: slug,
                             q: "",
                           })}
                           className={`block rounded-xl border px-3 py-2 text-sm cursor-pointer ${

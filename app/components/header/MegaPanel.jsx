@@ -7,7 +7,7 @@ import { getSideKeys, isGroupObject, isLinksArray } from "./helpers";
 function renderLinksList(list) {
   return (
     <ul className="space-y-2 pl-3">
-      {list.map((x) => (
+      {(list || []).map((x) => (
         <li key={x?.url || x?.slug || x?.name}>
           <Link
             href={x?.url || "#"}
@@ -34,6 +34,9 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
 
   if (!open) return null;
 
+  // ✅ fixed height for RIGHT content area (adjust as you want)
+  const RIGHT_HEIGHT = "h-[520px]"; // e.g. 520px fixed height
+
   return (
     <div
       className={[
@@ -46,6 +49,7 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
       <div className="mx-auto max-w-[92rem] px-4 sm:px-6 lg:px-8">
         <div className="mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
           <div className="grid grid-cols-12">
+            {/* LEFT SIDE */}
             <div className="col-span-12 lg:col-span-3 border-b lg:border-b-0 lg:border-r border-slate-200 p-4">
               {loading ? (
                 <div className="space-y-3">
@@ -54,7 +58,9 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                   <div className="h-4 w-36 animate-pulse rounded bg-slate-200" />
                 </div>
               ) : !item ? (
-                <p className="text-sm text-slate-600">Menu data not available.</p>
+                <p className="text-sm text-slate-600">
+                  Menu data not available.
+                </p>
               ) : (
                 <div className="space-y-2">
                   {sideKeys.map((k) => (
@@ -74,21 +80,19 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                       {k}
                     </button>
                   ))}
-
-                  {/* <div className="mt-6 rounded-xl bg-slate-50 p-4">
-                    <p className="text-sm text-slate-700 leading-6">
-                      Corpseed helps clients create long-term value for all stakeholders.
-                    </p>
-                    {/* <button className="mt-4 inline-flex items-center justify-center rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white cursor-pointer">
-                      Explore
-                    </button>
-                  </div> */}
                 </div>
               )}
             </div>
 
+            {/* RIGHT SIDE */}
             <div className="col-span-12 lg:col-span-9">
-              <div className="max-h-[68vh] overflow-y-auto overflow-x-hidden [scrollbar-gutter:stable] p-5">
+              {/* ✅ fixed height + scroll */}
+              <div
+                className={[
+                  RIGHT_HEIGHT,
+                  "overflow-y-auto overflow-x-hidden [scrollbar-gutter:stable] p-5",
+                ].join(" ")}
+              >
                 {loading ? (
                   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 6 }).map((_, i) => (
@@ -101,80 +105,67 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                     ))}
                   </div>
                 ) : !item ? null : (
-                  <>
-                    {(() => {
-                      const sideVal = categoryMap?.[activeSide];
+                  (() => {
+                    const sideVal = categoryMap?.[activeSide];
 
-                      const renderGroupBlock = (groupTitle, list) => {
-                        const items = Array.isArray(list) ? list : [];
-                        const visible = items.slice(0, 6);
-                        const hasMore = items.length > 6;
+                    const renderGroupBlock = (groupTitle, list) => {
+                      const items = Array.isArray(list) ? list : [];
 
-                        return (
-                          <div key={groupTitle} className="min-w-0">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-sm font-semibold text-blue-500 tracking-tight">
-                                {groupTitle}
-                              </p>
-                            </div>
+                      return (
+                        <div
+                          key={groupTitle}
+                          className="min-w-0 flex flex-col h-[220px]" // ✅ fixed height for each column
+                        >
+                          {/* Title */}
+                          <p className="text-sm font-semibold text-blue-500 tracking-tight mb-3">
+                            {groupTitle}
+                          </p>
 
-                            <div className="mt-3">{renderLinksList(visible)}</div>
-
-                            {hasMore ? (
-                              <div className="mt-3">
-                                <Link
-                                  href="/service"
-                                  className="text-[12px] font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
-                                >
-                                  More &gt;&gt;
-                                </Link>
-                              </div>
-                            ) : null}
+                          {/* Scrollable List */}
+                          <div className="flex-1 overflow-y-auto pr-2">
+                            {renderLinksList(items)}
                           </div>
-                        );
-                      };
+                        </div>
+                      );
+                    };
 
-                      const renderGroupsColumnsLocal = (groupsObj) => {
-                        const groupKeys = Object.keys(groupsObj || {});
-                        return (
-                          <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-                            {groupKeys.map((groupTitle) =>
-                              renderGroupBlock(groupTitle, groupsObj[groupTitle]),
-                            )}
-                          </div>
-                        );
-                      };
+                    const renderGroupsColumnsLocal = (groupsObj) => {
+                      const groupKeys = Object.keys(groupsObj || {});
+                      return (
+                        <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+                          {groupKeys.map((groupTitle) =>
+                            renderGroupBlock(groupTitle, groupsObj[groupTitle]),
+                          )}
+                        </div>
+                      );
+                    };
 
-                      if (isLinksArray(sideVal)) {
-                        const visible = sideVal.slice(0, 6);
-                        const hasMore = sideVal.length > 6;
+                    if (isLinksArray(sideVal)) {
+                      return (
+                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-blue-700">
+                              {activeSide}
+                            </p>
 
-                        return (
-                          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                            <div>
-                              <p className="text-sm font-semibold text-blue-700">{activeSide}</p>
-                              <div className="mt-3">{renderLinksList(visible)}</div>
-
-                              {hasMore ? (
-                                <div className="mt-3">
-                                  <Link
-                                    href="/service"
-                                    className="text-[12px] font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
-                                  >
-                                    More &gt;&gt;
-                                  </Link>
-                                </div>
-                              ) : null}
+                            {/* ✅ render ALL services */}
+                            <div className="mt-3">
+                              {renderLinksList(sideVal)}
                             </div>
                           </div>
-                        );
-                      }
+                        </div>
+                      );
+                    }
 
-                      if (isGroupObject(sideVal)) return renderGroupsColumnsLocal(sideVal);
+                    if (isGroupObject(sideVal))
+                      return renderGroupsColumnsLocal(sideVal);
 
-                      return <p className="text-sm text-slate-600">No data available for this section.</p>;
-                    })()}
-                  </>
+                    return (
+                      <p className="text-sm text-slate-600">
+                        No data available for this section.
+                      </p>
+                    );
+                  })()
                 )}
               </div>
             </div>

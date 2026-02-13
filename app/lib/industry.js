@@ -25,7 +25,6 @@ export async function getIndustryBySlug(slug) {
     const data = await res.json(); // ✅ read once
     return data;
   } catch (err) {
-    console.error("getServiceBySlug error:", err);
     return null;
   }
 }

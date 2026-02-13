@@ -24,7 +24,6 @@ export async function getPressReleaseData({page,size,filter}) {
     const data = await res.json(); // ✅ read once
     return data;
   } catch (err) {
-    console.error("getServiceBySlug error:", err);
     return null;
   }
 }
@@ -51,7 +50,6 @@ export async function getPressReleaseBySlug(slug) {
     const data = await res.json(); // ✅ read once
     return data;
   } catch (err) {
-    console.error("getServiceBySlug error:", err);
     return null;
   }
 }

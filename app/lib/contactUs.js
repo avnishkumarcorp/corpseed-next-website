@@ -1,14 +1,13 @@
+// app/lib/contact.js  (or wherever this function is)
+
+import { apiGet } from "./fetcher";
+
 export async function getContactUs() {
   try {
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const res = await fetch(`${base}/api/updated-contact-us`, {
-      method: "GET",
-      cache: "no-store",
-      headers: { "Content-Type": "application/json" },
+    // Contact page content — cache 10 minutes
+    return await apiGet("/api/updated-contact-us", {
+      revalidate: 600,
     });
-
-    if (!res.ok) return null;
-    return await res.json();
   } catch (e) {
     console.error("getContactUs error:", e);
     return null;

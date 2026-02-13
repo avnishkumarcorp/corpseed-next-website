@@ -21,15 +21,11 @@ export async function getServiceBySlug(slug) {
     });
 
     if (!res.ok) {
-      // helpful debug without crashing
-      // const text = await res.text().catch(() => "");
-      // console.error("getServiceBySlug failed:", res.status, text);
       return null;
     }
 
     return await res.json();
   } catch (err) {
-    console.error("getServiceBySlug error:", err);
     return null;
   } finally {
     clearTimeout(t);

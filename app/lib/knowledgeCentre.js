@@ -1,98 +1,66 @@
-// app/lib/knowledgeCentre.js (or wherever this function is)
+// app/lib/knowledgeCentre.js
+
+import { apiGet } from "./fetcher";
+
+function emptyKnowledgeCentrePayload(page = 1) {
+  return {
+    title: "Corpseed || Knowledge Center",
+    metaDescription: "",
+    metaKeyword: "",
+    currentPage: page,
+    totalPages: 1,
+    pageNumbers: [1],
+    blogs: [],
+    categories: [],
+    hotTags: [],
+    topBlogs: [],
+  };
+}
 
 export async function getKnowledgeCentreList({
   page = 1,
   size = 20,
   q = "",
-  filter = "", // ✅ correct
+  filter = "",
   tag = "",
 } = {}) {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-  const url = new URL(`${base}/api/updated-knowledge-centre`);
+  try {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("size", String(size));
+    if (q) params.set("q", String(q));
+    if (filter) params.set("filter", String(filter));
+    if (tag) params.set("tag", String(tag));
 
-  url.searchParams.set("page", String(page));
-  url.searchParams.set("size", String(size));
-  if (q) url.searchParams.set("q", String(q));
-  if (filter) url.searchParams.set("filter", String(filter)); // ✅ correct
-  if (tag) url.searchParams.set("tag", String(tag));
-
-  // ✅ TEMP (for debugging): disable caching so you can confirm it updates instantly
-  // After confirming, change to `next: { revalidate: 60 }`
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    // next: { revalidate: 60 },
-  });
-
-  if (!res.ok) {
-    return {
-      title: "Corpseed || Knowledge Center",
-      metaDescription: "",
-      metaKeyword: "",
-      currentPage: page,
-      totalPages: 1,
-      pageNumbers: [1],
-      blogs: [],
-      categories: [],
-      hotTags: [],
-      topBlogs: [],
-    };
+    // ✅ List page changes often → cache for 60s
+    return await apiGet(`/api/updated-knowledge-centre?${params.toString()}`, {
+      revalidate: 60,
+    });
+  } catch (e) {
+    console.error("getKnowledgeCentreList error:", e);
+    return emptyKnowledgeCentrePayload(page);
   }
-
-  return res.json();
 }
-
-
 
 export async function getKnowledgeCentreBySlug(slug) {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!slug) return null;
 
-  const res = await fetch(`${base}/api/updated-knowledge-centre/${slug}`, {
-    // Good for SEO pages, keep it cached a bit (change if you want)
-    next: { revalidate: 300 },
-  });
-
-  if (!res.ok) return null;
-  return res.json();
-}
-
-async function safeJson(res) {
   try {
-    return await res.json();
-  } catch {
+    // ✅ Slug page SEO → cache 5 minutes
+    return await apiGet(`/api/updated-knowledge-centre/${encodeURIComponent(slug)}`, {
+      revalidate: 300,
+    });
+  } catch (e) {
+    console.error("getKnowledgeCentreBySlug error:", e);
     return null;
   }
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 export async function getLatestBlogs() {
-  if (!API_BASE) {
-    console.error("NEXT_PUBLIC_API_BASE_URL is missing");
-    return [];
-  }
-
-  const url = `${API_BASE}/api/blogs/latest`;
-
   try {
-    const res = await fetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      console.error(
-        "getLatestBlogs API Error:",
-        res.status,
-        res.statusText,
-        txt,
-      );
-      return [];
-    }
-
-    const json = await safeJson(res);
-    return Array.isArray(json) ? json : [];
+    // ✅ Homepage latest blogs → cache 5 minutes
+    const data = await apiGet("/api/blogs/latest", { revalidate: 300 });
+    return Array.isArray(data) ? data : [];
   } catch (e) {
     console.error("getLatestBlogs error:", e);
     return [];

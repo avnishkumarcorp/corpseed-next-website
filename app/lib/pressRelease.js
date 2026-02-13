@@ -1,3 +1,6 @@
+import { apiGet } from "./fetcher";
+
+
 
 export async function getPressReleaseData({page,size,filter}) {
   try {
@@ -65,29 +68,10 @@ async function safeJson(res) {
 }
 
 
+
 export async function getLatestNews() {
-  if (!API_BASE) {
-    console.error("NEXT_PUBLIC_API_BASE_URL is missing");
-    return [];
-  }
-
-  const url = `${API_BASE}/api/news/latest`;
-
   try {
-    const res = await fetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      console.error("getLatestNews API Error:", res.status, res.statusText, txt);
-      return [];
-    }
-
-    const json = await safeJson(res);
-    return Array.isArray(json) ? json : [];
+    return await apiGet("/api/news/latest", { revalidate: 300 });
   } catch (e) {
     console.error("getLatestNews error:", e);
     return [];

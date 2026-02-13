@@ -1,20 +1,6 @@
 // app/partner-with-us/page.jsx
 import PartnerWithUsClient from "./PartnerWithUsClient";
-
-async function getPartnerPageSeo() {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-partner`,
-      { cache: "no-store" }
-    );
-
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (e) {
-    console.error("getPartnerPageSeo error:", e);
-    return null;
-  }
-}
+import { getPartnerPageSeo } from "../lib/partner";
 
 export async function generateMetadata() {
   const data = await getPartnerPageSeo();

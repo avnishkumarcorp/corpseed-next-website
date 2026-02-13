@@ -1,24 +1,13 @@
 // app/lib/faq.js
 
+import { apiGet } from "./fetcher";
+
 export async function getFaqMeta() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-faq`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store", // SSR fresh SEO
-      }
-    );
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      console.error("FAQ Meta API Error:", res.status, res.statusText, errText);
-      return null;
-    }
-
-    const data = await res.json(); // ✅ read once
-    return data;
+    // FAQ SEO + content — cache for 10 minutes
+    return await apiGet("/api/updated-faq", {
+      revalidate: 600,
+    });
   } catch (error) {
     console.error("getFaqMeta error:", error);
     return null;

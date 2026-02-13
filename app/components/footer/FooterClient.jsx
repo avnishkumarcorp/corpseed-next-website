@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import footerLogo from "../../assets/logo-footer.png";
 
 function LinkedInIcon() {
@@ -12,7 +13,6 @@ function LinkedInIcon() {
     </svg>
   );
 }
-
 function FacebookIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -20,7 +20,6 @@ function FacebookIcon() {
     </svg>
   );
 }
-
 function YouTubeIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -28,7 +27,6 @@ function YouTubeIcon() {
     </svg>
   );
 }
-
 function InstagramIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -36,7 +34,6 @@ function InstagramIcon() {
     </svg>
   );
 }
-
 function XIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -60,16 +57,22 @@ const ABOUT_US_COL = {
 
 function safeHrefFromFooterCatSlug(slug) {
   if (!slug) return "#";
-  // your legal routes are like: /legal/<slug>
   return `/legal/${slug}`;
 }
 
+function isValidEmail(v) {
+  const s = String(v || "").trim();
+  if (!s) return false;
+  // simple + safe
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
 export default function FooterClient({ data }) {
+  const router = useRouter();
+
   // ✅ API mapping
   const footerCols = useMemo(() => {
     const cols = Array.isArray(data?.footer) ? data.footer : [];
-
-    // convert API -> UI structure
     return cols.map((c) => ({
       title: c?.categoryName || "Category",
       links: Array.isArray(c?.services)
@@ -88,6 +91,54 @@ export default function FooterClient({ data }) {
       href: safeHrefFromFooterCatSlug(x?.slug),
     }));
   }, [data]);
+
+  // ✅ Subscribe state
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState({ type: "", msg: "" }); // type: success | error | info
+
+  async function handleSubscribe(e) {
+    e.preventDefault();
+
+    const trimmed = String(email || "").trim();
+    if (!isValidEmail(trimmed)) {
+      setStatus({ type: "error", msg: "Please enter a valid email address." });
+      return;
+    }
+
+    setSubmitting(true);
+    setStatus({ type: "info", msg: "Subscribing..." });
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed }),
+      });
+
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok || !json?.ok) {
+        setStatus({
+          type: "error",
+          msg: json?.message || "Subscription failed. Please try again.",
+        });
+        return;
+      }
+
+      setStatus({ type: "success", msg: "Subscribed successfully!" });
+      setEmail("");
+
+      router.push("/subscribe/thank-you");
+    } catch (err) {
+      setStatus({
+        type: "error",
+        msg: "Network error. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <footer className="w-full bg-white">
@@ -141,37 +192,54 @@ export default function FooterClient({ data }) {
             </SocialIcon>
           </div>
 
-          {/* Subscribe */}
-          <form
-            className="flex w-full max-w-xl items-center gap-3 lg:w-auto"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <input
-              type="email"
-              placeholder="Email address..."
-              className="h-11 w-full rounded-none border border-slate-300 bg-white px-4 text-[14px] text-slate-700 outline-none focus:border-blue-600"
-            />
-            <button
-              type="submit"
-              className="h-11 whitespace-nowrap bg-black px-6 text-[14px] font-semibold text-white cursor-pointer"
+          {/* ✅ Subscribe */}
+          <div className="w-full max-w-xl lg:w-auto">
+            <form
+              className="flex w-full items-center gap-3"
+              onSubmit={handleSubscribe}
             >
-              Subscribe
-            </button>
-          </form>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (status.type) setStatus({ type: "", msg: "" });
+                }}
+                placeholder="Email address..."
+                className="h-11 w-full rounded-none border border-slate-300 bg-white px-4 text-[14px] text-slate-700 outline-none focus:border-blue-600"
+              />
+              <button
+                type="submit"
+                disabled={submitting}
+                className={`h-11 whitespace-nowrap px-6 text-[14px] font-semibold text-white cursor-pointer transition
+      ${submitting ? "bg-slate-700 opacity-80" : "bg-black hover:bg-slate-900"}
+    `}
+              >
+                {submitting ? "Subscribing..." : "Subscribe"}
+              </button>
+            </form>
+
+            {/* small smooth status line */}
+            {status.msg ? (
+              <p
+                className={`mt-2 text-[13px] transition-all ${
+                  status.type === "success"
+                    ? "text-emerald-600"
+                    : status.type === "error"
+                      ? "text-red-600"
+                      : "text-slate-500"
+                }`}
+              >
+                {status.msg}
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
 
       {/* Links */}
-
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        {/* Auto-fit grid: equal columns, wrap when needed */}
-        <div
-          className="
-      grid gap-x-14 gap-y-10
-      [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]
-    "
-        >
-          {/* API Columns */}
+        <div className="grid gap-x-14 gap-y-10 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
           {footerCols.map((col) => (
             <div key={col.title} className="min-w-0">
               <h3 className="text-[18px] font-semibold text-slate-900">

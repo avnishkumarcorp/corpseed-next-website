@@ -1,24 +1,11 @@
 // app/lib/about.js
 
+import { apiGet } from "./fetcher";
+
 export async function getAboutUsData() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-about-us`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store", // always fresh (SSR). Change to revalidate if needed.
-      }
-    );
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      console.error("AboutUs API Error:", res.status, res.statusText, errText);
-      return null;
-    }
-
-    const data = await res.json(); // ✅ read once
-    return data;
+    // ✅ ISR: cache for 10 minutes (change if you want)
+    return await apiGet("/api/updated-about-us", { revalidate: 600 });
   } catch (err) {
     console.error("getAboutUsData error:", err);
     return null;

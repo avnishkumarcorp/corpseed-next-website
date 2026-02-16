@@ -124,15 +124,10 @@ function TocCard({ tocHtml }) {
   if (!tocHtml) return null;
 
   return (
-    <Card className="overflow-hidden">
-      <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
-        <p className="text-sm font-semibold text-slate-900">Table of Contents</p>
-        <p className="mt-1 text-xs text-slate-500">Jump to sections</p>
-      </div>
-
+    <div>
       {/* Desktop */}
-      <div className="hidden max-h-[420px] overflow-auto px-5 py-4 lg:block">
-        <SafeHtml html={tocHtml} />
+      <div className="hidden max-h-[420px] overflow-auto px-5 lg:block">
+        <SafeHtmlShadow html={tocHtml} />
       </div>
 
       {/* Mobile */}
@@ -145,11 +140,11 @@ function TocCard({ tocHtml }) {
             </span>
           </summary>
           <div className="mt-3 max-h-[320px] overflow-auto pr-1">
-            <SafeHtml html={tocHtml} />
+            <SafeHtmlShadow html={tocHtml} />
           </div>
         </details>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -207,6 +202,72 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
   );
 }
 
+function AuthorCard({ author }) {
+  if (!author) return null;
+
+  return (
+    <Card className="overflow-hidden">
+      {/* Thin accent line */}
+      <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-slate-900 to-blue-600 opacity-80" />
+
+      <div className="px-6 py-5">
+        {/* Header */}
+        <div className="mb-4">
+          <p className="text-sm font-semibold text-slate-900">
+            About the Author
+          </p>
+        </div>
+
+        {/* Main Layout */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {/* Avatar */}
+          <div className="relative h-[95px] w-[95px] flex-none overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
+            <Image
+              src={author.profilePicture}
+              alt={author.name}
+              fill
+              className="object-cover"
+              sizes="95px"
+            />
+          </div>
+
+          {/* Content */}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h3 className="text-base font-semibold text-slate-900">
+                {author.name}
+              </h3>
+
+              {author.jobTitle && (
+                <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                  {author.jobTitle}
+                </span>
+              )}
+            </div>
+
+            {/* Compact Bio */}
+            <div className="mt-2 text-sm leading-6 text-slate-600 line-clamp-4">
+              <SafeHtml html={author.aboutMe} />
+            </div>
+
+            {/* Button */}
+            <div className="mt-3">
+              <Link
+                href={`/profile/${author.slug}`}
+                className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+              >
+                View profile →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+
+
 /** ✅ SEO from API (news slug) */
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -238,6 +299,8 @@ export default async function NewsRoomSlugPage({ params }) {
   const item = apiData.news;
   const author = apiData.author || null;
 
+  console.log("sdmhvsjdgjsgjh", apiData);
+
   // ✅ Share URL
   const pageUrl = `https://www.corpseed.com/news-room/${item.slug}`;
 
@@ -266,7 +329,7 @@ export default async function NewsRoomSlugPage({ params }) {
             </div>
 
             {/* RIGHT text */}
-            <div className="min-w-0">
+            <div className="min-w-0 lg:flex lg:h-full lg:flex-col lg:justify-center">
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                 {item.title}
               </h1>
@@ -279,7 +342,7 @@ export default async function NewsRoomSlugPage({ params }) {
                 {item.postDate ? (
                   <span className="inline-flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    Published: {formatDate(item.postDate)}
+                    {formatDate(item.postDate)}
                   </span>
                 ) : null}
 
@@ -329,7 +392,9 @@ export default async function NewsRoomSlugPage({ params }) {
 
                     {/* Mobile share */}
                     <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
-                      <p className="text-sm font-semibold text-slate-900">Share</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        Share
+                      </p>
                       <div className="flex items-center gap-2">
                         <a
                           className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
@@ -369,6 +434,11 @@ export default async function NewsRoomSlugPage({ params }) {
                     </div>
                   </div>
                 </Card>
+                {author ? (
+                  <div className="mt-10">
+                    <AuthorCard author={author} />
+                  </div>
+                ) : null}
               </div>
 
               {/* Sidebar */}

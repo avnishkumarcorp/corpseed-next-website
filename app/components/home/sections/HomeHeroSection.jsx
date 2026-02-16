@@ -905,24 +905,14 @@ export default function HomeHeroSection({
             </h1>
 
             <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
-              {categories.map((c, idx) => (
-                <span key={c.href} className="flex items-center">
-                    <div className="font-medium text-blue-600 ">   
-                    {c.label}
-                    </div>
-                  {idx !== categories.length - 1 && (
-                    <span className="mx-2 text-gray-300">|</span>
-                  )}
-                </span>
-              ))}
-              <span className="text-gray-900">
-                &amp; Plant Setup Compliance
-              </span>
+              <p className="text-lg">
+                <span className="text-blue-500">Regulatory, Sustainability, Environmental, Legal </span>
+            
+                  & Plant Setup Compliance Advisory Platform For Individuals,
+                  SME & Enterprise.
+              
+              </p>
             </div>
-
-            <p className="mt-3 max-w-xl text-base text-gray-700 sm:text-lg">
-              {subtitle}
-            </p>
 
             <div className="mt-6 flex items-center gap-2 text-sm text-gray-700">
               <Star className="h-5 w-5 text-amber-500" />

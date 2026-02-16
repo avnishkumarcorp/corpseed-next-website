@@ -7,7 +7,6 @@ import styles from "./SafeHtml.module.css";
 const LEGACY_BASE =
   process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://www.corpseed.com";
 
-
 // ✅ Only CSS here (remove JS from this list)
 const CSS_URLS = [
   "https://www.corpseed.com/assets/css/bootstrap.min.css",
@@ -192,6 +191,48 @@ export default function SafeHtmlShadow({ html }) {
         margin-bottom: 0.5rem !important;
         font-weight: 500 !important;
       }
+
+    #main-toc {
+    background: #f3f3f391;
+    border: 0;
+    border-left: 5px solid #2b63f9;
+    padding: 15px 10px 5px;
+    margin: 2rem 0;
+    position: relative;
+  }
+
+  p.toc_title {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+    #main-toc ul, #main-toc ol {
+    font-weight: 400;
+}
+
+#sideTableOfContents ul li::before {
+    content: "";
+    width: 15px !important;
+    height: 15px !important;
+    display: inline-block !important;
+    margin-right: 8px !important;
+    vertical-align: bottom !important;
+    background: url("${iconUrl}") no-repeat center;
+    background-size: cover !important;
+    border-radius: 50% !important;
+    margin-bottom: 0.2rem !important;
+}
+
+#main-toc ul li, #main-toc ol li{
+    padding: 3px;
+   }
+
+   #main-toc ul li a, #main-toc ol li a {
+    color: #444;
+    font-size: 14px;
+    line-height: 24px;
+    margin-left:24px;
+}
+
     `;
     shadowRoot.appendChild(base);
 

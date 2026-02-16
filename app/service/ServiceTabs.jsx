@@ -173,7 +173,7 @@ export default function ServiceTabs({ tabs = [] }) {
                     onClick={() => onTabClick(t.id)}
                     className={[
                       "group relative cursor-pointer transition",
-                      "whitespace-nowrap text-sm font-semibold",
+                      "whitespace-nowrap text-sm font-normal",
                       "text-slate-700 hover:text-blue-600",
                       // ✅ keep full-width on desktop (like before)
                       "md:flex-1 md:text-center",

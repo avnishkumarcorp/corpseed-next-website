@@ -378,7 +378,7 @@ export default function LogoMarquee({
   // ------------------ UI ------------------
   return (
     <div className="relative w-full bg-white">
-      <button
+      {/* <button
         type="button"
         onClick={() => {
           setDir(-1);
@@ -388,9 +388,9 @@ export default function LogoMarquee({
         className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-300 bg-white/90 p-2 shadow-sm hover:bg-white cursor-pointer"
       >
         <ChevronLeft className="h-5 w-5" />
-      </button>
+      </button> */}
 
-      <button
+      {/* <button
         type="button"
         onClick={() => {
           setDir(1);
@@ -400,7 +400,7 @@ export default function LogoMarquee({
         className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-300 bg-white/90 p-2 shadow-sm hover:bg-white cursor-pointer"
       >
         <ChevronRight className="h-5 w-5" />
-      </button>
+      </button> */}
 
       <div
         ref={viewportRef}

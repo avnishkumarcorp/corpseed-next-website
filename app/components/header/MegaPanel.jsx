@@ -35,7 +35,7 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
   if (!open) return null;
 
   // ✅ fixed height for RIGHT content area (adjust as you want)
-  const RIGHT_HEIGHT = "h-[520px]"; // e.g. 520px fixed height
+  const RIGHT_HEIGHT = "max-h-[520px]"; // e.g. 520px fixed height
 
   return (
     <div

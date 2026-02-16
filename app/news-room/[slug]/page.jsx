@@ -384,7 +384,7 @@ export default async function NewsRoomSlugPage({ params }) {
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_420px]">
               {/* Main */}
               <div className="space-y-6">
-                <Card className="overflow-hidden">
+                {/* <Card className="overflow-hidden"> */}
                   <div className="p-5 sm:p-7">
                     <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
                       <SafeHtmlShadow html={bodyHtml} />
@@ -433,7 +433,7 @@ export default async function NewsRoomSlugPage({ params }) {
                       </div>
                     </div>
                   </div>
-                </Card>
+                {/* </Card> */}
                 {author ? (
                   <div className="mt-10">
                     <AuthorCard author={author} />

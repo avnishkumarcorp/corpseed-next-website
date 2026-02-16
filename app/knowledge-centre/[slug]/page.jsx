@@ -144,6 +144,70 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
   );
 }
 
+function AuthorCard({ author }) {
+  if (!author) return null;
+
+  return (
+    <Card className="overflow-hidden">
+      {/* Thin accent line */}
+      <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-slate-900 to-blue-600 opacity-80" />
+
+      <div className="px-6 py-5">
+        {/* Header */}
+        <div className="mb-4">
+          <p className="text-sm font-semibold text-slate-900">
+            About the Author
+          </p>
+        </div>
+
+        {/* Main Layout */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {/* Avatar */}
+          <div className="relative h-[95px] w-[95px] flex-none overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
+            <Image
+              src={author.profilePicture}
+              alt={`${author.firstName} ${author.lastName}`}
+              fill
+              className="object-cover"
+              sizes="95px"
+            />
+          </div>
+
+          {/* Content */}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h3 className="text-base font-semibold text-slate-900">
+                {author.firstName} {author.lastName}
+              </h3>
+
+              {author.jobTitle && (
+                <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                  {author.jobTitle}
+                </span>
+              )}
+            </div>
+
+            {/* Compact Bio */}
+            <div className="mt-2 text-sm leading-6 text-slate-600 line-clamp-4">
+              <SafeHtml html={author.aboutMe} />
+            </div>
+
+            {/* Button */}
+            <div className="mt-3">
+              <Link
+                href={`/profile/${author.slug}`}
+                className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+              >
+                View profile →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 /* ===============================
    SEO
 ================================= */
@@ -175,6 +239,9 @@ export default async function KnowledgeCentreSlugPage({ params }) {
 
   const apiData = await getKnowledgeCentreBySlug(slug);
   if (!apiData?.blog) return notFound();
+
+
+  console.log("blogDtaattatatat",apiData)
 
   const blog = apiData.blog;
   const author = apiData.author || null;
@@ -257,7 +324,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_420px]">
               {/* Main */}
               <div className="space-y-6">
-                <Card className="overflow-hidden">
+                {/* <Card className="overflow-hidden"> */}
                   <div className="p-5 sm:p-7">
                     <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
                       <SafeHtmlShadow html={bodyHtml} />
@@ -267,7 +334,13 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                       <EnquiryOtpInline />
                     </div>
                   </div>
-                </Card>
+                {/* </Card> */}
+
+                {author ? (
+                  <div className="mt-10">
+                    <AuthorCard author={author} />
+                  </div>
+                ) : null}
 
                 {apiData?.feedback ? <FeedbackBox /> : null}
 

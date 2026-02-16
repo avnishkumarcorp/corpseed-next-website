@@ -377,7 +377,7 @@ export default function LogoMarquee({
 
   // ------------------ UI ------------------
   return (
-    <div className="relative w-full">
+    <div className="relative w-full bg-white">
       <button
         type="button"
         onClick={() => {

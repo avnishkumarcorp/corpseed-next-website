@@ -45,7 +45,7 @@ function XIcon() {
 const ABOUT_US_COL = {
   title: "About Us",
   links: [
-    { label: "Become A Partner", href: "/become-a-partner" },
+    { label: "Become A Partner", href: "/partner" },
     { label: "Contact Us", href: "/contact-us" },
     { label: "Knowledge Centre", href: "/knowledge-centre" },
     { label: "Change Your CA", href: "/change-your-ca" },
@@ -143,7 +143,7 @@ export default function FooterClient({ data }) {
   return (
     <footer className="w-full bg-white">
       {/* Top strip */}
-      <div className="border-b border-slate-200">
+      <div className="border-y border-slate-200">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           {/* Follow us */}
           <div className="flex items-center gap-3 text-slate-500">

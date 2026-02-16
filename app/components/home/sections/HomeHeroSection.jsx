@@ -887,10 +887,10 @@ export default function HomeHeroSection({
 
       <div className="relative mx-auto max-w-7xl px-4 pt-10 pb-10 sm:px-6 lg:px-8 lg:pt-12 lg:pb-12">
         <div className="grid items-start gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center">
             <Link
               href={ctaHref}
-              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm hover:bg-blue-700 cursor-pointer"
+              className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm hover:bg-blue-700 cursor-pointer"
             >
               <span>{ctaText}</span>
               <PhoneCall className="h-4 w-4" />
@@ -906,11 +906,11 @@ export default function HomeHeroSection({
 
             <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
               <p className="text-lg">
-                <span className="text-blue-500">Regulatory, Sustainability, Environmental, Legal </span>
-            
-                  & Plant Setup Compliance Advisory Platform For Individuals,
-                  SME & Enterprise.
-              
+                <span className="text-blue-500">
+                  Regulatory, Sustainability, Environmental, Legal{" "}
+                </span>
+                &amp; Plant Setup Compliance Advisory Platform For Individuals,
+                SME &amp; Enterprise.
               </p>
             </div>
 
@@ -992,8 +992,12 @@ export default function HomeHeroSection({
                         Net Zero
                       </Link>{" "}
                       <br />
+                      <Link href={"/service/waste-management"}>
+                        Waste Channelization
+                      </Link>
+                      /
                       <Link href="/service/carbon-credit-trading-scheme">
-                        Waste Channelization / Carbon Credits
+                        Carbon Credits
                       </Link>
                     </div>
                   </div>
@@ -1018,16 +1022,25 @@ export default function HomeHeroSection({
                       <Link href="/service/fire-noc-fire-noc-renewal">
                         Fire
                       </Link>{" "}
-                      / Trade <br />
-                      FSSAI / CGWA / Labour <br />
+                      /<Link href={"/service/health-trade-license"}>Trade</Link>
+                      <br />
+                      <Link href={"/service/fssai-basic-registration-renewal"}>
+                        FSSAI
+                      </Link>{" "}
+                      /
+                      <Link
+                        href={
+                          "/service/central-ground-water-authority-noc-for-water-boring-tube-wells"
+                        }
+                      >
+                        CGWA
+                      </Link>
+                      / <Link href={""}>Labour</Link> <br />
                       &amp; Other Compliance
                     </div>
                   </div>
 
-                  <Link
-                    href="/service/environmental"
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_16px_34px_rgba(0,0,0,0.14)] cursor-pointer"
-                  >
+                  <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_16px_34px_rgba(0,0,0,0.14)] cursor-pointer">
                     <div className="text-[14px] font-semibold text-gray-900">
                       Environmental
                     </div>
@@ -1041,16 +1054,53 @@ export default function HomeHeroSection({
                       />
                     </div>
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
-                      EPR / EIA / CTO / CTE <br />
-                      EC / BWM / PWM / EWM <br />
-                      HWM / FSC / Wildlife
+                      <Link href={"/service/epr-authorization"}>EPR</Link> /{" "}
+                      <Link
+                        href={"/service/environmental-impact-assessment-eia"}
+                      >
+                        EIA
+                      </Link>{" "}
+                      / <Link href={"/"}>CTO</Link> /{" "}
+                      <Link href={"/"}>CTE</Link> <br />
+                      <Link href={"/service/environmental-clearance"}>EC </Link>
+                      /{" "}
+                      <Link
+                        href={
+                          "/service/bio-medical-waste-management-authorization"
+                        }
+                      >
+                        BWM
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href={"/service/plastic-waste-management-authorization"}
+                      >
+                        PWM
+                      </Link>{" "}
+                      /{" "}
+                      <Link href={"/service/e-waste-management-authorization"}>
+                        EWM
+                      </Link>{" "}
+                      <br />
+                      <Link
+                        href={
+                          "/service/hazardous-waste-management-authorization"
+                        }
+                      >
+                        HWM
+                      </Link>{" "}
+                      /<Link href={"/service/fsc-certification"}>FSC</Link> /
+                      <Link
+                        href={
+                          "/service/wildlife-and-forests-clearance-certificate-for-project"
+                        }
+                      >
+                        Wildlife
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
 
-                  <Link
-                    href="/service/import-export"
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer"
-                  >
+                  <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer">
                     <div className="text-[14px] font-semibold text-gray-900">
                       Import Export
                     </div>
@@ -1064,18 +1114,67 @@ export default function HomeHeroSection({
                       />
                     </div>
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
-                      IEC / DGFT / CHA <br />
-                      CDSCO / BIS / LMPC <br />
-                      EPR / Custom Clearance
+                      <Link
+                        href="/service/import-export-code"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        IEC
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/dgft-export-import-license"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        DGFT
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        CHA
+                      </Link>
+                      <br />
+                      <Link
+                        href="/service/cdsco-online-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        CDSCO
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/bis-certification"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        BIS
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/lmpc-certificate-for-import"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        LMPC
+                      </Link>
+                      <br />
+                      <Link
+                        href="/service/epr-authorization"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        EPR
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        Custom Clearance
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 </div>
 
                 <div className="flex justify-center">
-                  <Link
-                    href="/service/product-compliance"
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer"
-                  >
+                  <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-[0_10px_22px_rgba(0,0,0,0.10)] cursor-pointer">
                     <div className="text-[14px] font-semibold text-gray-900">
                       Product Compliance
                     </div>
@@ -1089,10 +1188,78 @@ export default function HomeHeroSection({
                       />
                     </div>
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
-                      ISI / BIS / ISO / BEE / FDA / Meity <br />
-                      CDSCO / TEC / WPC / OSP / etc.
+                      <Link
+                        href="/service/isi-registration-process-in-india"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        ISI
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/bis-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        BIS
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/iso-certification-consulting"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        ISO
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/bee-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        BEE
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/fda-wholesale-license"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        FDA
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        Meity
+                      </Link>
+                      <br />
+                      <Link
+                        href="/service/cdsco-online-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        CDSCO
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/tec-certificate"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        TEC
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/wpc-advisory-services"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        WPC
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/dot-osp-license"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        OSP
+                      </Link>{" "}
+                      / <span className="text-gray-400">etc.</span>
                     </div>
-                  </Link>
+                  </div>
                 </div>
               </div>
             </div>

@@ -74,7 +74,7 @@ export default async function LawUpdateDetailPage({ params }) {
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
-              href="/law-updates"
+              href="/law-update"
               className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
             >
               ← Back to Law Updates
@@ -103,7 +103,7 @@ export default async function LawUpdateDetailPage({ params }) {
               ) : null}
 
               <a
-                href={`/law-updates/${item?.slug}`}
+                href={`/law-update/${item?.slug}`}
                 className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
               >
                 Copy Link
@@ -265,7 +265,7 @@ export default async function LawUpdateDetailPage({ params }) {
 
                 <div className="mt-4">
                   <Link
-                    href={`/law-updates?dept=${encodeURIComponent(item?.department || "")}&page=1&size=6`}
+                    href={`/law-update?dept=${encodeURIComponent(item?.department || "")}&page=1&size=6`}
                     className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
                     View more from {item?.department || "this department"}

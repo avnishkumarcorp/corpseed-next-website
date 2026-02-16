@@ -249,7 +249,7 @@ export default async function LawUpdatesPage({ searchParams }) {
                       </p>
 
                       <Link
-                        href={`/law-updates/${item?.slug}`}
+                        href={`/law-update/${item?.slug}`}
                         className="mt-1 block text-lg font-semibold leading-snug text-slate-900 hover:text-blue-700 cursor-pointer"
                       >
                         {item?.title}

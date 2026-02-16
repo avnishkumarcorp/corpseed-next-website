@@ -51,7 +51,7 @@ export default async function LawUpdateDetailPage({ params }) {
             </p>
 
             <Link
-              href="/law-updates"
+              href="/law-update"
               className="mt-4 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
             >
               ← Back to list

@@ -52,7 +52,6 @@ export async function getNewsBySlug(slug) {
     }
 
     const data = await res.json(); // ✅ read once
-    // console.log("news slug data:", data);
     return data;
   } catch (err) {
     console.error("getNewsBySlug error:", err);

@@ -240,9 +240,6 @@ export default async function KnowledgeCentreSlugPage({ params }) {
   const apiData = await getKnowledgeCentreBySlug(slug);
   if (!apiData?.blog) return notFound();
 
-
-  console.log("blogDtaattatatat",apiData)
-
   const blog = apiData.blog;
   const author = apiData.author || null;
 

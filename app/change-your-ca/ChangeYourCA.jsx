@@ -252,10 +252,6 @@ export default function ChangeYourCA() {
       alert("Please fill all required fields.");
       return;
     }
-
-    // TODO: API call
-    // console.log({ plan: selectedPlan.title, billing, ...form });
-
     alert("Submitted successfully!");
     setOpen(false);
   };

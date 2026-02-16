@@ -299,8 +299,6 @@ export default async function NewsRoomSlugPage({ params }) {
   const item = apiData.news;
   const author = apiData.author || null;
 
-  console.log("sdmhvsjdgjsgjh", apiData);
-
   // ✅ Share URL
   const pageUrl = `https://www.corpseed.com/news-room/${item.slug}`;
 

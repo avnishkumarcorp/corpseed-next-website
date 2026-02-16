@@ -154,7 +154,7 @@ export default async function IndustryPage({ params }) {
         </div>
       </div>
 
-      <section className="border-t border-gray-200 bg-gray-50">
+      {/* <section className="border-t border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -170,7 +170,7 @@ export default async function IndustryPage({ params }) {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

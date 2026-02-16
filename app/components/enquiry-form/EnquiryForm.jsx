@@ -12,7 +12,6 @@ function Backdrop({ open, onClose, children }) {
 
   useEffect(() => setMounted(true), []);
 
-  // Optional: prevent background scroll when modal open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;

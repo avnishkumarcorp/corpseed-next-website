@@ -73,7 +73,7 @@ export default function ServiceHero({
 
           {/* Right highlight card */}
           <div className="lg:col-span-4">
-            <div className="bg-[#f2f3ff] p-5 shadow-sm -ml-24 w-fit">
+            <div className="hidden md:block bg-[#f2f3ff] p-5 shadow-sm -ml-24 w-fit">
               <p className="text-sm text-gray-900">Why wait? Start now!</p>
               <p className="mt-2 text-sm text-gray-600">We’re available 24/7</p>
 
@@ -87,17 +87,11 @@ export default function ServiceHero({
                 </p>
               </div>
 
-              {/* <button
-                onClick={() => setConsultOpen(true)}
-                className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
-              >
-                Get Free Consultation
-              </button> */}
-
               <p className="mt-3 text-xs text-gray-500">
                 By continuing, you agree to Terms & Privacy Policy.
               </p>
             </div>
+
             <div className="bg-[#f2f3ff] p-2 mt-2.5">
               <EnquiryOtpFlow
                 triggerText="Get Free Consultation"

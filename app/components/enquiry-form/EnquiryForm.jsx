@@ -1,23 +1,41 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Phone, ShieldCheck } from "lucide-react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
+import { createPortal } from "react-dom";
 
 /* ---------------- MODAL HELPERS ---------------- */
 
 function Backdrop({ open, onClose, children }) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  // Optional: prevent background scroll when modal open
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  if (!open || !mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
       <div className="relative w-full max-w-md">{children}</div>
-    </div>
+    </div>,
+    document.body
   );
 }
+
 
 function Modal({ title, subtitle, onClose, children }) {
   return (

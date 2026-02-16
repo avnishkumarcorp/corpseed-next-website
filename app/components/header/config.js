@@ -14,7 +14,7 @@ export const ALL_CORPSEED_ALLOWED_KEYS = [
 ];
 
 export const ALL_CORPSEED_ROUTE_MAP = {
-  "Compliance Updates": "/compliance-updates",
+  "Compliance Updates": "/law-updates",
   "Knowledge Centre": "/knowledge-centre",
   NewsRoom: "/news-room",
   "Product Based Services": "/products",

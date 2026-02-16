@@ -158,25 +158,21 @@ export default async function ProductSlugPage({ params }) {
             </div>
 
             {/* HTML Content (before marker) */}
-            <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-              <SafeHtmlShadow html={before} />
-            </div>
+            {/* <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"> */}
+            <SafeHtmlShadow html={before} />
+            {/* </div> */}
 
             {/* Replace legacy form marker with your EnquiryForm */}
-            <div className="mt-6 rounded-2xl border border-gray-200 bg-slate-50 p-5">
-              <div className="mb-3">
-                <p className="text-lg font-bold text-gray-900 text-center">
-                  BOOK A FREE CONSULTATION
-                </p>
-                <p className="mt-2 text-sm text-gray-600 text-center">
-                  Get help from our experts. It’s absolutely FREE.
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-white border border-gray-200 p-4 shadow-sm">
-                <EnquiryForm serviceName={product?.title || product?.name} />
-              </div>
+            <div className="mb-3">
+              <p className="text-lg font-bold text-gray-900 text-center">
+                BOOK A FREE CONSULTATION
+              </p>
+              <p className="mt-2 text-sm text-gray-600 text-center">
+                Get help from our experts. It’s absolutely FREE.
+              </p>
             </div>
+
+            <EnquiryForm serviceName={product?.title || product?.name} />
 
             {/* if anything remains after marker */}
             {/* {after?.trim() ? (

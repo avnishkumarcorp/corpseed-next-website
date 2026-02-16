@@ -17,7 +17,7 @@ export const ALL_CORPSEED_ROUTE_MAP = {
   "Compliance Updates": "/law-update",
   "Knowledge Centre": "/knowledge-centre",
   NewsRoom: "/news-room",
-  "Product Based Services": "/products",
+  "Product Based Services": "/product",
 };
 
 export const GRID_KEYS_ORDER = [

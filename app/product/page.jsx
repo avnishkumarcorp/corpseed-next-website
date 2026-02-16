@@ -18,11 +18,11 @@ export async function generateMetadata({ searchParams }) {
   return {
     title,
     description,
-    alternates: { canonical: "/products" },
+    alternates: { canonical: "/product" },
     openGraph: {
       title,
       description,
-      url: "https://www.corpseed.com/products",
+      url: "https://www.corpseed.com/product",
       siteName: "CORPSEED ITES PRIVATE LIMITED",
       type: "website",
     },

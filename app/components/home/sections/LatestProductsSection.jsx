@@ -188,7 +188,7 @@ export default function LatestProductsSection({ data = [] }) {
 }
 
 function ProductCard({ item }) {
-  const href = `/products/${item?.slug || ""}`;
+  const href = `/product/${item?.slug || ""}`;
   const imgUrl = toImgUrl(item?.image);
 
   return (

@@ -18,19 +18,19 @@ export default function ServiceHero({
   return (
     <section className="relative overflow-hidden border-b border-gray-200">
       {/* subtle gradient backdrop */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50 via-white to-white" />
+      {/* <div className="absolute inset-0 bg-gradient-to-b from-blue-50 via-white to-white" />
       <div className="absolute -top-24 right-[-120px] h-[360px] w-[360px] rounded-full bg-blue-100 blur-3xl" />
-      <div className="absolute -bottom-28 left-[-140px] h-[360px] w-[360px] rounded-full bg-indigo-100 blur-3xl" />
+      <div className="absolute -bottom-28 left-[-140px] h-[360px] w-[360px] rounded-full bg-indigo-100 blur-3xl" /> */}
 
       <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
-          <div className="lg:col-span-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-blue-700">
-              <span className="h-2 w-2 rounded-full bg-blue-600" />
+          <div className="lg:col-span-6">
+            <div className="inline-flex items-center border border-gray-200 px-3 py-1 text-white text-xs font-semibold bg-[#2b63f9]">
+              {/* <span className="h-2 w-2 rounded-full bg-blue-600" /> */}
               {badgeText}
             </div>
 
-            <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            <h1 className="mt-4 text-3xl tracking-tight sm:text-4xl lg:text-5xl">
               <span className="text-blue-600">
                 {title?.split(" ")?.[0] || title}
               </span>{" "}
@@ -39,7 +39,7 @@ export default function ServiceHero({
               </span>
             </h1>
 
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg">
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-gray-600 font-sans">
               {summary}
             </p>
 
@@ -53,13 +53,13 @@ export default function ServiceHero({
             </div>
 
             {/* small stats */}
-            <div className="mt-8 grid max-w-2xl grid-cols-3 gap-4 rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="mt-8 grid max-w-2xl grid-cols-3 divide-x divide-gray-200 rounded-2xl bg-white p-4">
               {[
                 { value: "10000+", label: "Happy Customers" },
                 { value: "500+", label: "CA, CS & Lawyers" },
                 { value: "7+", label: "Offices" },
               ].map((s) => (
-                <div key={s.label} className="text-center">
+                <div key={s.label} className="text-center px-4">
                   <div className="text-lg font-bold text-blue-600">
                     {s.value}
                   </div>
@@ -69,12 +69,12 @@ export default function ServiceHero({
             </div>
           </div>
 
+          <div className="lg:col-span-2"></div>
+
           {/* Right highlight card */}
           <div className="lg:col-span-4">
-            <div className="bg-white p-5 shadow-sm">
-              <p className="text-sm font-semibold text-gray-900">
-                Why wait? Start now!
-              </p>
+            <div className="bg-[#f2f3ff] p-5 shadow-sm -ml-24 w-fit">
+              <p className="text-sm text-gray-900">Why wait? Start now!</p>
               <p className="mt-2 text-sm text-gray-600">We’re available 24/7</p>
 
               <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 flex gap-1.5">
@@ -98,7 +98,12 @@ export default function ServiceHero({
                 By continuing, you agree to Terms & Privacy Policy.
               </p>
             </div>
-            <EnquiryOtpFlow triggerText="Get Free Consultation" />
+            <div className="bg-[#f2f3ff] p-2 mt-2.5">
+              <EnquiryOtpFlow
+                triggerText="Get Free Consultation"
+                className="m-0"
+              />
+            </div>
 
             <ConsultNowModal
               open={consultOpen}

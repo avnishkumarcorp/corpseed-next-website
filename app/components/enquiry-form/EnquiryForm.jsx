@@ -241,7 +241,7 @@ export default function EnquiryForm({ serviceName }) {
 
   return (
     <>
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-sm bg-white p-5 shadow-2xl border border-t border-gray-100">
         <p className="text-lg font-bold text-gray-900">Enquiry Now</p>
         <p className="text-lg font-bold text-blue-600">{serviceName}</p>
 

@@ -136,7 +136,7 @@ export default function EnquiryOtpInline({ onVerified }) {
   return (
     <>
       {/* ===== ALWAYS VISIBLE FORM ===== */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm mt-4">
+      <div className="bg-white p-5">
         <h3 className="text-base font-semibold text-gray-900">
           Schedule a call back
         </h3>
@@ -150,7 +150,7 @@ export default function EnquiryOtpInline({ onVerified }) {
           />
 
           <div className="flex rounded-xl border border-gray-200 overflow-hidden focus-within:ring-4 focus-within:ring-blue-100 focus-within:border-blue-500">
-            <div className="flex items-center gap-1 bg-gray-50 px-3 text-sm">
+            <div className="flex items-center text-nowrap gap-1 bg-gray-50 px-3 text-sm ">
               🇮🇳 +91
             </div>
             <input

@@ -29,7 +29,7 @@ function buildHref({ page, size, filter, q }) {
   if ((q || "").trim()) sp.set("q", String(q).trim());
   else if ((filter || "").trim()) sp.set("filter", String(filter).trim());
 
-  return `/products?${sp.toString()}`;
+  return `/product?${sp.toString()}`;
 }
 
 // ✅ safe image url (handles absolute + relative)

@@ -42,7 +42,7 @@ export default function ServiceFaqs({
                 key={item.id || idx}
                 className="group rounded-xl border border-gray-200 bg-white shadow-sm open:shadow-md transition"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-2.5 py-2 bg-[#fafafa]">
                   <span className="text-sm sm:text-base font-medium text-gray-900">
                     {item.question}
                   </span>
@@ -52,7 +52,7 @@ export default function ServiceFaqs({
                   </span>
                 </summary>
 
-                <div className="px-5 pb-5 pt-0 text-sm sm:text-base text-gray-700 leading-relaxed bg-gray-200">
+                <div className="px-2 pb-5 pt-0 text-sm sm:text-base text-gray-700 leading-relaxed bg-white">
                   {/* ✅ answer is HTML from API */}
                   <SafeHtmlShadow html={item.answerHtml} />
                 </div>

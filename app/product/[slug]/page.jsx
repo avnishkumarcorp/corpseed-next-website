@@ -29,11 +29,11 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description,
-    alternates: { canonical: `/products/${slug}` },
+    alternates: { canonical: `/product/${slug}` },
     openGraph: {
       title,
       description,
-      url: `https://www.corpseed.com/products/${slug}`,
+      url: `https://www.corpseed.com/product/${slug}`,
       siteName: "CORPSEED ITES PRIVATE LIMITED",
       type: "article",
       images: data?.product?.image ? [{ url: data.product.image }] : [],
@@ -69,7 +69,7 @@ function SideSection({ badge, title, items, type }) {
         {items?.map((it) => {
           const href =
             type === "product"
-              ? `/products/${it.slug}`
+              ? `/product/${it.slug}`
               : `/knowledge-centre/${it.slug}`;
 
           return (

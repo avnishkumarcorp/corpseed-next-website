@@ -957,7 +957,11 @@ export default function HomeHeroSection({
                       / <Link href="/">Medical</Link> /{" "}
                       <Link href="/">Electronics</Link> <br />
                       <Link href="industries/recycling-and-waste-management">
-                        Waste Management / Renewable
+                        Waste Management
+                      </Link>
+                      /
+                      <Link href={"/industries/renewable-energy"}>
+                        Renewable
                       </Link>
                     </div>
                   </div>

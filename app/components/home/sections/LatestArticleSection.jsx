@@ -277,7 +277,7 @@ function ArticleCard({ article }) {
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 flex-col p-5">
+        <div className="flex flex-1 flex-col px-5 py-2">
           <div className="flex items-center gap-3">
             <span className="rounded-md bg-orange-500 px-3 py-1 text-[11px] font-semibold tracking-wide text-white">
               LATEST BLOG
@@ -288,11 +288,11 @@ function ArticleCard({ article }) {
             </span>
           </div>
 
-          <h3 className="mt-4 text-[15px] font-semibold leading-6 text-slate-900 line-clamp-2 min-h-[48px]">
+          <h3 className="mt-4 text-[15px] font-semibold leading-6 text-slate-900 line-clamp-2">
             {article?.title}
           </h3>
 
-          <div className="mt-auto" />
+          {/* <div className="mt-auto" /> */}
         </div>
       </div>
     </Link>

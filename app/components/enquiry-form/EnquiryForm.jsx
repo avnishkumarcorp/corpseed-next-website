@@ -242,8 +242,8 @@ export default function EnquiryForm({ serviceName }) {
   return (
     <>
       <div className="rounded-sm bg-white p-5 shadow-2xl border border-t border-gray-100">
-        <p className="text-lg font-bold text-gray-900">Enquiry Now</p>
-        <p className="text-lg font-bold text-blue-600">{serviceName}</p>
+        <p className="text-lg font-normal text-center text-[#212529]">Enquiry Now</p>
+        <p className="text-lg font-normal text-blue-600 text-center">{serviceName}</p>
 
         <form onSubmit={onSubmit} className="mt-5 space-y-4">
           <div>

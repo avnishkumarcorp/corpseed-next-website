@@ -153,11 +153,11 @@ export default function NewsSection({ data }) {
 
 function NewsSlide({ slide }) {
   const imgUrl = toImgUrl(slide?.image);
-  const href = `/news-room/${slide?.slug}`; // adjust route if needed
+  const href = `/press-release/${slide?.slug}`; // adjust route if needed
 
   return (
     <div className="w-full shrink-0">
-      <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
+      <div className="grid min-h-full grid-cols-1 md:grid-cols-2">
         {/* LEFT IMAGE */}
         <div className="relative min-h-[240px] md:min-h-[360px] bg-slate-100 overflow-hidden">
           {imgUrl && (
@@ -181,12 +181,12 @@ function NewsSlide({ slide }) {
 
           <div className="max-w-xl">
             <div className="text-[12px] font-semibold tracking-widest text-blue-600">
-              NEWS
+              Press release
             </div>
 
-            <h3 className="mt-5 text-[22px] font-semibold leading-snug text-blue-600 sm:text-[24px] line-clamp-3">
+            <Link href={href} className="mt-5 text-[22px] leading-snug text-blue-600 sm:text-[24px] line-clamp-3">
               {slide?.title}
-            </h3>
+            </Link>
 
             <div className="mt-6 flex gap-4">
               <div className="mt-1 h-auto w-[3px] rounded-full bg-yellow-400" />

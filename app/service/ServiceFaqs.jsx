@@ -52,7 +52,7 @@ export default function ServiceFaqs({
                   </span>
                 </summary>
 
-                <div className="px-2 pb-5 pt-0 text-sm sm:text-base text-gray-700 leading-relaxed bg-white">
+                <div className="px-2 pb-2 pt-4 text-sm sm:text-base text-gray-700 leading-relaxed bg-white">
                   {/* ✅ answer is HTML from API */}
                   <SafeHtmlShadow html={item.answerHtml} />
                 </div>

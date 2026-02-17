@@ -166,7 +166,7 @@ function Tabs({ tabs = [], activeKey, onChange }) {
               type="button"
               onClick={() => onChange?.(key)}
               className={[
-                "relative whitespace-nowrap text-sm font-medium cursor-pointer",
+                "relative whitespace-nowrap text-lg font-medium cursor-pointer",
                 isActive ? "text-blue-600" : "text-gray-800 hover:text-blue-600",
               ].join(" ")}
             >
@@ -351,11 +351,11 @@ function ServiceTile({ item }) {
         "rounded-2xl bg-white p-6 shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
       ].join(" ")}
     >
-      <h3 className="text-base font-semibold leading-snug text-gray-900">
+      <h5 className="font-medium text-lg leading-snug text-[#212529]">
         {title}
-      </h3>
+      </h5>
 
-      <p className="mt-4 line-clamp-6 text-sm leading-6 text-gray-600">
+      <p className="mt-4 line-clamp-6 leading-6 text-[#212529]">
         {desc}
       </p>
 

@@ -866,14 +866,6 @@ function HeroSearch({
 
 export default function HomeHeroSection({
   title = "Tailored Solutions\nFor Your Business",
-  categories = [
-    { label: "Regulatory", href: "/service/regulatory-compliance" },
-    { label: "Environmental", href: "/service/environmental" },
-    { label: "Sustainability", href: "/service/sustainability" },
-    { label: "Legal", href: "/service/legal" },
-    { label: "Plant Setup", href: "/service/industry-setup-solution" },
-  ],
-  subtitle = "Compliance Advisory Platform For Individuals, SME & Enterprise.",
   ratingText = "Rated 4.9 stars ratings by 15000+ Customers like you",
   ctaHref = "/contact-us",
   ctaText = "CALL FOR FREE CONSULTATION",
@@ -896,7 +888,7 @@ export default function HomeHeroSection({
               <PhoneCall className="h-4 w-4" />
             </Link>
 
-            <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-5 text-3xl font-bold leading-[1.05] tracking-tight text-[#272d30] sm:text-5xl lg:text-6xl">
               {title.split("\n").map((line, i) => (
                 <span key={i} className="block">
                   {line}

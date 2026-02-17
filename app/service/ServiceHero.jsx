@@ -16,7 +16,7 @@ export default function ServiceHero({
   const [consultOpen, setConsultOpen] = useState(false);
 
   return (
-    <section className="relative overflow-hidden border-b border-gray-200">
+    <section className="relative overflow-hidden ">
       {/* subtle gradient backdrop */}
       {/* <div className="absolute inset-0 bg-gradient-to-b from-blue-50 via-white to-white" />
       <div className="absolute -top-24 right-[-120px] h-[360px] w-[360px] rounded-full bg-blue-100 blur-3xl" />
@@ -24,22 +24,26 @@ export default function ServiceHero({
 
       <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-7">
             <div className="inline-flex items-center border border-gray-200 px-3 py-1 text-white text-xs font-semibold bg-[#2b63f9]">
               {/* <span className="h-2 w-2 rounded-full bg-blue-600" /> */}
               {badgeText}
             </div>
 
-            <h1 className="mt-4 text-3xl tracking-tight sm:text-4xl lg:text-5xl">
-              <span className="text-blue-600">
-                {title?.split(" ")?.[0] || title}
-              </span>{" "}
-              <span className="text-gray-900">
-                {title?.split(" ")?.slice(1).join(" ")}
-              </span>
+            <h1 className="mt-4 text-3xl tracking-tight sm:text-4xl lg:text-5xl leading-tight break-words">
+              {title && (
+                <>
+                  <span className="text-blue-600">
+                    {title.split(" ").slice(0, 2).join(" ")}
+                  </span>{" "}
+                  <span className="text-gray-900">
+                    {title.split(" ").slice(2).join(" ")}
+                  </span>
+                </>
+              )}
             </h1>
 
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-gray-600 font-sans">
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#212529] font-sans text-justify">
               {summary}
             </p>
 
@@ -69,7 +73,7 @@ export default function ServiceHero({
             </div>
           </div>
 
-          <div className="lg:col-span-2"></div>
+          <div className="lg:col-span-1"></div>
 
           {/* Right highlight card */}
           <div className="lg:col-span-4">

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { getPressReleaseBySlug } from "@/app/lib/pressRelease";
 import SafeHtml from "@/app/components/SafeHtml";
+import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
@@ -91,19 +92,20 @@ function TocBlock({ tableContent }) {
   if (!tableContent) return null;
 
   return (
-    <Card className="overflow-hidden">
-      <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
+    <>
+      {/* <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
         <p className="text-sm font-semibold text-slate-900">
           Table of Contents
         </p>
         <p className="mt-1 text-xs text-slate-500">Jump to sections</p>
-      </div>
+      </div> */}
 
       {/* Desktop */}
-      <div
+      {/* <div
         className="hidden max-h-[420px] overflow-auto px-5 py-4 lg:block"
         dangerouslySetInnerHTML={{ __html: tableContent }}
-      />
+      /> */}
+      <SafeHtmlShadow html={tableContent} />
 
       {/* Mobile */}
       <div className="block px-5 py-4 lg:hidden">
@@ -120,7 +122,7 @@ function TocBlock({ tableContent }) {
           />
         </details>
       </div>
-    </Card>
+    </>
   );
 }
 
@@ -288,48 +290,49 @@ export default async function PressReleaseSlugPage({ params }) {
             </div>
 
             {/* Article Card */}
-            <Card className="overflow-hidden">
-              <div className="p-5 sm:p-7">
-                {/* Author */}
-                {author ? (
-                  <div className="mb-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="relative h-11 w-11 overflow-hidden rounded-full border border-slate-200 bg-white">
-                      {author.profilePicture ? (
-                        <Image
-                          src={author.profilePicture}
-                          alt={`${author.firstName || ""} ${author.lastName || ""}`.trim()}
-                          fill
-                          className="object-cover"
-                          sizes="44px"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-slate-500">
-                          <User2 className="h-5 w-5" />
-                        </div>
-                      )}
-                    </div>
+            {/* <Card className="overflow-hidden"> */}
+            <div className="p-5 sm:p-7">
+              {/* Author */}
 
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900">
-                        {`${author.firstName || ""} ${author.lastName || ""}`.trim() ||
-                          "Author"}
-                      </p>
-                      <p className="text-xs text-slate-600">
-                        {author.slug ? `@${author.slug}` : "Corpseed"}
-                      </p>
-                    </div>
+              {/* Body (API HTML) */}
+              <SafeHtmlShadow html={press.shortDescription} />
+
+              {author ? (
+                <div className="mb-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="relative h-11 w-11 overflow-hidden rounded-full border border-slate-200 bg-white">
+                    {author.profilePicture ? (
+                      <Image
+                        src={author.profilePicture}
+                        alt={`${author.firstName || ""} ${author.lastName || ""}`.trim()}
+                        fill
+                        className="object-cover"
+                        sizes="44px"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-slate-500">
+                        <User2 className="h-5 w-5" />
+                      </div>
+                    )}
                   </div>
-                ) : null}
 
-                {/* Body (API HTML) */}
-                <SafeHtml html={press.shortDescription} />
-
-                {/* ✅ Share row after content as well */}
-                <div className="mt-8 border-t border-slate-200 pt-5">
-                  <ShareRow url={pageUrl} title={press.title} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-900">
+                      {`${author.firstName || ""} ${author.lastName || ""}`.trim() ||
+                        "Author"}
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      {author.slug ? `@${author.slug}` : "Corpseed"}
+                    </p>
+                  </div>
                 </div>
+              ) : null}
+
+              {/* ✅ Share row after content as well */}
+              <div className="mt-8 border-t border-slate-200 pt-5">
+                <ShareRow url={pageUrl} title={press.title} />
               </div>
-            </Card>
+            </div>
+            {/* </Card> */}
           </div>
 
           {/* Sidebar */}

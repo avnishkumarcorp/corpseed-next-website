@@ -220,22 +220,22 @@ export default async function AuthorProfilePage({ params }) {
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                         {safeText(user.department)}
                       </span>
-                      {apiData?.articleCount != null ? (
+                      {/* {apiData?.articleCount != null ? (
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                           {apiData.articleCount} articles
                         </span>
-                      ) : null}
+                      ) : null} */}
                     </div>
                   ) : null}
 
-                  {user?.address ? (
+                  {/* {user?.address ? (
                     <div className="flex items-start gap-2">
                       <MapPin className="mt-0.5 h-4 w-4 text-slate-400" />
                       <span className="text-sm">{safeText(user.address)}</span>
                     </div>
-                  ) : null}
+                  ) : null} */}
 
-                  {user?.mobile ? (
+                  {/* {user?.mobile ? (
                     <div className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-slate-400" />
                       <a
@@ -245,12 +245,12 @@ export default async function AuthorProfilePage({ params }) {
                         {safeText(user.mobile)}
                       </a>
                     </div>
-                  ) : null}
+                  ) : null} */}
                 </div>
-
+{/* 
                 <div className="mt-5">
                   <SocialPills user={user} />
-                </div>
+                </div> */}
               </div>
             </Card>
 

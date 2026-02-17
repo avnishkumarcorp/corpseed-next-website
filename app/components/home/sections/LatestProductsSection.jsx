@@ -207,7 +207,7 @@ function ProductCard({ item }) {
         ) : null}
       </div>
 
-      <div className="p-5">
+      <div className="px-5 pt-2">
         <h3 className="text-[15px] font-medium leading-6 text-slate-900 line-clamp-2">
           {item?.name}
         </h3>

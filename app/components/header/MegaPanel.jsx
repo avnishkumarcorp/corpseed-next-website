@@ -10,7 +10,7 @@ function renderLinksList(list) {
       {(list || []).map((x) => (
         <li key={x?.url || x?.slug || x?.name}>
           <Link
-            href={x?.url || "#"}
+            href={x?.url || (x?.slug ? `/service/${x.slug}` : "#")}
             className="block text-[13px] leading-5 text-slate-600 hover:text-slate-900 cursor-pointer"
           >
             {x?.name}
@@ -19,6 +19,37 @@ function renderLinksList(list) {
       ))}
     </ul>
   );
+}
+
+// ✅ ONLY for Corpseed Info: 3 columns => 2 rows for 6 items
+function renderAboutGrid(list) {
+  return (
+    <div className="mt-3 grid grid-cols-1 gap-x-10 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+      {(list || []).map((x) => (
+        <Link
+          key={x?.url || x?.slug || x?.name}
+          href={x?.url || (x?.slug ? `/service/${x.slug}` : "#")}
+          className="text-[13px] leading-5 text-slate-600 hover:text-slate-900 cursor-pointer"
+        >
+          {x?.name}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+// ✅ helper: decide which "More" button to show
+function getMoreHref(items = []) {
+  const hasService = items.some(
+    (it) => typeof it?.url === "string" && it.url.startsWith("/service"),
+  );
+  const hasIndustries = items.some(
+    (it) => typeof it?.url === "string" && it.url.startsWith("/industries"),
+  );
+
+  if (hasIndustries) return "/industries";
+  if (hasService) return "/service";
+  return "";
 }
 
 export default function MegaPanel({ open, navKey, menuMap, loading }) {
@@ -34,8 +65,8 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
 
   if (!open) return null;
 
-  // ✅ fixed height for RIGHT content area (adjust as you want)
-  const RIGHT_HEIGHT = "max-h-[520px]"; // e.g. 520px fixed height
+  const RIGHT_HEIGHT = "max-h-[520px]";
+  const ABOUT_SIDES = new Set(["Corpseed Info", "About"]);
 
   return (
     <div
@@ -58,9 +89,7 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                   <div className="h-4 w-36 animate-pulse rounded bg-slate-200" />
                 </div>
               ) : !item ? (
-                <p className="text-sm text-slate-600">
-                  Menu data not available.
-                </p>
+                <p className="text-sm text-slate-600">Menu data not available.</p>
               ) : (
                 <div className="space-y-2">
                   {sideKeys.map((k) => (
@@ -86,7 +115,6 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
 
             {/* RIGHT SIDE */}
             <div className="col-span-12 lg:col-span-9">
-              {/* ✅ fixed height + scroll */}
               <div
                 className={[
                   RIGHT_HEIGHT,
@@ -111,12 +139,12 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                     const renderGroupBlock = (groupTitle, list) => {
                       const items = Array.isArray(list) ? list : [];
 
+                      // ✅ detect "More" target
+                      const moreHref = getMoreHref(items);
+
                       return (
-                        <div
-                          key={groupTitle}
-                          className="min-w-0 flex flex-col h-[220px]" // ✅ fixed height for each column
-                        >
-                          {/* Title */}
+                        <div key={groupTitle} className="min-w-0 flex flex-col h-[220px]">
+                          {/* Section Title */}
                           <p className="text-sm font-semibold text-blue-500 tracking-tight mb-3">
                             {groupTitle}
                           </p>
@@ -125,6 +153,18 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                           <div className="flex-1 overflow-y-auto pr-2">
                             {renderLinksList(items)}
                           </div>
+
+                          {/* ✅ MORE BUTTON */}
+                          {moreHref && (
+                            <div className="pt-2">
+                              <Link
+                                href={moreHref}
+                                className="text-[13px] font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
+                              >
+                                More →
+                              </Link>
+                            </div>
+                          )}
                         </div>
                       );
                     };
@@ -140,25 +180,39 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                       );
                     };
 
+                    // ✅ sideVal is a list (not group object)
                     if (isLinksArray(sideVal)) {
-                      return (
-                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-blue-700">
-                              {activeSide}
-                            </p>
+                      const isAbout = ABOUT_SIDES.has(String(activeSide || "").trim());
+                      const moreHref = getMoreHref(sideVal);
 
-                            {/* ✅ render ALL services */}
-                            <div className="mt-3">
-                              {renderLinksList(sideVal)}
+                      return (
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-blue-700">
+                            {activeSide}
+                          </p>
+
+                          {isAbout ? (
+                            renderAboutGrid(sideVal)
+                          ) : (
+                            <div className="mt-3">{renderLinksList(sideVal)}</div>
+                          )}
+
+                          {/* ✅ MORE BUTTON for list sections too */}
+                          {moreHref && (
+                            <div className="pt-3">
+                              <Link
+                                href={moreHref}
+                                className="text-[13px] font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
+                              >
+                                More →
+                              </Link>
                             </div>
-                          </div>
+                          )}
                         </div>
                       );
                     }
 
-                    if (isGroupObject(sideVal))
-                      return renderGroupsColumnsLocal(sideVal);
+                    if (isGroupObject(sideVal)) return renderGroupsColumnsLocal(sideVal);
 
                     return (
                       <p className="text-sm text-slate-600">

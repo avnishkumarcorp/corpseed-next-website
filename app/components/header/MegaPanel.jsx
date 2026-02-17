@@ -89,7 +89,9 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                   <div className="h-4 w-36 animate-pulse rounded bg-slate-200" />
                 </div>
               ) : !item ? (
-                <p className="text-sm text-slate-600">Menu data not available.</p>
+                <p className="text-sm text-slate-600">
+                  Menu data not available.
+                </p>
               ) : (
                 <div className="space-y-2">
                   {sideKeys.map((k) => (
@@ -118,7 +120,7 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
               <div
                 className={[
                   RIGHT_HEIGHT,
-                  "overflow-y-auto overflow-x-hidden [scrollbar-gutter:stable] p-5",
+                  "hover-scroll overflow-x-hidden p-5", // ✅ hover scrollbar
                 ].join(" ")}
               >
                 {loading ? (
@@ -143,14 +145,17 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                       const moreHref = getMoreHref(items);
 
                       return (
-                        <div key={groupTitle} className="min-w-0 flex flex-col h-[220px]">
+                        <div
+                          key={groupTitle}
+                          className="min-w-0 flex flex-col h-[220px]"
+                        >
                           {/* Section Title */}
                           <p className="text-sm font-semibold text-blue-500 tracking-tight mb-3">
                             {groupTitle}
                           </p>
 
                           {/* Scrollable List */}
-                          <div className="flex-1 overflow-y-auto pr-2">
+                          <div className="flex-1 hover-scroll pr-2">
                             {renderLinksList(items)}
                           </div>
 
@@ -182,7 +187,9 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
 
                     // ✅ sideVal is a list (not group object)
                     if (isLinksArray(sideVal)) {
-                      const isAbout = ABOUT_SIDES.has(String(activeSide || "").trim());
+                      const isAbout = ABOUT_SIDES.has(
+                        String(activeSide || "").trim(),
+                      );
                       const moreHref = getMoreHref(sideVal);
 
                       return (
@@ -194,7 +201,9 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                           {isAbout ? (
                             renderAboutGrid(sideVal)
                           ) : (
-                            <div className="mt-3">{renderLinksList(sideVal)}</div>
+                            <div className="mt-3">
+                              {renderLinksList(sideVal)}
+                            </div>
                           )}
 
                           {/* ✅ MORE BUTTON for list sections too */}
@@ -212,7 +221,8 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                       );
                     }
 
-                    if (isGroupObject(sideVal)) return renderGroupsColumnsLocal(sideVal);
+                    if (isGroupObject(sideVal))
+                      return renderGroupsColumnsLocal(sideVal);
 
                     return (
                       <p className="text-sm text-slate-600">

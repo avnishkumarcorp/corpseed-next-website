@@ -314,7 +314,7 @@ export default function ContactUsClient({ data }) {
                 </p>
               </div>
 
-              <div className="p-6 sm:p-8 max-h-[520px] overflow-y-auto space-y-6">
+              <div className="p-6 sm:p-8  space-y-6">
                 {addresses.length ? (
                   addresses.map((a) => (
                     <Office

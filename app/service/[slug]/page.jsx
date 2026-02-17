@@ -10,6 +10,7 @@ import ServiceFaqs from "../ServiceFaqs";
 import ServiceSlugClient from "./ServiceSlugClient";
 import { getServiceData } from "./serviceData";
 import StepsTimelineSection from "../StepsTimelineSection";
+import PdfShareBar from "@/app/components/PdfShareBar";
 
 // ✅ Route-level caching
 export const revalidate = 3600;
@@ -209,6 +210,9 @@ export default async function ServicePage({ params }) {
 
           <div className="lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
+              <div className="mb-6">
+                <PdfShareBar />
+              </div>
               <EnquiryForm serviceName={service.title} />
             </div>
           </div>
@@ -225,4 +229,3 @@ export default async function ServicePage({ params }) {
     </div>
   );
 }
- 

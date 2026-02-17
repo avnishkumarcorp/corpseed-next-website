@@ -328,9 +328,9 @@ export default async function PressReleaseSlugPage({ params }) {
               ) : null}
 
               {/* ✅ Share row after content as well */}
-              <div className="mt-8 border-t border-slate-200 pt-5">
+              {/* <div className="mt-8 border-t border-slate-200 pt-5">
                 <ShareRow url={pageUrl} title={press.title} />
-              </div>
+              </div> */}
             </div>
             {/* </Card> */}
           </div>

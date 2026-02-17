@@ -75,3 +75,31 @@ export async function getLatestNews() {
     return [];
   }
 }
+
+
+
+export async function getLatestUpdatedPressRelease() {
+  try {
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL; // https://api.corpseed.com
+    if (!base) throw new Error("NEXT_PUBLIC_API_BASE_URL is missing");
+
+    const res = await fetch(`${base}/api/updated-press-release/latest`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      throw new Error(`API failed ${res.status} :: ${t}`);
+    }
+
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : data?.data ?? [];
+    return list;
+  } catch (e) {
+    console.error("getLatestUpdatedPressRelease error:", e);
+    return [];
+  }
+}
+

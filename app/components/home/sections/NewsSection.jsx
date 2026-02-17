@@ -201,9 +201,9 @@ function NewsSlide({ slide }) {
                   {slide.postDate}
                 </span>
               ) : null}
-              <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
+              {/* <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
                 {slide?.visited ?? 0} views
-              </span>
+              </span> */}
             </div>
 
             {/* <div className="mt-8">

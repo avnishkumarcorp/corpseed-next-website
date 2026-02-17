@@ -13,3 +13,4 @@ export async function getHomeTestData() {
     return null;
   }
 }
+

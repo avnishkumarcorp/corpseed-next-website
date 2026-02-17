@@ -233,6 +233,42 @@ export default function SafeHtmlShadow({ html }) {
     margin-left:24px;
 }
 
+.blog-desc .text {
+    font-size: 16px;
+    line-height: 25px;
+    color: #212529;
+    margin: 1.5rem 0px;
+}
+
+.blog-text text{
+    font-size: 16px;
+    line-height: 25px;
+    color: #212529;
+    margin: 1.5rem 0px;
+}
+
+.blog-text text img{
+margin: 0 auto;
+    padding: 7px;
+}
+
+.page-header .blog-text img{
+    margin: 0 auto;
+    padding: 7px;
+    max-width: 100%;
+}
+
+.blog-text img {
+    display: block !important;
+}
+    article.blog-post img{
+    max-width: 100% !important;
+}
+
+.blog-text img {
+    display: block !important;
+}
+
     `;
     shadowRoot.appendChild(base);
 

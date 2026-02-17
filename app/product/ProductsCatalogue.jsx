@@ -43,7 +43,7 @@ function toImgUrl(image) {
 // ✅ Memoized card so modal open/close doesn't rerender all cards
 const ProductCard = React.memo(function ProductCard({ p, idx }) {
   const imgUrl = toImgUrl(p?.image || p?.img || p?.thumbnail);
-  const href = `/products/${p?.slug || ""}`;
+  const href = `/product/${p?.slug || ""}`;
 
   return (
     <Link

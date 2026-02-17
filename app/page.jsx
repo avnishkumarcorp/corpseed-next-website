@@ -3,8 +3,8 @@ import HomeClientSections from "./components/home/HomeClientSections";
 
 import { getHomeTestData } from "./lib/home";
 import { getLatestBlogs } from "./lib/knowledgeCentre";
-import { getLatestNews } from "./lib/pressRelease";
 import { getLatestProducts } from "./lib/products";
+import { getLatestUpdatedPressRelease } from "./lib/pressRelease";
 
 // ✅ Home Page SEO (Meta)
 export async function generateMetadata() {
@@ -41,9 +41,9 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  const [homeData, newsData, latestBlogs, products] = await Promise.all([
+  const [homeData, pressList, latestBlogs, products] = await Promise.all([
     getHomeTestData(),
-    getLatestNews(),
+    getLatestUpdatedPressRelease(),
     getLatestBlogs(),
     getLatestProducts(),
   ]);
@@ -56,7 +56,7 @@ export default async function HomePage() {
       {/* ✅ Everything else client-lazy */}
       <HomeClientSections
         homeData={homeData}
-        newsData={newsData}
+        newsData={pressList}
         latestBlogs={latestBlogs}
         products={products}
       />

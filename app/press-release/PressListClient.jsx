@@ -336,16 +336,18 @@ export default function PressListClient({ apiData, page, size }) {
                       href={`/press-release/${p.slug}`}
                       className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:bg-slate-50 cursor-pointer"
                     >
-                      <div className="relative h-14 w-16 overflow-hidden rounded-lg border border-slate-200">
+                      {/* ✅ prevent shrink */}
+                      <div className="relative h-14 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
                         <Image
                           src={p.image}
                           alt={p.title}
                           fill
-                          className="object-cover"
-                          sizes="80px"
+                          className="object-cover" // use object-contain if you don't want crop
+                          sizes="64px"
                         />
                       </div>
-                      <div className="min-w-0">
+
+                      <div className="min-w-0 flex-1">
                         <p className="line-clamp-2 text-sm font-semibold text-slate-900">
                           {p.title}
                         </p>
@@ -408,7 +410,7 @@ export default function PressListClient({ apiData, page, size }) {
               </form>
             </div>
           </CardShell> */}
-          <EnquiryForm/>
+          <EnquiryForm />
         </aside>
       </div>
     </section>

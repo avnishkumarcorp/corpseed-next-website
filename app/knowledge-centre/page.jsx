@@ -169,12 +169,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 method="GET"
                 className="w-full max-w-xl"
               >
-                {filter ? (
-                  <input type="hidden" name="filter" value={filter} />
-                ) : null}
-                {tag ? <input type="hidden" name="tag" value={tag} /> : null}
                 <input type="hidden" name="page" value="1" />
-
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input

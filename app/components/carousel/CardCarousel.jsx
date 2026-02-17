@@ -348,18 +348,24 @@ function ServiceTile({ item }) {
       className={[
         "snap-start",
         "min-w-[200px] max-w-[200px] sm:min-w-[280px] sm:max-w-[280px]",
-        "rounded-2xl bg-white p-6 shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
+        "rounded-2xl bg-white p-6",
+        "shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
+        "flex flex-col",                 // ✅ IMPORTANT
+        "h-[260px] sm:h-[280px]",         // ✅ fixed height (adjust if you want)
       ].join(" ")}
     >
-      <h5 className="font-medium text-lg leading-snug text-[#212529]">
+      {/* Title */}
+      <h5 className="font-medium text-lg leading-snug text-[#212529] line-clamp-2">
         {title}
       </h5>
 
-      <p className="mt-4 line-clamp-6 leading-6 text-[#212529]">
+      {/* Description area (fixed space) */}
+      <p className="mt-4 text-sm leading-6 text-[#212529] line-clamp-6">
         {desc}
       </p>
 
-      <div className="mt-10 flex justify-end">
+      {/* ✅ Always bottom */}
+      <div className="mt-auto pt-6 flex justify-end">
         <Link
           href={href}
           className="text-sm font-medium text-blue-600 hover:text-blue-700 cursor-pointer"
@@ -370,3 +376,4 @@ function ServiceTile({ item }) {
     </div>
   );
 }
+

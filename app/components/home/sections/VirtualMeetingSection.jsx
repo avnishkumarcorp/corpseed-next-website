@@ -1,12 +1,17 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import Image from "next/image";
 import calendarImg from "../../../../public/home/calander.svg";
 import Link from "next/link";
+import StartupGuidePopup from "../../StartupGuidePopup";
 
-const RightCard = ({ icon, title, desc, href }) => {
+const RightCard = ({ icon, title, desc, href, onClick = () => {} }) => {
   return (
     <Link
       href={href || ""}
+      target={href ? "_blank" : ""}
+      rel={href ? "noopener noreferrer" : ""}
+      onClick={onClick}
       className="flex gap-3 rounded-xl bg-white px-5 py-4 shadow-[0_10px_30px_-22px_rgba(2,6,23,0.35)] ring-1 ring-slate-200"
     >
       <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -22,6 +27,7 @@ const RightCard = ({ icon, title, desc, href }) => {
 };
 
 export default function VirtualMeetingSection() {
+  const [openStartupGuide, setOpenStartupGuide] = useState(false);
   return (
     <section className="w-full bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -57,6 +63,7 @@ export default function VirtualMeetingSection() {
               <RightCard
                 title="Start Up Guide"
                 desc="Download Your Free Legal Guide Now"
+                onClick={() => setOpenStartupGuide(true)}
                 icon={
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
@@ -86,6 +93,7 @@ export default function VirtualMeetingSection() {
               <RightCard
                 title="Your Order"
                 desc="Feel Free To Ask Any Query"
+                href={"https://crm.corpseed.com/client_orders.html"}
                 icon={
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
@@ -145,6 +153,10 @@ export default function VirtualMeetingSection() {
           </div>
         </div>
       </div>
+      <StartupGuidePopup
+        open={openStartupGuide}
+        onClose={() => setOpenStartupGuide(false)}
+      />
     </section>
   );
 }

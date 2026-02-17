@@ -35,12 +35,12 @@ export default function ServiceFaqs({
           </p>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-3 sm:p-4">
+        <div className="mt-6  p-3 sm:p-4">
           <div className="space-y-3">
             {items.map((item, idx) => (
               <details
                 key={item.id || idx}
-                className="group rounded-xl border border-gray-200 bg-white shadow-sm open:shadow-md transition"
+                className="group rounded-lg border border-gray-200 bg-white shadow-sm open:shadow-md transition"
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-2.5 py-2 bg-[#fafafa]">
                   <span className="text-sm sm:text-base font-medium text-gray-900">

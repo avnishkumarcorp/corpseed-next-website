@@ -4,13 +4,13 @@ import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
 import { getLifeAtCorpseedBySlug } from "@/app/lib/life-at-corpseed";
 
-
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const data = await getLifeAtCorpseedBySlug(slug)
+  const data = await getLifeAtCorpseedBySlug(slug);
 
   return {
-    title: data?.title || data?.lifeUser?.title || "Life at Corpseed | Corpseed",
+    title:
+      data?.title || data?.lifeUser?.title || "Life at Corpseed | Corpseed",
     description:
       data?.metaDescription ||
       data?.lifeUser?.summary ||
@@ -56,13 +56,23 @@ export default async function LifeAtCorpseedSlugPage({ params }) {
 
   const u = data.lifeUser;
 
-  const tags = (u.categories || []).map((t) => (t?.startsWith("#") ? t : `#${t}`));
+  const tags = (u.categories || []).map((t) =>
+    t?.startsWith("#") ? t : `#${t}`,
+  );
 
   // ✅ your API has duplicates in relatedLifeUsers, so we clean it
-  const related = uniqBy(data.relatedLifeUsers || [], (x) => `${x?.id}-${x?.slug}`);
-  const allUsers = uniqBy(data.allLifeUsers || [], (x) => `${x?.id}-${x?.slug}`);
+  const related = uniqBy(
+    data.relatedLifeUsers || [],
+    (x) => `${x?.id}-${x?.slug}`,
+  );
+  const allUsers = uniqBy(
+    data.allLifeUsers || [],
+    (x) => `${x?.id}-${x?.slug}`,
+  );
 
-  const sidebarList = related.length ? related : allUsers.filter((x) => x.slug !== u.slug).slice(0, 6);
+  const sidebarList = related.length
+    ? related
+    : allUsers.filter((x) => x.slug !== u.slug).slice(0, 6);
 
   return (
     <main className="bg-white text-slate-800">
@@ -79,7 +89,8 @@ export default async function LifeAtCorpseedSlugPage({ params }) {
             </Link>
 
             <div className="text-sm text-gray-500 truncate">
-              Life at Corpseed / <span className="text-gray-900">{u.title}</span>
+              Life at Corpseed /{" "}
+              <span className="text-gray-900">{u.title}</span>
             </div>
           </div>
         </div>
@@ -91,14 +102,15 @@ export default async function LifeAtCorpseedSlugPage({ params }) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Image Card */}
             <div className="lg:col-span-7">
-              <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div className="relative aspect-[16/9] sm:aspect-[16/8]">
+              <div className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                {/* ✅ same height as right card */}
+                <div className="relative h-[260px] sm:h-[320px] lg:h-full lg:min-h-[420px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                   <Image
                     src={u.pictureName}
                     alt={u.title}
                     fill
                     priority
-                    className="object-cover object-center"
+                    className="object-cover object-top" // ✅ focus top so head doesn't cut
                     sizes="(max-width: 1024px) 100vw, 60vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-black/0 to-black/0" />
@@ -119,7 +131,9 @@ export default async function LifeAtCorpseedSlugPage({ params }) {
                 </h1>
 
                 {u.summary ? (
-                  <p className="mt-3 text-gray-600 leading-relaxed">{u.summary}</p>
+                  <p className="mt-3 text-gray-600 leading-relaxed">
+                    {u.summary}
+                  </p>
                 ) : null}
 
                 {/* Tags */}
@@ -139,7 +153,9 @@ export default async function LifeAtCorpseedSlugPage({ params }) {
                 {/* Optional designation */}
                 {u.designation ? (
                   <div className="mt-5 text-sm text-gray-500">
-                    <span className="font-semibold text-gray-700">Designation: </span>
+                    <span className="font-semibold text-gray-700">
+                      Designation:{" "}
+                    </span>
                     {u.designation}
                   </div>
                 ) : null}
@@ -176,7 +192,7 @@ export default async function LifeAtCorpseedSlugPage({ params }) {
             {/* Sidebar */}
             <aside className="lg:col-span-4">
               <div className="lg:sticky lg:top-6 space-y-6">
-                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                {/* <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                   <h3 className="text-base font-bold text-gray-900">
                     More stories
                   </h3>
@@ -221,7 +237,7 @@ export default async function LifeAtCorpseedSlugPage({ params }) {
                       View all <ArrowRight className="h-4 w-4" />
                     </Link>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Tags list from API (optional) */}
                 {Array.isArray(data.tags) && data.tags.length ? (

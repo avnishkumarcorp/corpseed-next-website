@@ -945,11 +945,19 @@ export default function HomeHeroSection({
                         className="object-contain"
                       />
                     </div>
-
-                    <div className="mt-2 text-[11px] leading-snug text-gray-500 line-clamp-3">
-                      Bio-fuels / Medical / Electronics
-                      <br />
-                      Waste Management / Renewable
+                    <div className="mt-2 text-[12px] leading-snug text-gray-500">
+                      <Link href="/service/biofuel-manufacturing-plant-setup-in-india">
+                        Bio-fuels
+                      </Link>{" "}
+                      / <Link href="/">Medical</Link> /{" "}
+                      <Link href="/">Electronics</Link> <br />
+                      <Link href="industries/recycling-and-waste-management">
+                        Waste Management
+                      </Link>
+                      /
+                      <Link href={"/industries/renewable-energy"}>
+                        Renewable
+                      </Link>
                     </div>
                   </div>
 
@@ -968,11 +976,30 @@ export default function HomeHeroSection({
                         className="object-contain"
                       />
                     </div>
-
-                    <div className="mt-2 text-[11px] leading-snug text-gray-500 line-clamp-3">
-                      ESG / ESDD / ESMS / Net Zero
+                    <div className="mt-2 text-[12px] leading-snug text-gray-500">
+                      <Link href="/service/environmental-social-and-governance-esg">
+                        ESG
+                      </Link>{" "}
+                      /{" "}
+                      <Link href="/service/environmental-and-social-due-diligence-esdd">
+                        ESDD
+                      </Link>{" "}
+                      /{" "}
+                      <Link href="/service/environmental-and-social-management-system-esms">
+                        ESMS
+                      </Link>{" "}
+                      /{" "}
+                      <Link href="/service/leed-zero-carbon-certification">
+                        Net Zero
+                      </Link>{" "}
                       <br />
-                      Waste Channelization / Carbon Credits
+                      <Link href={"/service/waste-management"}>
+                        Waste Channelization
+                      </Link>
+                      /
+                      <Link href="/service/carbon-credit-trading-scheme">
+                        Carbon Credits
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -993,11 +1020,26 @@ export default function HomeHeroSection({
                         className="object-contain"
                       />
                     </div>
-
-                    <div className="mt-2 text-[11px] leading-snug text-gray-500 line-clamp-3">
-                      Factory / Fire / Trade
+                    <div className="mt-2 text-[11px] leading-snug text-gray-500">
+                      <Link href="/service/factory-license">Factory</Link> /{" "}
+                      <Link href="/service/fire-noc-fire-noc-renewal">
+                        Fire
+                      </Link>{" "}
+                      /<Link href={"/service/health-trade-license"}>Trade</Link>
                       <br />
-                      FSSAI / CGWA / Labour
+                      <Link href={"/service/fssai-basic-registration-renewal"}>
+                        FSSAI
+                      </Link>{" "}
+                      /
+                      <Link
+                        href={
+                          "/service/central-ground-water-authority-noc-for-water-boring-tube-wells"
+                        }
+                      >
+                        CGWA
+                      </Link>
+                      / <Link href={""}>Labour</Link> <br />
+                      &amp; Other Compliance
                     </div>
                   </div>
 
@@ -1015,11 +1057,50 @@ export default function HomeHeroSection({
                         className="object-contain"
                       />
                     </div>
-
-                    <div className="mt-2 text-[11px] leading-snug text-gray-500 line-clamp-3">
-                      EPR / EIA / CTO / CTE
+                    <div className="mt-2 text-[11px] leading-snug text-gray-500">
+                      <Link href={"/service/epr-authorization"}>EPR</Link> /{" "}
+                      <Link
+                        href={"/service/environmental-impact-assessment-eia"}
+                      >
+                        EIA
+                      </Link>{" "}
+                      / <Link href={"/"}>CTO</Link> /{" "}
+                      <Link href={"/"}>CTE</Link> <br />
+                      <Link href={"/service/environmental-clearance"}>EC </Link>
+                      /{" "}
+                      <Link
+                        href={
+                          "/service/bio-medical-waste-management-authorization"
+                        }
+                      >
+                        BWM
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href={"/service/plastic-waste-management-authorization"}
+                      >
+                        PWM
+                      </Link>{" "}
+                      /{" "}
+                      <Link href={"/service/e-waste-management-authorization"}>
+                        EWM
+                      </Link>{" "}
                       <br />
-                      EC / BWM / PWM / FSC
+                      <Link
+                        href={
+                          "/service/hazardous-waste-management-authorization"
+                        }
+                      >
+                        HWM
+                      </Link>{" "}
+                      /<Link href={"/service/fsc-certification"}>FSC</Link> /
+                      <Link
+                        href={
+                          "/service/wildlife-and-forests-clearance-certificate-for-project"
+                        }
+                      >
+                        Wildlife
+                      </Link>
                     </div>
                   </div>
 
@@ -1037,11 +1118,62 @@ export default function HomeHeroSection({
                         className="object-contain"
                       />
                     </div>
-
-                    <div className="mt-2 text-[11px] leading-snug text-gray-500 line-clamp-3">
-                      IEC / DGFT / CHA
+                    <div className="mt-2 text-[11px] leading-snug text-gray-500">
+                      <Link
+                        href="/service/import-export-code"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        IEC
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/dgft-export-import-license"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        DGFT
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        CHA
+                      </Link>
                       <br />
-                      CDSCO / BIS / LMPC
+                      <Link
+                        href="/service/cdsco-online-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        CDSCO
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/bis-certification"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        BIS
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/lmpc-certificate-for-import"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        LMPC
+                      </Link>
+                      <br />
+                      <Link
+                        href="/service/epr-authorization"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        EPR
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        Custom Clearance
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -1062,11 +1194,77 @@ export default function HomeHeroSection({
                         className="object-contain"
                       />
                     </div>
-
-                    <div className="mt-2 text-[11px] leading-snug text-gray-500 line-clamp-3">
-                      ISI / BIS / ISO / BEE
+                    <div className="mt-2 text-[11px] leading-snug text-gray-500">
+                      <Link
+                        href="/service/isi-registration-process-in-india"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        ISI
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/bis-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        BIS
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/iso-certification-consulting"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        ISO
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/bee-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        BEE
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/fda-wholesale-license"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        FDA
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        Meity
+                      </Link>
                       <br />
-                      FDA / CDSCO / TEC / WPC
+                      <Link
+                        href="/service/cdsco-online-registration"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        CDSCO
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/tec-certificate"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        TEC
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/wpc-advisory-services"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        WPC
+                      </Link>{" "}
+                      /{" "}
+                      <Link
+                        href="/service/dot-osp-license"
+                        className="hover:text-blue-600 cursor-pointer"
+                      >
+                        OSP
+                      </Link>{" "}
+                      / <span className="text-gray-400">etc.</span>
                     </div>
                   </div>
                 </div>

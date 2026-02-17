@@ -1,9 +1,8 @@
 // app/news-room/page.jsx
 import Link from "next/link";
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { getNewsRoomList } from "../lib/newsRoom";
-
 
 function Card({ children, className = "" }) {
   return (
@@ -113,8 +112,6 @@ export async function generateMetadata({ searchParams }) {
     alternates: { canonical: "/news-room" },
   };
 }
-
-
 
 export default async function NewsRoomPage({ searchParams }) {
   const { page, size, q, categorySlug } = await searchParams;
@@ -237,13 +234,19 @@ export default async function NewsRoomPage({ searchParams }) {
                           {n.title}
                         </Link>
 
-                        <div className="mt-2 text-xs text-slate-500">
-                          {safeDate(n.postDate)}{" "}
+                        <div className="mt-2 text-xs text-slate-500 flex">
+                          <span>
+                            {n.author?.firstName} {n.author?.lastName}
+                          </span>
+                          <span className="mx-1.5">|</span>
+                          <span>Updated : {safeDate(n.postDate)} </span>
                           {n?.visited != null ? (
-                            <span className="text-slate-400">•</span>
-                          ) : null}{" "}
-                          {n?.visited != null ? (
-                            <span>{n.visited} views</span>
+                            <div className="flex items-center">
+                              <span className="mx-1.5">|</span>
+                              <span className="flex items-center gap-1.5 flex-nowrap">
+                                {n.visited} <Eye className="h-3 w-3" />
+                              </span>
+                            </div>
                           ) : null}
                         </div>
 

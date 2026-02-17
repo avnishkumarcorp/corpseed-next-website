@@ -310,7 +310,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
       </section>
 
       {/* CONTENT (same as news-room: rail overlay + 2-col grid) */}
-      <section className="py-8 md:py-10">
+      <section className="py-8 md:py-10 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="relative">
             {/* Social rail overlay (doesn't consume grid column) */}

@@ -1,7 +1,7 @@
 // app/knowledge-centre/page.jsx
 import Link from "next/link";
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { getKnowledgeCentreList } from "../lib/knowledgeCentre";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
@@ -225,13 +225,19 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                           {b.title}
                         </Link>
 
-                        <div className="mt-2 text-xs text-slate-500">
-                          {safeDate(b.postDate)}{" "}
+                        <div className="mt-2 text-xs text-slate-500 flex">
+                          <span>
+                            {b.author?.firstName} {b.author?.lastName}
+                          </span>
+                          <span className="mx-1.5">|</span>
+                          <span>Updated : {safeDate(b.modifyDate)}{" "}</span>
                           {b?.visited != null ? (
-                            <>
-                              <span className="text-slate-400">•</span>{" "}
-                              <span>{b.visited} views</span>
-                            </>
+                            <div className="flex items-center">
+                              <span className="mx-1.5">|</span>
+                              <span className="flex items-center gap-1.5 flex-nowrap">
+                                {b.visited} <Eye className="h-3 w-3" />
+                              </span>
+                            </div>
                           ) : null}
                         </div>
 

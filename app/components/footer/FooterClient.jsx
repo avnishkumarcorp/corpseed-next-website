@@ -148,7 +148,7 @@ export default function FooterClient({ data }) {
           {/* Follow us */}
           <div className="col-lg-4 d-flex align-items-center">
             <div className="w-full flex justify-center items-center gap-1.5">
-              <h4 className="text-xl font-semibold m-0">Follow Us : </h4>
+              <h4 className="text-xl font-semibold !m-0">Follow Us : </h4>
               <nav className="flex gap-1.5">
                 <a
                   href="https://www.linkedin.com/company/corpseed/"

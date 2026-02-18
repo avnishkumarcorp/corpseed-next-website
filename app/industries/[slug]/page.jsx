@@ -130,7 +130,7 @@ export default async function IndustryPage({ params }) {
         videoText="Click to Watch & Know More"
       />
 
-      <section className="mx-auto max-w-7xl px-4 py-10 bg-white">
+      <section className="mx-auto max-w-full px-4 py-10 bg-white">
         <LogoMarquee speed={60} />
       </section>
 

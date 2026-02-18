@@ -10,7 +10,7 @@ import EnquiryForm from "../components/enquiry-form/EnquiryForm";
 /* ================= META DATA ================= */
 export async function generateMetadata() {
   return {
-    title: "Industries | Corpseed",
+    title: "Industries - Definition, Types, Sectors, & Facts - Corpseed",
     description:
       "Explore industries supported by Corpseed including compliance, regulatory, sustainability, and environmental services.",
     keywords: [
@@ -20,7 +20,7 @@ export async function generateMetadata() {
       "Corporate Consulting",
     ],
     openGraph: {
-      title: "Industries | Corpseed",
+      title: "Industries - Definition, Types, Sectors, & Facts - Corpseed",
       description:
         "Explore industries supported by Corpseed including compliance and regulatory services.",
       images: [
@@ -188,7 +188,7 @@ export default async function IndustriesPage() {
       </section>
 
       {/* CLIENTS */}
-      <section className="mx-auto max-w-7xl px-4 py-10 bg-white">
+      <section className="mx-auto max-w-full px-4 py-10 bg-white">
         <LogoMarquee speed={60} />
       </section>
 

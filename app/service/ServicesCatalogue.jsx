@@ -115,7 +115,7 @@ export default function ServicesCatalogue({ apiData }) {
           <aside className="order-1 lg:order-none lg:col-span-3">
             <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
               <div className="sticky top-24">
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 max-h-[300px] overflow-auto">
                   {(categories || []).map((c) => {
                     const active = !query && c.id === activeId;
                     const img = c.icon;
@@ -147,14 +147,14 @@ export default function ServicesCatalogue({ apiData }) {
                             {img ? (
                               <Image
                                 src={img}
-                                alt={c.title}
+                                alt={c.subCategoryName || "category"}
                                 width={40}
                                 height={40}
                                 className="h-10 w-10 object-cover"
                               />
                             ) : (
                               <span className="text-sm font-bold">
-                                {(c.title || "C").slice(0, 1).toUpperCase()}
+                                {(c.subCategoryName || "C").slice(0, 1).toUpperCase()}
                               </span>
                             )}
                           </div>
@@ -166,7 +166,7 @@ export default function ServicesCatalogue({ apiData }) {
                                 active ? "text-blue-700" : "text-slate-800",
                               ].join(" ")}
                             >
-                              {c.title}
+                              {c.subCategoryName}
                             </p>
                             <p className="mt-0.5 text-xs text-slate-500">
                               {(c.serviceMiniResponseDTOS?.length || 0) +

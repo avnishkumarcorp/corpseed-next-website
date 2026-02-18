@@ -13,7 +13,8 @@ export default function AllCorpseedDropdown({ open, menuMap }) {
   const keys =
     categoryMap && typeof categoryMap === "object" ? Object.keys(categoryMap) : [];
 
-  const items = ALL_CORPSEED_ALLOWED_KEYS.filter((k) => keys.includes(k));
+  // const items = ALL_CORPSEED_ALLOWED_KEYS.filter((k) => keys.includes(k));
+  const items = ALL_CORPSEED_ALLOWED_KEYS;
 
   const iconFor = (k) => {
     if (k === "Compliance Updates") return "🧾";

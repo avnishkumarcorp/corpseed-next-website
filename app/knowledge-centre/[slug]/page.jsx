@@ -277,10 +277,10 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               </p>
 
               <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
-                {blog.postDate ? (
+                {blog.modifyDate ? (
                   <span className="inline-flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    {formatDate(blog.postDate)}
+                    {formatDate(blog.modifyDate)}
                   </span>
                 ) : null}
 
@@ -318,16 +318,16 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               <SocialRail pageUrl={pageUrl} title={blog.title} />
             </div>
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_420px]">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
               {/* Main */}
-              <div className="space-y-6">
+              <div className="space-y-6 bg-white">
                 {/* <Card className="overflow-hidden"> */}
-                  <div className="p-5 sm:p-7">
+                  <div className="bg-white flex flex-col gap-6">
                     <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
                       <SafeHtmlShadow html={bodyHtml} />
                     </div>
 
-                    <div className="mt-8">
+                    <div className="border border-[#e5e5e5] shadow-[0_0_0_12px_#f8f9fa]">
                       <EnquiryOtpInline />
                     </div>
                   </div>

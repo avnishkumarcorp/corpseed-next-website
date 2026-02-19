@@ -68,18 +68,20 @@ export default function LatestProductsSection({ data = [] }) {
 
   return (
     <section className="w-full bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center gap-2">
           <span className="rounded-md bg-blue-600 px-3 py-1.5 text-[14px] font-semibold text-white">
             Latest
           </span>
-          <h2 className="text-[26px] font-semibold text-slate-900">Products</h2>
+          <h2 className="text-[26px] font-semibold text-slate-900 !m-0">
+            Products
+          </h2>
         </div>
 
         {/* Slider */}
         <div
-          className="relative mt-8"
+          className="relative mt-4"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
@@ -194,21 +196,50 @@ function ProductCard({ item }) {
   return (
     <Link
       href={href}
-      className="block overflow-hidden rounded-2xl bg-white shadow-[0_18px_45px_-35px_rgba(2,6,23,0.35)] ring-1 ring-slate-200 cursor-pointer"
+      className={[
+        "group block overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200",
+        "shadow-[0_18px_45px_-35px_rgba(2,6,23,0.35)]",
+        "transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_55px_-35px_rgba(2,6,23,0.45)] hover:ring-slate-300 cursor-pointer",
+      ].join(" ")}
     >
-      <div className="relative h-[150px] w-full bg-slate-50">
+      {/* Image */}
+      <div className="relative h-[150px] w-full bg-gradient-to-b from-slate-50 to-white">
         {imgUrl ? (
           <Image
             src={imgUrl}
             alt={item?.name || "Product"}
             fill
-            className="object-contain p-5"
+            className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : null}
       </div>
 
-      <div className="px-5 pt-2">
-        <h3 className="text-[15px] font-medium leading-6 text-slate-900 line-clamp-2">
+      {/* Content */}
+      <div className="px-5 pt-4 pb-4">
+        {/* ✅ Service Name Badge (fixed above title) */}
+        {item?.serviceName && (
+          <div className="mb-2">
+            <span
+              title={item.serviceName}
+              className="
+          inline-block
+          rounded-md
+          bg-blue-50
+          px-2.5 py-1
+          text-[11px]
+          font-semibold
+          text-blue-600
+          truncate
+          max-w-full
+        "
+            >
+              {item.serviceName}
+            </span>
+          </div>
+        )}
+
+        {/* Product Name */}
+        <h3 className="text-[15px] font-semibold leading-6 text-slate-900 line-clamp-2">
           {item?.name}
         </h3>
       </div>

@@ -30,7 +30,7 @@ export default function VirtualMeetingSection() {
   const [openStartupGuide, setOpenStartupGuide] = useState(false);
   return (
     <section className="w-full bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* main container */}
         <div className="rounded-2xl bg-[#cfe1ff] px-6 py-10 sm:px-10">
           <div className="grid items-center gap-10 lg:grid-cols-2">

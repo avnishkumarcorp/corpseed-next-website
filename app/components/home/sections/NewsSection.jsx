@@ -64,7 +64,7 @@ export default function NewsSection({ data }) {
 
   return (
     <section className="w-full bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div
           className="relative overflow-hidden rounded-2xl bg-[#f6f8fb] shadow-[0_24px_60px_-50px_rgba(2,6,23,0.5)] ring-1 ring-slate-200"
           onMouseEnter={() => setPaused(true)}
@@ -142,9 +142,9 @@ export default function NewsSection({ data }) {
           </button>
 
           {/* label */}
-          <div className="absolute left-0 top-5 z-20 -translate-y-1/2 rounded-md bg-white px-6 py-3 text-[14px] font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
+          {/* <div className="absolute left-0 top-0 z-50 -translate-y-1/2 rounded-md bg-white px-6 py-3 text-[14px] font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
             In The News
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

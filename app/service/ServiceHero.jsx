@@ -79,8 +79,6 @@ export default function ServiceHero({
           <div className="lg:col-span-4">
             <div className="hidden md:block bg-[#f2f3ff] p-5 shadow-sm -ml-24 w-fit">
               <p className="text-sm text-gray-900">Why wait? Start now!</p>
-              <p className="mt-2 text-sm text-gray-600">We’re available 24/7</p>
-
               <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 flex gap-1.5">
                 <Phone className="h-5 w-5" />
                 <p className="text-sm text-gray-700">
@@ -92,7 +90,7 @@ export default function ServiceHero({
               </div>
 
               <p className="mt-3 text-xs text-gray-500">
-                By continuing, you agree to Terms & Privacy Policy.
+                We are available 24/7.
               </p>
             </div>
 

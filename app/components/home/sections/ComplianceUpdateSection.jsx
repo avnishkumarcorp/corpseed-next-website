@@ -20,7 +20,7 @@ const Feature = ({ icon, title, desc }) => (
 export default function ComplianceUpdateSection() {
   return (
     <section className="w-full bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* LEFT CONTENT */}
           <div>

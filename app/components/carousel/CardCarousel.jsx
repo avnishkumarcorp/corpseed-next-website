@@ -116,7 +116,7 @@ export default function CardCarousel({
   }, [activeTab, itemsByTab]);
 
   return (
-    <section className="relative bg-[#EEF6FF] py-14">
+    <section className="relative bg-[#EEF6FF] py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 className="text-center text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
           {title}
@@ -124,13 +124,13 @@ export default function CardCarousel({
 
         {/* Tabs */}
         {tabs?.length > 0 && (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-2 flex justify-center">
             <Tabs tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
           </div>
         )}
 
         {/* Carousel */}
-        <div className="mt-10">
+        <div className="mt-2">
           <ServicesCarousel items={items} showDots={showDots} />
         </div>
 

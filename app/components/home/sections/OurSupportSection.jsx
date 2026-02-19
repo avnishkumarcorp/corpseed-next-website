@@ -239,7 +239,7 @@ export default function OurSupportSection() {
 
   return (
     <section className="w-full bg-[#f3f6fb]">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* ✅ compact header row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-[38px] font-semibold tracking-tight text-blue-600 sm:text-[44px]">

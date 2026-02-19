@@ -14,27 +14,32 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import PartnerRegisterModal from "./PartnerRegisterModal";
+import icon1 from '../assets/Group 1006.svg'
+import icon2 from '../assets/Group 1007.svg'
+import icon3 from '../assets/Group 1008.svg'
+import icon4 from '../assets/Group 1009.svg'
+import Image from "next/image";
 
 const advantages = [
   {
     title: "Earning Money",
     desc: "Earn upto 20% commission for every job you outsource to other partners.",
-    icon: Wallet,
+    icon: icon1,
   },
   {
     title: "Intelligent Reporting",
     desc: "Learn about new time-saving reporting at your fingertips.",
-    icon: LineChart,
+    icon: icon2,
   },
   {
     title: "Growth Potential",
     desc: "Become part of the network of one of the fastest growing companies.",
-    icon: Rocket,
+    icon: icon3,
   },
   {
     title: "Easy Registration",
     desc: "Register in less than 10 minutes, All you need is to have a business of your own.",
-    icon: ClipboardList,
+    icon: icon4,
   },
 ];
 
@@ -73,7 +78,7 @@ export default function PartnerWithUsClient() {
               </div>
 
               <h1 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                PARTNER <br className="hidden sm:block" />
+                PARTNER 
                 WITH US
               </h1>
 
@@ -251,17 +256,33 @@ function StatRow({ icon: Icon, title, value }) {
   );
 }
 
-function AdvCard({ title, desc, icon: Icon }) {
+function AdvCard({ title, desc, icon }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
-      <div className="h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center">
-        <Icon className="w-6 h-6 text-blue-600" />
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden transition hover:shadow-md">
+      
+      {/* BIG IMAGE */}
+      <div className="relative h-48 w-full bg-blue-50">
+        <Image
+          src={icon}
+          alt={title}
+          fill
+          className="object-contain p-6"
+        />
       </div>
-      <h3 className="mt-4 text-lg font-semibold text-gray-900">{title}</h3>
-      <p className="mt-2 text-sm text-gray-600 leading-relaxed">{desc}</p>
+
+      {/* CONTENT */}
+      <div className="p-6 text-center">
+        <h3 className="text-lg font-semibold text-gray-900">
+          {title}
+        </h3>
+        <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+          {desc}
+        </p>
+      </div>
     </div>
   );
 }
+
 
 function StepCard({ step, title, desc, icon: Icon }) {
   return (

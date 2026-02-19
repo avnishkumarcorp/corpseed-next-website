@@ -877,7 +877,7 @@ export default function HomeHeroSection({
         <div className="absolute -right-40 top-20 h-[520px] w-[520px] rounded-full bg-indigo-100/50 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 pt-10 pb-10 sm:px-6 lg:px-8 lg:pt-12 lg:pb-12">
+      <div className="relative mx-auto max-w-7xl px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-6 lg:pb-6">
         <div className="grid items-start gap-10 lg:grid-cols-12">
           <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center">
             <Link
@@ -888,7 +888,7 @@ export default function HomeHeroSection({
               <PhoneCall className="h-4 w-4" />
             </Link>
 
-            <h1 className="mt-5 text-3xl font-bold leading-[1.05] tracking-tight text-[#272d30] sm:text-5xl lg:text-6xl">
+            <h1 className="mt-5 text-[3rem] font-semibold not-italic leading-[1.05] tracking-[0.03em] text-[#272d30]">
               {title.split("\n").map((line, i) => (
                 <span key={i} className="block">
                   {line}
@@ -897,7 +897,7 @@ export default function HomeHeroSection({
             </h1>
 
             <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
-              <p className="text-lg">
+              <p className="text-[16px] tracking-[0.05rem] font-light">
                 <span className="text-blue-500">
                   Regulatory, Sustainability, Environmental, Legal{" "}
                 </span>
@@ -931,73 +931,100 @@ export default function HomeHeroSection({
                 {/* Row 1 */}
                 <div className="flex justify-center gap-6">
                   {/* Card */}
-                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-4 py-3 text-center shadow-md hover:shadow-lg transition cursor-pointer">
-                    <div className="text-[13px] font-semibold text-gray-900">
+                  <div className="w-[200px] h-[130px] rounded-lg border border-gray-200 bg-white px-0.5 py-1.5 text-center shadow-md hover:shadow-lg transition cursor-pointer">
+                    <p className="text-center text-[14px] font-semibold text-[#3d3d3d] leading-none mb-0">
                       Industry Setup Solution
-                    </div>
+                    </p>
 
                     <div className="mx-auto mt-2 flex h-[60px] w-[90px] items-center justify-center rounded-xl bg-gray-50">
                       <Image
                         src={industryImg}
                         alt="Industry Setup Solution"
-                        height={60}
-                        width={90}
+                        height={"auto"}
+                        width={"100%"}
                         className="object-contain"
                       />
                     </div>
-                    <div className="mt-2 text-[12px] leading-snug text-gray-500">
-                      <Link href="/service/biofuel-manufacturing-plant-setup-in-india">
+                    <div className="text-[12px] leading-snug text-gray-500">
+                      <Link
+                        href="/service/biofuel-manufacturing-plant-setup-in-india"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         Bio-fuels
                       </Link>{" "}
                       / <Link href="/">Medical</Link> /{" "}
                       <Link href="/">Electronics</Link> <br />
-                      <Link href="industries/recycling-and-waste-management">
+                      <Link
+                        href="industries/recycling-and-waste-management"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         Waste Management
                       </Link>
                       /
-                      <Link href={"/industries/renewable-energy"}>
+                      <Link
+                        href={"/industries/renewable-energy"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         Renewable
                       </Link>
                     </div>
                   </div>
 
                   {/* Card */}
-                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-4 py-3 text-center shadow-md hover:shadow-lg transition cursor-pointer">
-                    <div className="text-[13px] font-semibold text-gray-900">
+                  <div className="w-[200px] h-[130px] rounded-lg border border-gray-200 bg-white px-0.5 py-1.5 text-center shadow-md hover:shadow-lg transition cursor-pointer">
+                    <p className="text-center text-[14px] font-semibold text-[#3d3d3d] leading-none mb-0">
                       Sustainability
-                    </div>
+                    </p>
 
-                    <div className="mx-auto mt-2 flex h-[60px] w-[90px] items-center justify-center rounded-xl bg-gray-50">
+                    <div className="mx-auto mt-2 flex h-[50px] w-[90px] items-center justify-center rounded-xl bg-gray-50">
                       <Image
                         src={sustainabilityImg}
                         alt="Sustainability"
-                        height={60}
-                        width={90}
+                        height={"auto"}
+                        width={"100%"}
                         className="object-contain"
                       />
                     </div>
-                    <div className="mt-2 text-[12px] leading-snug text-gray-500">
-                      <Link href="/service/environmental-social-and-governance-esg">
+                    <div className="text-[12px] leading-snug text-gray-500 mt-2.5">
+                      <Link
+                        href="/service/environmental-social-and-governance-esg"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         ESG
                       </Link>{" "}
                       /{" "}
-                      <Link href="/service/environmental-and-social-due-diligence-esdd">
+                      <Link
+                        href="/service/environmental-and-social-due-diligence-esdd"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         ESDD
                       </Link>{" "}
                       /{" "}
-                      <Link href="/service/environmental-and-social-management-system-esms">
+                      <Link
+                        href="/service/environmental-and-social-management-system-esms"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         ESMS
                       </Link>{" "}
                       /{" "}
-                      <Link href="/service/leed-zero-carbon-certification">
+                      <Link
+                        href="/service/leed-zero-carbon-certification"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         Net Zero
                       </Link>{" "}
                       <br />
-                      <Link href={"/service/waste-management"}>
+                      <Link
+                        href={"/service/waste-management"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         Waste Channelization
                       </Link>
                       /
-                      <Link href="/service/carbon-credit-trading-scheme">
+                      <Link
+                        href="/service/carbon-credit-trading-scheme"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         Carbon Credits
                       </Link>
                     </div>
@@ -1006,28 +1033,43 @@ export default function HomeHeroSection({
 
                 {/* Row 2 */}
                 <div className="flex justify-center gap-6">
-                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-4 py-3 text-center shadow-md hover:shadow-lg transition cursor-pointer">
-                    <div className="text-[13px] font-semibold text-gray-900">
+                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-0.5 py-1.5 text-center shadow-md hover:shadow-lg transition cursor-pointer">
+                    <p className="text-center text-[14px] font-semibold text-[#3d3d3d] leading-none mb-0">
                       Regulatory Compliance
-                    </div>
+                    </p>
 
-                    <div className="mx-auto mt-2 flex h-[58px] w-[88px] items-center justify-center rounded-xl bg-gray-50">
+                    <div className="mx-auto mt-2 flex h-[58px] w-[88px] items-center justify-center rounded-xl bg-gray-50 relative">
                       <Image
                         src={regulatoryImg}
                         alt="Regulatory"
-                        height={58}
-                        width={88}
+                        fill
                         className="object-contain"
                       />
                     </div>
+
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
-                      <Link href="/service/factory-license">Factory</Link> /{" "}
+                      <Link
+                        href="/service/factory-license"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
+                        Factory
+                      </Link>{" "}
+                      /{" "}
                       <Link href="/service/fire-noc-fire-noc-renewal">
                         Fire
                       </Link>{" "}
-                      /<Link href={"/service/health-trade-license"}>Trade</Link>
+                      /
+                      <Link
+                        href={"/service/health-trade-license"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
+                        Trade
+                      </Link>
                       <br />
-                      <Link href={"/service/fssai-basic-registration-renewal"}>
+                      <Link
+                        href={"/service/fssai-basic-registration-renewal"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         FSSAI
                       </Link>{" "}
                       /
@@ -1035,54 +1077,78 @@ export default function HomeHeroSection({
                         href={
                           "/service/central-ground-water-authority-noc-for-water-boring-tube-wells"
                         }
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         CGWA
                       </Link>
-                      / <Link href={""}>Labour</Link> <br />
+                      /{" "}
+                      <Link
+                        href={""}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
+                        Labour
+                      </Link>{" "}
+                      <br />
                       &amp; Other Compliance
                     </div>
                   </div>
 
-                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-4 py-3 text-center shadow-md hover:shadow-lg transition cursor-pointer">
-                    <div className="text-[13px] font-semibold text-gray-900">
+                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-0.5 py-1.5 text-center shadow-md hover:shadow-lg transition cursor-pointer">
+                    <p className="text-center text-[14px] font-semibold text-[#3d3d3d] leading-none mb-0">
                       Environmental
-                    </div>
+                    </p>
 
-                    <div className="mx-auto mt-2 flex h-[65px] w-[95px] items-center justify-center rounded-xl bg-gray-50">
+                    <div className="mx-auto mt-2 flex h-[58px] w-[88px] items-center justify-center rounded-xl bg-gray-50 relative">
                       <Image
                         src={envBgMid}
-                        alt="Environmental"
-                        height={65}
-                        width={95}
+                        alt="Regulatory"
+                        fill
                         className="object-contain"
                       />
                     </div>
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
-                      <Link href={"/service/epr-authorization"}>EPR</Link> /{" "}
+                      <Link
+                        href={"/service/epr-authorization"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
+                        EPR
+                      </Link>{" "}
+                      /{" "}
                       <Link
                         href={"/service/environmental-impact-assessment-eia"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         EIA
                       </Link>{" "}
                       / <Link href={"/"}>CTO</Link> /{" "}
                       <Link href={"/"}>CTE</Link> <br />
-                      <Link href={"/service/environmental-clearance"}>EC </Link>
+                      <Link
+                        href={"/service/environmental-clearance"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
+                        EC{" "}
+                      </Link>
                       /{" "}
                       <Link
                         href={
                           "/service/bio-medical-waste-management-authorization"
                         }
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         BWM
                       </Link>{" "}
                       /{" "}
                       <Link
                         href={"/service/plastic-waste-management-authorization"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         PWM
                       </Link>{" "}
                       /{" "}
-                      <Link href={"/service/e-waste-management-authorization"}>
+                      <Link
+                        href={"/service/e-waste-management-authorization"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
                         EWM
                       </Link>{" "}
                       <br />
@@ -1090,87 +1156,96 @@ export default function HomeHeroSection({
                         href={
                           "/service/hazardous-waste-management-authorization"
                         }
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         HWM
                       </Link>{" "}
-                      /<Link href={"/service/fsc-certification"}>FSC</Link> /
+                      /
+                      <Link
+                        href={"/service/fsc-certification"}
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
+                      >
+                        FSC
+                      </Link>{" "}
+                      /
                       <Link
                         href={
                           "/service/wildlife-and-forests-clearance-certificate-for-project"
                         }
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         Wildlife
                       </Link>
                     </div>
                   </div>
 
-                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-4 py-3 text-center shadow-md hover:shadow-lg transition cursor-pointer">
-                    <div className="text-[13px] font-semibold text-gray-900">
+                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-0.5 py-1.5 text-center shadow-md hover:shadow-lg transition cursor-pointer">
+                    <p className="text-center text-[14px] font-semibold text-[#3d3d3d] leading-none mb-0">
                       Import Export
-                    </div>
+                    </p>
 
-                    <div className="mx-auto mt-2 flex h-[58px] w-[88px] items-center justify-center rounded-xl bg-gray-50">
+                    <div className="mx-auto mt-2 flex h-[58px] w-[88px] items-center justify-center rounded-xl bg-gray-50 relative">
                       <Image
                         src={importExportImg}
-                        alt="Import Export"
-                        height={58}
-                        width={88}
+                        alt="Regulatory"
+                        fill
                         className="object-contain"
                       />
                     </div>
+
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
                       <Link
                         href="/service/import-export-code"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         IEC
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/dgft-export-import-license"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         DGFT
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         CHA
                       </Link>
                       <br />
                       <Link
                         href="/service/cdsco-online-registration"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         CDSCO
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/bis-certification"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         BIS
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/lmpc-certificate-for-import"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         LMPC
                       </Link>
                       <br />
                       <Link
                         href="/service/epr-authorization"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         EPR
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         Custom Clearance
                       </Link>
@@ -1180,87 +1255,86 @@ export default function HomeHeroSection({
 
                 {/* Row 3 */}
                 <div className="flex justify-center">
-                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-4 py-3 text-center shadow-md hover:shadow-lg transition cursor-pointer">
-                    <div className="text-[13px] font-semibold text-gray-900">
+                  <div className="w-[210px] rounded-lg border border-gray-200 bg-white px-0.5 py-1.5 text-center shadow-md hover:shadow-lg transition cursor-pointer">
+                    <p className="text-center text-[14px] font-semibold text-[#3d3d3d] leading-none mb-0">
                       Product Compliance
-                    </div>
+                    </p>
 
-                    <div className="mx-auto mt-2 flex h-[60px] w-[90px] items-center justify-center rounded-xl bg-gray-50">
-                      <Image
-                        src={productComplianceImg}
+                    <div className="mx-auto mt-2 h-[58px] w-[88px] rounded-xl bg-gray-50 overflow-hidden">
+                      <img
+                        src={productComplianceImg.src}
                         alt="Product Compliance"
-                        height={60}
-                        width={90}
-                        className="object-contain"
+                        className="h-full w-full object-contain"
                       />
                     </div>
+
                     <div className="mt-2 text-[11px] leading-snug text-gray-500">
                       <Link
                         href="/service/isi-registration-process-in-india"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         ISI
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/bis-registration"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         BIS
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/iso-certification-consulting"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         ISO
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/bee-registration"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         BEE
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/fda-wholesale-license"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         FDA
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         Meity
                       </Link>
                       <br />
                       <Link
                         href="/service/cdsco-online-registration"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         CDSCO
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/tec-certificate"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         TEC
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/wpc-advisory-services"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         WPC
                       </Link>{" "}
                       /{" "}
                       <Link
                         href="/service/dot-osp-license"
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="text-[#8c8c8c] text-[11px] leading-[13px]"
                       >
                         OSP
                       </Link>{" "}

@@ -210,7 +210,7 @@ export default async function ServicePage({ params }) {
 
           <div className="lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
-              <div className="mb-6">
+              <div className="mb-6 w-full flex justify-end">
                 <PdfShareBar />
               </div>
               <EnquiryForm serviceName={service.title} />

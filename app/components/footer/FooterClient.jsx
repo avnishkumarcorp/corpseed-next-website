@@ -153,7 +153,7 @@ export default function FooterClient({ data }) {
                 <a
                   href="https://www.linkedin.com/company/corpseed/"
                   target="_blank"
-                  className="mr-2"
+                  className="text-[#BEBEBE] hover:text-blue-700 transition-colors duration-300"
                   rel="noreferrer"
                 >
                   <svg
@@ -184,7 +184,7 @@ export default function FooterClient({ data }) {
                 <a
                   href="https://www.facebook.com/CorpseedGroup/"
                   target="_blank"
-                  className="mr-2"
+                  className="text-[#BEBEBE] hover:text-blue-700 transition-colors duration-300"
                   rel="noreferrer"
                 >
                   <svg
@@ -215,8 +215,8 @@ export default function FooterClient({ data }) {
                 <a
                   href="https://www.youtube.com/channel/UCk19GzvT2hLrGQsskedcn2w"
                   target="_blank"
-                  className="mr-2"
                   rel="noreferrer"
+                  className="text-[#BEBEBE] hover:text-blue-700 transition-colors duration-300"
                 >
                   <svg
                     width="26"
@@ -235,6 +235,7 @@ export default function FooterClient({ data }) {
                   href="https://www.instagram.com/corpseed/"
                   target="_blank"
                   rel="noreferrer"
+                  className="text-[#BEBEBE] hover:text-blue-700 transition-colors duration-300"
                 >
                   <svg
                     width="26"
@@ -260,32 +261,18 @@ export default function FooterClient({ data }) {
                 <a
                   href="https://www.twitter.com/corpseed"
                   target="_blank"
-                  className="ml-2"
                   rel="noreferrer"
+                  className="ml-2"
                 >
                   <svg
                     width="26"
                     height="26"
-                    viewBox="0 0 48 49"
-                    fill="none"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
+                    className="text-[#BEBEBE] hover:text-black transition-colors duration-300"
                   >
-                    <g clipPath="url(#clip1)">
-                      <path
-                        d="M15.1003 43.5017C33.2091 43.5017 43.1166 28.4951 43.1166 15.4855C43.1166 15.0636 43.1072 14.6323 43.0884 14.2105C45.0157 12.8167 46.679 11.0902 48 9.11234C46.205 9.91094 44.2993 10.4325 42.3478 10.6592C44.4026 9.42756 45.9411 7.49268 46.6781 5.21327C44.7451 6.35885 42.6312 7.16696 40.4269 7.60296C38.9417 6.02486 36.978 4.97997 34.8394 4.62984C32.7008 4.27971 30.5064 4.64384 28.5955 5.66593C26.6846 6.68802 25.1636 8.31115 24.2677 10.2844C23.3718 12.2576 23.1509 14.471 23.6391 16.5823C19.725 16.3859 15.8959 15.3691 12.4 13.5979C8.90405 11.8267 5.81939 9.34061 3.34594 6.30077C2.0888 8.46823 1.70411 11.033 2.27006 13.4739C2.83601 15.9148 4.31013 18.0486 6.39281 19.4417C4.82926 19.3921 3.29995 18.9711 1.93125 18.2136V18.3355C1.92985 20.61 2.7162 22.8149 4.15662 24.5753C5.59704 26.3356 7.60265 27.5429 9.8325 27.9917C8.38411 28.388 6.86396 28.4457 5.38969 28.1605C6.01891 30.1166 7.24315 31.8275 8.89154 33.0544C10.5399 34.2813 12.5302 34.9629 14.5847 35.0042C11.0968 37.744 6.78835 39.23 2.35313 39.223C1.56657 39.2218 0.780798 39.1735 0 39.0786C4.50571 41.9692 9.74706 43.5045 15.1003 43.5017Z"
-                        fill="#BEBEBE"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip1">
-                        <rect
-                          width="48"
-                          height="48"
-                          fill="white"
-                          transform="translate(0 0.00164795)"
-                        />
-                      </clipPath>
-                    </defs>
+                    <path d="M18.901 1H22L14.62 9.408L23.5 23H16.54L11.09 15.548L4.5 23H1.4L9.3 14.12L1 1H8.14L13.07 7.8L18.901 1ZM17.88 21H19.6L7.21 2.9H5.35L17.88 21Z" />
                   </svg>
                 </a>
               </nav>
@@ -293,9 +280,9 @@ export default function FooterClient({ data }) {
           </div>
 
           {/* ✅ Subscribe */}
-          <div className="w-full max-w-xl lg:w-auto">
+          <div className="w-full max-w-2xl lg:w-auto">
             <form
-              className="flex w-full items-center gap-3"
+              className="flex w-full items-center gap-0"
               onSubmit={handleSubscribe}
             >
               <input

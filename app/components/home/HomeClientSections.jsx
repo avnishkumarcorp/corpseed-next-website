@@ -55,7 +55,7 @@ export default function HomeClientSections({
 }) {
   return (
     <>
-      <section className="mx-auto max-w-full px-4 py-10 bg-white">
+      <section className="mx-auto max-w-full px-4 py-6 bg-white">
         <LogoMarquee speed={60} />
       </section>
       <CardCarousel data={homeData} />

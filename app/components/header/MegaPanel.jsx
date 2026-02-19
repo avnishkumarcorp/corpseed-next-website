@@ -194,9 +194,11 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
 
                       return (
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-blue-700">
-                            {activeSide}
-                          </p>
+                          {!isAbout && (
+                            <p className="text-sm font-semibold text-blue-700">
+                              {activeSide}
+                            </p>
+                          )}
 
                           {isAbout ? (
                             renderAboutGrid(sideVal)

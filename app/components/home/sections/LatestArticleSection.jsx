@@ -122,18 +122,18 @@ export default function LatestArticlesSection({
 
   return (
     <section className="w-full bg-[#eef5ff]">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center gap-2">
           <span className="rounded-md bg-blue-600 px-3 py-1.5 text-[14px] font-semibold text-white">
             Latest
           </span>
-          <h2 className="text-[26px] font-semibold text-slate-900">Articles</h2>
+          <h2 className="text-[26px] font-semibold text-slate-900 !m-0">Articles</h2>
         </div>
 
         {/* Carousel */}
         <div
-          className="relative mt-8"
+          className="relative mt-4"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >

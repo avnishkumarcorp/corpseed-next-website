@@ -5,7 +5,6 @@ import { getIndustriesPage, clamp } from "../lib/industry";
 import heroImg from "../assets/industry.webp";
 import LogoMarquee from "../components/carousel/LogoMarquee";
 import IndustryCaterTabs from "./IndustryCaterTabs";
-import EnquiryForm from "../components/enquiry-form/EnquiryForm";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 /* ================= META DATA ================= */
@@ -196,7 +195,7 @@ export default async function IndustriesPage() {
       </section>
 
       {/* FEATURED */}
-      <Section title="Industries" className="pb-10">
+      <Section title="Industries" className="pb-10 bg-white">
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           {featured.slice(0, 3).map((x) => (
             <FeaturedCard key={x?.id || x?.slug} item={x} />
@@ -205,12 +204,12 @@ export default async function IndustriesPage() {
       </Section>
 
       {/* CATER */}
-      <Section className="pb-12">
+      <Section className="pb-12 bg-white">
         <IndustryCaterTabs items={highlighted} />
       </Section>
 
       {/* NEWS */}
-      <Section title="Industries Latest News" className="pb-16">
+      <Section title="Industries Latest News" className="pb-16 bg-white">
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           <NewsCard
             title="Knowledge-Center"

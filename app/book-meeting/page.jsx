@@ -1,6 +1,7 @@
 // app/book-meeting/page.jsx
 
 import EnquiryForm from "../components/enquiry-form/EnquiryForm";
+import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 
 export const metadata = {
@@ -84,7 +85,7 @@ export default function BookMeetingPage() {
               <div className="p-6">
                 {/* ✅ Your reusable form */}
                 {/* If your EnquiryForm accepts props, pass them here */}
-                <EnquiryForm />
+                <EnquiryOtpInline />
 
                 {/* Small helper text */}
                 <p className="mt-4 text-xs leading-5 text-slate-500">

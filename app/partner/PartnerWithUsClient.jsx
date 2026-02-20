@@ -196,7 +196,7 @@ export default function PartnerWithUsClient() {
               Register Now <ArrowRight className="w-4 h-4" />
             </button>
             <Link
-              href="/contact"
+              href="/contact-us"
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-gray-900 font-semibold hover:bg-slate-100 transition cursor-pointer"
             >
               Talk to our team

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
+import { sendOtp, submitStartupGuideEnquiry, verifyOtp } from "@/app/lib/enquiryOtp";
 
 /* ---------------- MODAL SHELL (matches screenshot) ---------------- */
 
@@ -215,70 +215,73 @@ export default function StartupGuidePopup({ open, onClose }) {
   };
 
   /* ---------------- 2) VERIFY OTP = POST DATA ---------------- */
-  const handleVerify = async () => {
-    if (otp.length !== 4) return setBannerError("Enter 4 digit OTP.");
+const handleVerify = async () => {
+  if (otp.length !== 4) {
+    setBannerError("Enter 4 digit OTP.");
+    return;
+  }
 
-    setLoading(true);
-    setBannerError("");
+  setLoading(true);
+  setBannerError("");
 
+  try {
+    /* ---------- 1️⃣ VERIFY OTP ---------- */
     const vres = await verifyOtp({
       mobile: cleanMobile,
       otp,
       name: resData?.name || form.name,
     });
 
-    if (vres.status !== 200) {
+    if (!vres.ok) {
       setLoading(false);
       setBannerError("Invalid OTP. Please try again.");
       return;
     }
 
-    // ✅ post final payload via Next route (no CORS)
-    try {
-      const postRes = await fetch("/api/enquiry/startup-guide", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          mobile: cleanMobile,
-          // add anything else your backend expects:
-          source: "startup-guide",
-        }),
-      });
+    /* ---------- 2️⃣ SUBMIT STARTUP GUIDE DATA ---------- */
+    const submitRes = await submitStartupGuideEnquiry({
+      otp,
+      name: form.name,
+      email: form.email,
+      mobile: cleanMobile,
+    });
 
-      const j = await postRes.json().catch(() => ({}));
-
-      if (!postRes.ok || j?.ok === false) {
-        setLoading(false);
-
-        // 🔥 Trigger PDF download
-        const pdfUrl =
-          "https://erp-corpseed.s3.ap-south-1.amazonaws.com/1771321684648Corpseed_guide.pdf";
-
-        // Method 1 (Best & Clean)
-        const link = document.createElement("a");
-        link.href = pdfUrl;
-        link.setAttribute("download", "Corpseed_Startup_Guide.pdf");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        // Show success UI
-        setStep("success");
-
-        setBannerError(j?.message || "Failed to submit. Please try again.");
-        return;
-      }
-
+    if (!submitRes.ok) {
       setLoading(false);
-      setStep("success");
-    } catch {
-      setLoading(false);
-      setBannerError("Network error. Please try again.");
+      setBannerError(`Submit failed (${submitRes.status})`);
+      return;
     }
-  };
+
+    const backendStatus =
+      String(submitRes.data?.status || "").toLowerCase();
+
+    if (["pass", "success", "duplicate"].includes(backendStatus)) {
+      /* ---------- 3️⃣ DOWNLOAD PDF ---------- */
+      const pdfUrl =
+        "https://erp-corpseed.s3.ap-south-1.amazonaws.com/1771321684648Corpseed_guide.pdf";
+
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.setAttribute("download", "Corpseed_Startup_Guide.pdf");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setStep("success");
+      setLoading(false);
+      return;
+    }
+
+    // Unexpected backend response
+    setLoading(false);
+    setBannerError(
+      submitRes.data?.message || "Something went wrong."
+    );
+  } catch (error) {
+    setLoading(false);
+    setBannerError("Network error. Please try again.");
+  }
+};
 
   return (
     <Backdrop open={open} onClose={onClose}>

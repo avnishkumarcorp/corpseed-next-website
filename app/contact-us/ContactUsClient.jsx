@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React, { useMemo, useRef, useState } from "react";
 import { MapPin, Phone, Mail, HelpCircle, ShieldCheck } from "lucide-react";
-import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
+import { sendOtp, submitContactUsEnquiry, verifyOtp } from "@/app/lib/enquiryOtp";
 
 function cn(...s) {
   return s.filter(Boolean).join(" ");
@@ -110,8 +110,11 @@ export default function ContactUsClient({ data }) {
   const [resData, setResData] = useState(null);
 
   const cleanMobile = useMemo(
-    () => String(form.mobile || "").replace(/\D/g, "").slice(0, 10),
-    [form.mobile]
+    () =>
+      String(form.mobile || "")
+        .replace(/\D/g, "")
+        .slice(0, 10),
+    [form.mobile],
   );
 
   const onChange = (e) =>
@@ -160,27 +163,61 @@ export default function ContactUsClient({ data }) {
 
   /* ---------------- VERIFY OTP ---------------- */
   const handleVerify = async () => {
-    if (otp.length !== 4) return setError("Enter 4 digit OTP.");
+    if (otp.length !== 4) {
+      setError("Enter 4 digit OTP.");
+      return;
+    }
 
     setLoading(true);
     setError("");
 
+    // 1️⃣ VERIFY OTP
     const res = await verifyOtp({
       mobile: cleanMobile,
       otp,
       name: resData?.name || form.name,
     });
 
+    if (!res.ok) {
+      setLoading(false);
+      setError("Invalid OTP. Please try again.");
+      return;
+    }
+
+    // 2️⃣ CALL CONTACT-US API AFTER VERIFY
+    const contactRes = await submitContactUsEnquiry({
+      otp,
+      name: form.name,
+      email: form.email,
+      mobile: cleanMobile,
+      city: form.location, // backend expects city
+      message: form.message,
+      location: form.location,
+    });
+
     setLoading(false);
 
-    if (res.status === 200) {
-      setStep("success");
-      setForm({ name: "", email: "", mobile: "", location: "", message: "" });
-      setOtp("");
-      setResData(null);
-    } else {
-      setError("Invalid OTP. Please try again.");
+    if (!contactRes.ok) {
+      setError(`Submit failed (${contactRes.status})`);
+      return;
     }
+
+    const backendStatus = contactRes.data?.status?.toLowerCase();
+
+    if (["success", "pass", "duplicate"].includes(backendStatus)) {
+      setStep("success");
+      setForm({
+        name: "",
+        email: "",
+        mobile: "",
+        location: "",
+        message: "",
+      });
+      setOtp("");
+      return;
+    }
+
+    setError(contactRes.data?.message || "Something went wrong.");
   };
 
   return (
@@ -193,7 +230,8 @@ export default function ContactUsClient({ data }) {
               Contact Us
             </h1>
             <p className="mt-4 text-gray-600 text-lg">
-              Thanks for your interest in Corpseed. Share your requirement and we’ll contact you shortly.
+              Thanks for your interest in Corpseed. Share your requirement and
+              we’ll contact you shortly.
             </p>
           </div>
         </div>
@@ -252,8 +290,10 @@ export default function ContactUsClient({ data }) {
                 </div>
 
                 <Field label="Mobile" required>
-                  <div className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-3
-                                  focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100">
+                  <div
+                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-3
+                                  focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
+                  >
                     <span className="text-sm text-gray-600">🇮🇳 +91</span>
                     <div className="h-5 w-px bg-gray-200" />
                     <input
@@ -297,7 +337,8 @@ export default function ContactUsClient({ data }) {
                 <div className="flex items-start gap-2 text-xs text-gray-500">
                   <ShieldCheck className="mt-0.5 h-4 w-4 text-green-600" />
                   <p>
-                    Your details are safe with us. By submitting you agree to our Terms & Privacy Policy.
+                    Your details are safe with us. By submitting you agree to
+                    our Terms & Privacy Policy.
                   </p>
                 </div>
               </form>
@@ -308,7 +349,9 @@ export default function ContactUsClient({ data }) {
           <div className="lg:col-span-6">
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
               <div className="p-6 sm:p-8 border-b border-gray-200 bg-slate-50">
-                <h2 className="text-xl font-semibold text-gray-900">Our Offices</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Our Offices
+                </h2>
                 <p className="text-sm text-gray-600 mt-1">
                   Reach the nearest Corpseed location
                 </p>
@@ -338,8 +381,16 @@ export default function ContactUsClient({ data }) {
         {/* FOOT LINKS */}
         <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <HelpCard text="Have questions?" linkText="FAQs" href="/faq" />
-          <HelpCard text="For job opportunities" linkText="Open roles" href="/join-our-team" />
-          <HelpCard text="For business partnerships" linkText="Forum" href="/partner" />
+          <HelpCard
+            text="For job opportunities"
+            linkText="Open roles"
+            href="/join-our-team"
+          />
+          <HelpCard
+            text="For business partnerships"
+            linkText="Forum"
+            href="/partner"
+          />
         </div>
       </section>
 

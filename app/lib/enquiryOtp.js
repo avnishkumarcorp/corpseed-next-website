@@ -150,3 +150,75 @@ export async function submitBookMeetingEnquiry({
     data: await res.json().catch(() => null),
   };
 }
+
+
+
+export async function submitContactUsEnquiry({
+  otp,
+  name,
+  email,
+  mobile,
+  city,
+  message,
+  location,
+}) {
+  const payload = {
+    otp: String(otp || "").trim(),
+    name: String(name || "").trim(),
+    email: String(email || "").trim(),
+    mobile: String(mobile || "").trim(),
+    city: String(city || "").trim(),
+    message: String(message || "").trim(),
+    location: String(location || "").trim(),
+    postDate: "",
+    modifyDate: "",
+  };
+
+  const res = await fetch("/api/enquiry/contact-us", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => null);
+
+  return {
+    ok: res.ok,
+    status: res.status,
+    data,
+  };
+}
+
+
+
+export async function submitStartupGuideEnquiry({
+  otp,
+  name,
+  email,
+  mobile,
+}) {
+  const payload = {
+    otp: String(otp || "").trim(),
+    name: String(name || "").trim(),
+    email: String(email || "").trim(),
+    mobile: String(mobile || "").trim(),
+    url: "https://www.corpseed.com/",   // 🔥 EXACT FIELD FROM SWAGGER
+    postDate: "",
+    modifyDate: "",
+  };
+
+  const res = await fetch("/api/enquiry/startup-guide", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => null);
+
+  return {
+    ok: res.ok,
+    status: res.status,
+    data,
+  };
+}

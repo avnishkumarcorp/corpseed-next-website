@@ -80,13 +80,13 @@ export async function getLatestNews() {
 
 export async function getLatestUpdatedPressRelease() {
   try {
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL; // https://api.corpseed.com
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL;
     if (!base) throw new Error("NEXT_PUBLIC_API_BASE_URL is missing");
 
     const res = await fetch(`${base}/api/updated-press-release/latest`, {
       method: "GET",
       headers: { Accept: "application/json" },
-      cache: "no-store",
+      next: { revalidate: 300 }, // ✅ FIXED
     });
 
     if (!res.ok) {
@@ -95,8 +95,7 @@ export async function getLatestUpdatedPressRelease() {
     }
 
     const data = await res.json();
-    const list = Array.isArray(data) ? data : data?.data ?? [];
-    return list;
+    return Array.isArray(data) ? data : data?.data ?? [];
   } catch (e) {
     console.error("getLatestUpdatedPressRelease error:", e);
     return [];

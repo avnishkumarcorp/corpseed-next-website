@@ -325,7 +325,7 @@ export default function FooterClient({ data }) {
       </div>
 
       {/* Links */}
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-x-14 gap-y-10 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
           {footerCols.map((col) => (
             <div key={col.title} className="min-w-0">
@@ -367,6 +367,14 @@ export default function FooterClient({ data }) {
               ))}
             </ul>
           </div>
+        </div>
+        <div className="flex justify-center">
+          <Link
+            href={"/category/all"}
+            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 cursor-pointer"
+          >
+            SEE ALL SERVICES
+          </Link>
         </div>
       </div>
 

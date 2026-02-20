@@ -6,6 +6,7 @@ import heroImg from "../assets/industry.webp";
 import LogoMarquee from "../components/carousel/LogoMarquee";
 import IndustryCaterTabs from "./IndustryCaterTabs";
 import EnquiryForm from "../components/enquiry-form/EnquiryForm";
+import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 /* ================= META DATA ================= */
 export async function generateMetadata() {
@@ -141,7 +142,9 @@ export default async function IndustriesPage() {
             <p className="mt-4 text-sm leading-6 text-white/90">
               Industry is a group of diverse organizations involved in the
               manufacture, production, or processing of the same type of product
-              and service.
+              and service. All industries are part of the goods- producing
+              sector. Secondary or production converts all raw materials into
+              products that are more beneficial to people.
             </p>
           </div>
         </div>
@@ -150,9 +153,9 @@ export default async function IndustriesPage() {
       {/* INTRO + ENQUIRY FORM (ABOVE LOGO MARQUEE) */}
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
+          <div className="grid gap-10 lg:grid-cols-[2fr_1fr] lg:items-start">
             {/* Left content */}
-            <div className="text-slate-700 leading-7">
+            <div className="text-slate-700 leading-7 w-full">
               <p>
                 Industry is an economic branch that produces closely related raw
                 materials, goods, or services. For example, you can refer to the
@@ -179,8 +182,8 @@ export default async function IndustriesPage() {
 
             {/* Right Enquiry Form */}
             <div className="lg:flex lg:justify-end">
-              <div className="w-full max-w-[420px]">
-                <EnquiryForm />
+              <div className="w-full max-w-[600px] border border-gray-200 rounded-sm">
+                <EnquiryOtpInline page={"Industries"} />
               </div>
             </div>
           </div>

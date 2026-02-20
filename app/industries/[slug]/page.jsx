@@ -2,9 +2,9 @@
 import ServiceContent from "@/app/service/ServiceContent";
 import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
 import ServiceTabs from "@/app/service/ServiceTabs";
-import ServiceHero from "@/app/service/ServiceHero";
 import LogoMarquee from "@/app/components/carousel/LogoMarquee";
 import { getIndustryBySlug } from "@/app/lib/industry";
+import IndustryHeroSection from "./IndustryHeroSection";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -121,7 +121,74 @@ export default async function IndustryPage({ params }) {
       {faqSchema ? <JsonLd data={faqSchema} /> : null}
 
       {/* Your existing UI */}
-      <ServiceHero
+
+      <section className="relative w-full overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src={data?.industry?.image} // replace with your actual image path
+            alt="Industry Background"
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center">
+            {/* Left Content */}
+            <div className="lg:col-span-7 text-white">
+              <span className="inline-block rounded-md bg-blue-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                INCLUDES FREE SUPPORT
+              </span>
+
+              <h2 className="mt-4 text-3xl font-bold sm:text-4xl lg:text-5xl">
+                {data?.industry?.title}
+              </h2>
+
+              <p className="mt-6 max-w-2xl text-base leading-7 text-gray-200">
+                {data?.industry?.summary}
+              </p>
+            </div>
+
+            {/* Right CTA Card */}
+            {/* <div className="lg:col-span-5 lg:flex lg:justify-end">
+              <div className="w-full max-w-[420px] rounded-xl bg-white p-6 shadow-xl">
+                <p className="text-lg font-semibold text-gray-900">
+                  Why wait. Start now!
+                </p>
+
+                <div className="mt-4 flex items-center gap-3 text-blue-600 font-medium">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 5h2l3 7-1.5 3h9.5M6 5h15M9 12h6"
+                    />
+                  </svg>
+                  <span>Call 7558640644 - Harshita</span>
+                </div>
+
+                <p className="mt-3 text-sm text-gray-500">
+                  We’re available 24/7
+                </p>
+
+                <button className="mt-6 w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+                  Get Started
+                </button>
+              </div>
+            </div> */}
+          </div>
+        </div>
+      </section>
+
+      <IndustryHeroSection
         title={data?.industry?.title}
         summary={data?.industry?.summary}
         videoUrl={data?.industry?.videoUrl || "/videos/corpseed-intro.mp4"}
@@ -148,7 +215,11 @@ export default async function IndustryPage({ params }) {
 
           <div className="lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
-              <EnquiryForm serviceName={data?.industry?.title} type={"industry"} industryId={data?.industry?.id} />
+              <EnquiryForm
+                serviceName={data?.industry?.title}
+                type={"industry"}
+                industryId={data?.industry?.id}
+              />
             </div>
           </div>
         </div>

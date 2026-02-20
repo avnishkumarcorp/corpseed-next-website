@@ -10,6 +10,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { getLifeAtCorpseed } from "../lib/life-at-corpseed";
+import LifeStoriesClient from "./LifeStoriesClient";
 
 // ✅ dynamic SEO from API
 export async function generateMetadata() {
@@ -32,9 +33,7 @@ export default async function LifeAtCorpseedPage() {
     title: u.title,
     slug: u.slug,
     desc: u.summary,
-    tags: (u.categories || []).map((x) =>
-      x?.startsWith("#") ? x : `#${x}`
-    ),
+    tags: (u.categories || []).map((x) => (x?.startsWith("#") ? x : `#${x}`)),
     image: u.pictureName,
     reverse: idx % 2 === 1,
   }));
@@ -125,45 +124,15 @@ export default async function LifeAtCorpseedPage() {
       {/* PEOPLE STORIES */}
       <section id="people" className="py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between gap-6 mb-8">
-            <div>
-              <h3 className="text-xl md:text-3xl font-bold text-gray-900">
-                People Stories
-              </h3>
-              <p className="mt-2 text-gray-600">
-                Real roles. Real impact. Real growth.
-              </p>
-            </div>
-
-            <div className="hidden md:flex items-center gap-2 text-gray-500 text-sm">
-              <Quote className="w-4 h-4" />
-              Stories from across teams
-            </div>
-          </div>
-
-          {peopleStories.length === 0 ? (
-            <div className="rounded-2xl border border-gray-300 bg-white p-8 text-center text-gray-600">
-              No stories available right now.
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {peopleStories.map((item) => (
-                <StoryRow key={item.id} item={item} />
-              ))}
-            </div>
-          )}
-
-          {/* LOAD MORE (placeholder) */}
-          <div className="flex justify-center pt-10">
-            <button className="px-8 py-3 rounded-xl border border-gray-300 bg-white hover:bg-slate-50 transition font-semibold cursor-pointer">
-              Load More
-            </button>
-          </div>
+          <LifeStoriesClient
+            initialStories={data?.lifeUsers || []}
+            totalPages={data?.totalPages || 1}
+          />
         </div>
       </section>
 
       {/* COMMUNITY SECTION */}
-      <section className="py-10 md:py-14 bg-slate-50 border-t border-gray-300">
+      {/* <section className="py-10 md:py-14 bg-slate-50 border-t border-gray-300">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center">
             <h2 className="text-2xl md:text-4xl font-bold text-gray-900">
@@ -187,7 +156,7 @@ export default async function LifeAtCorpseedPage() {
             </div>
           )}
         </div>
-      </section>
+      </section> */}
     </main>
   );
 }

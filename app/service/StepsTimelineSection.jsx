@@ -14,14 +14,14 @@ function StepDot({ active }) {
       <span
         className={cn(
           "absolute h-10 w-10 rounded-full border transition-all duration-300",
-          active ? "border-blue-500 bg-blue-50" : "border-slate-200 bg-white"
+          active ? "border-blue-500 bg-blue-50" : "border-slate-200 bg-white",
         )}
       />
       {/* inner */}
       <span
         className={cn(
           "relative h-3 w-3 rounded-full transition-all duration-300",
-          active ? "bg-blue-600" : "bg-slate-300"
+          active ? "bg-blue-600" : "bg-slate-300",
         )}
       />
     </div>
@@ -39,7 +39,7 @@ function StepCard({ step, active, onClick }) {
         "transition-all duration-300 ease-out",
         "hover:-translate-y-[2px] hover:shadow-md",
         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-        active ? "border-blue-500 shadow-md" : "border-slate-200"
+        active ? "border-blue-500 shadow-md" : "border-slate-200",
       )}
     >
       <div className="flex items-start gap-4">
@@ -49,7 +49,7 @@ function StepCard({ step, active, onClick }) {
               "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide",
               active
                 ? "bg-blue-50 text-blue-700"
-                : "bg-slate-100 text-slate-600"
+                : "bg-slate-100 text-slate-600",
             )}
           >
             STEP {step.no}
@@ -57,12 +57,8 @@ function StepCard({ step, active, onClick }) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold text-slate-900">
-            {step.title}
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            {step.desc}
-          </p>
+          <h3 className="text-lg font-semibold text-slate-900">{step.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{step.desc}</p>
 
           {/* optional meta row (phone/email etc.) */}
           {step.meta ? (
@@ -123,27 +119,30 @@ export default function StepsTimelineSection({ steps: stepsProp }) {
               desc: "Once the job is completed, you will receive registrations & certifications directly to your email ID and at your doorstep.",
             },
           ],
-    [stepsProp]
+    [stepsProp],
   );
 
   const [active, setActive] = useState(steps?.[0]?.no ?? 1);
 
   return (
     <section className="bg-white pb-6">
-      <div className="mx-auto max-w-6xl ">
-        {/* Timeline */}
-        <div className="mt-10">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mt-8 sm:mt-10">
           <div className="relative">
-            {/* Vertical line */}
-            <div className="absolute left-[20px] top-0 h-full w-[2px] bg-gradient-to-b from-slate-200 via-slate-200 to-transparent" />
+            {/* Vertical Line – only on md+ */}
+            <div className="hidden md:block absolute left-[20px] top-0 h-full w-[2px] bg-gradient-to-b from-slate-200 via-slate-200 to-transparent" />
 
-            <div className="space-y-6">
+            <div className="space-y-6 sm:space-y-8">
               {steps.map((s) => {
                 const isActive = active === s.no;
+
                 return (
-                  <div key={s.no} className="relative flex gap-6">
-                    {/* Rail */}
-                    <div className="relative z-10">
+                  <div
+                    key={s.no}
+                    className="relative flex flex-col md:flex-row md:gap-6"
+                  >
+                    {/* Dot */}
+                    <div className="relative z-10 flex justify-center md:block mb-3 md:mb-0">
                       <StepDot active={isActive} />
                     </div>
 

@@ -36,67 +36,93 @@ function buildQueryString(next) {
   return qs ? `?${qs}` : "";
 }
 
-function Pagination({ currentPage, totalPages, pageNumbers, q, filter, tag }) {
-  const pages =
-    Array.isArray(pageNumbers) && pageNumbers.length
-      ? pageNumbers
-      : [currentPage];
+function Pagination({ currentPage, totalPages, q, filter, tag }) {
+  const safeCurrent = Number(currentPage || 1);
+  const safeTotal = Number(totalPages || 1);
 
-  const prevPage = Math.max(1, Number(currentPage || 1) - 1);
-  const nextPage = Math.min(
-    Number(totalPages || 1),
-    Number(currentPage || 1) + 1,
-  );
+  if (safeTotal <= 1) return null;
 
   const mkHref = (page) =>
     `/knowledge-centre${buildQueryString({ page, q, filter, tag })}`;
 
+  const windowSize = 5;
+  const half = Math.floor(windowSize / 2);
+
+  let start = Math.max(1, safeCurrent - half);
+  let end = Math.min(safeTotal, start + windowSize - 1);
+
+  if (end - start + 1 < windowSize) {
+    start = Math.max(1, end - windowSize + 1);
+  }
+
+  const pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
   return (
     <div className="mt-10 flex flex-wrap items-center gap-2">
-      <Link
-        href={mkHref(prevPage)}
-        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-      >
-        Previous
-      </Link>
 
-      {pages.map((p) => {
-        const active = Number(p) === Number(currentPage);
-        return (
-          <Link
-            key={p}
-            href={mkHref(p)}
-            className={`rounded-lg px-3 py-2 text-sm cursor-pointer ${
-              active
-                ? "bg-blue-600 text-white"
-                : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            {p}
-          </Link>
-        );
-      })}
+      {/* First */}
+      {safeCurrent > 1 && (
+        <Link
+          href={mkHref(1)}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+        >
+          First
+        </Link>
+      )}
 
-      <Link
-        href={mkHref(nextPage)}
-        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-      >
-        Next
-      </Link>
+      {/* Previous */}
+      {safeCurrent > 1 && (
+        <Link
+          href={mkHref(safeCurrent - 1)}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+        >
+          Previous
+        </Link>
+      )}
 
-      <Link
-        href={mkHref(totalPages)}
-        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-      >
-        Last
-      </Link>
+      {/* Numbered Pages */}
+      {pages.map((p) => (
+        <Link
+          key={p}
+          href={mkHref(p)}
+          className={`rounded-lg px-3 py-2 text-sm ${
+            p === safeCurrent
+              ? "bg-blue-600 text-white"
+              : "border border-slate-200 bg-white"
+          }`}
+        >
+          {p}
+        </Link>
+      ))}
+
+      {/* Next */}
+      {safeCurrent < safeTotal && (
+        <Link
+          href={mkHref(safeCurrent + 1)}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+        >
+          Next
+        </Link>
+      )}
+
+      {/* Last */}
+      {safeCurrent < safeTotal && (
+        <Link
+          href={mkHref(safeTotal)}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+        >
+          Last
+        </Link>
+      )}
     </div>
   );
 }
 
-/** ✅ SEO from API */
+/** ✅ SEO */
 export async function generateMetadata({ searchParams }) {
-  // ✅ IMPORTANT: searchParams is a Promise in Next 15+
   const sp = await searchParams;
 
   const page = Number(sp?.page || 1);
@@ -115,10 +141,9 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default async function KnowledgeCentrePage({ searchParams }) {
-  // ✅ IMPORTANT: searchParams is a Promise in Next 15+
   const sp = await searchParams;
 
-  const currentPage = Number(sp?.page || 1);
+  let currentPage = Number(sp?.page || 1);
   const q = (sp?.q || "").toString();
   const filter = (sp?.filter || "").toString();
   const tag = (sp?.tag || "").toString();
@@ -134,12 +159,22 @@ export default async function KnowledgeCentrePage({ searchParams }) {
   const categories = Array.isArray(data?.categories) ? data.categories : [];
   const hotTags = Array.isArray(data?.hotTags) ? data.hotTags : [];
   const topBlogs = Array.isArray(data?.topBlogs) ? data.topBlogs : [];
-
   const totalPages = Number(data?.totalPages || 1);
-  const pageNumbers = Array.isArray(data?.pageNumbers) ? data.pageNumbers : [];
+
+  // ✅ Strict clamp
+  if (currentPage > totalPages) {
+    currentPage = totalPages;
+  }
+
+  // 🚫 If page > totalPages and empty → don't render invalid page
+  if (blogs.length === 0 && currentPage > totalPages) {
+    return null;
+  }
 
   return (
     <div className="bg-white">
+      {/* UI untouched below */}
+
       {/* Header */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -163,7 +198,6 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 </p>
               </div>
 
-              {/* Search (GET form) */}
               <form
                 action="/knowledge-centre"
                 method="GET"
@@ -188,7 +222,6 @@ export default async function KnowledgeCentrePage({ searchParams }) {
       {/* Content */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-          {/* Left - Blog grid */}
           <div className="lg:col-span-8">
             {blogs.length === 0 ? (
               <Card className="p-6">
@@ -211,7 +244,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                             src={b.image}
                             alt={b.title || "Blog"}
                             fill
-                            className="object-contain p-2" // ✅ no cut
+                            className="object-contain p-2"
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
                         </div>
@@ -230,15 +263,15 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                             {b.author?.firstName} {b.author?.lastName}
                           </span>
                           <span className="mx-1.5">|</span>
-                          <span>Updated : {safeDate(b.modifyDate)}{" "}</span>
-                          {b?.visited != null ? (
+                          <span>Updated : {safeDate(b.modifyDate)} </span>
+                          {b?.visited != null && (
                             <div className="flex items-center">
                               <span className="mx-1.5">|</span>
                               <span className="flex items-center gap-1.5 flex-nowrap">
                                 {b.visited} <Eye className="h-3 w-3" />
                               </span>
                             </div>
-                          ) : null}
+                          )}
                         </div>
 
                         <p className="mt-3 line-clamp-3 text-sm text-slate-600">
@@ -266,9 +299,8 @@ export default async function KnowledgeCentrePage({ searchParams }) {
             )}
 
             <Pagination
-              currentPage={data?.currentPage || currentPage}
+              currentPage={currentPage}
               totalPages={totalPages}
-              pageNumbers={pageNumbers}
               q={q}
               filter={filter}
               tag={tag}
@@ -420,7 +452,9 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 </div>
               </Card>
 
-              <EnquiryOtpInline />
+              <div className="border border-gray-200 rounded-sm">
+                <EnquiryOtpInline />
+              </div>
             </div>
           </aside>
         </div>

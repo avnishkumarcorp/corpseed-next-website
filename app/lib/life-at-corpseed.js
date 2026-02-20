@@ -5,12 +5,14 @@ import { apiGet } from "./fetcher";
 /**
  * Get main Life At Corpseed page data
  */
-export async function getLifeAtCorpseed() {
+// app/lib/life-at-corpseed.js
+
+export async function getLifeAtCorpseed({ page = 1, size = 5 } = {}) {
   try {
-    // Cache for 10 minutes (adjust if needed)
-    return await apiGet("/api/updated-life-at-corpseed", {
-      revalidate: 600,
-    });
+    return await apiGet(
+      `/api/updated-life-at-corpseed?page=${page}&size=${size}`,
+      { revalidate: 0 } // dynamic
+    );
   } catch (e) {
     console.error("getLifeAtCorpseed error:", e);
     return null;

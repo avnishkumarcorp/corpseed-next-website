@@ -286,7 +286,7 @@ export async function generateMetadata({ params }) {
     title: data?.title || item?.title || "News Room | Corpseed",
     description: data?.metaDescription || item?.summary || "Corpseed news.",
     keywords: data?.metaKeyword || undefined,
-    alternates: { canonical: `/news-room/${slug}` },
+    alternates: { canonical: `/news/${slug}` },
   };
 }
 
@@ -300,7 +300,7 @@ export default async function NewsRoomSlugPage({ params }) {
   const author = apiData.author || null;
 
   // ✅ Share URL
-  const pageUrl = `https://www.corpseed.com/news-room/${item.slug}`;
+  const pageUrl = `https://www.corpseed.com/news/${item.slug}`;
 
   // ✅ TOC split
   const { tocHtml, bodyHtml } = splitTocAndBody(item.description || "");
@@ -449,7 +449,7 @@ export default async function NewsRoomSlugPage({ params }) {
                     badge="Trending"
                     icon={Newspaper}
                     items={apiData?.topNews || []}
-                    basePath="/news-room"
+                    basePath="/news"
                   />
 
                   <ListCard
@@ -457,7 +457,7 @@ export default async function NewsRoomSlugPage({ params }) {
                     badge="Fresh updates"
                     icon={Newspaper}
                     items={apiData?.latestNews || []}
-                    basePath="/news-room"
+                    basePath="/news"
                   />
 
                   <ListCard
@@ -486,7 +486,7 @@ export default async function NewsRoomSlugPage({ params }) {
       <div className="pb-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Link
-            href="/news-room"
+            href="/news"
             className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
           >
             ← Back to News Room

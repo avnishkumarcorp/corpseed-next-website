@@ -410,7 +410,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                     badge="Trending"
                     icon={Newspaper}
                     items={apiData?.topNews || []}
-                    basePath="/news-room"
+                    basePath="/news"
                   />
 
                   <ListCard
@@ -418,7 +418,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                     badge="Fresh updates"
                     icon={Newspaper}
                     items={apiData?.latestNews || []}
-                    basePath="/news-room"
+                    basePath="/news"
                   />
                 </div>
               </aside>

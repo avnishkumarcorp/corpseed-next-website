@@ -93,7 +93,7 @@ export default function NewsSearchBox({ defaultValue = "", size, categorySlug })
   }, [trimmed]);
 
   function goToSearch(q) {
-    const href = `/news-room${buildQueryString({
+    const href = `/news${buildQueryString({
       page: 1,
       size,
       q,
@@ -126,7 +126,7 @@ export default function NewsSearchBox({ defaultValue = "", size, categorySlug })
       // If a dropdown item is selected, go directly to slug page
       if (activeIdx >= 0 && items[activeIdx]) {
         e.preventDefault();
-        router.push(`/news-room/${items[activeIdx].slug}`);
+        router.push(`/news/${items[activeIdx].slug}`);
         setOpen(false);
       }
     } else if (e.key === "Escape") {
@@ -185,7 +185,7 @@ export default function NewsSearchBox({ defaultValue = "", size, categorySlug })
                       onMouseEnter={() => setActiveIdx(idx)}
                       onClick={() => {
                         // go directly to that news detail page
-                        router.push(`/news-room/${x.slug}`);
+                        router.push(`/news/${x.slug}`);
                         setOpen(false);
                       }}
                       className={`w-full px-4 py-3 text-left text-sm cursor-pointer ${

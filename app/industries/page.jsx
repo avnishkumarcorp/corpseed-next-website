@@ -216,7 +216,7 @@ export default async function IndustriesPage() {
             item={blog}
             hrefBase="/knowledge-centre"
           />
-          <NewsCard title="News" item={news} hrefBase="/news-room" />
+          <NewsCard title="News" item={news} hrefBase="/news" />
           <NewsCard title="Law Update" item={law} hrefBase="/law-update" />
         </div>
       </Section>

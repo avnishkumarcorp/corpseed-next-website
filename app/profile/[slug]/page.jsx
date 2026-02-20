@@ -276,7 +276,7 @@ export default async function AuthorProfilePage({ params }) {
           {/* Back */}
           <div className="mt-8">
             <Link
-              href="/news-room"
+              href="/news"
               className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
             >
               ← Back

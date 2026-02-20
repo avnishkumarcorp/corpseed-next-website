@@ -57,7 +57,7 @@ function Pagination({
   );
 
   const mkHref = (page) =>
-    `/news-room${buildQueryString({ page, size, q, categorySlug })}`;
+    `/news${buildQueryString({ page, size, q, categorySlug })}`;
 
   return (
     <div className="mt-10 flex flex-wrap items-center gap-2">
@@ -110,7 +110,7 @@ export async function generateMetadata({ searchParams }) {
     title: data?.title || "Corpseed || News Room",
     description: data?.metaDescription || "Corpseed News Room",
     keywords: data?.metaKeyword || undefined,
-    alternates: { canonical: "/news-room" },
+    alternates: { canonical: "/news" },
   };
 }
 
@@ -191,7 +191,7 @@ export default async function NewsRoomPage({ searchParams }) {
             ) : (
               <div className="grid gap-8 md:grid-cols-2">
                 {news.map((n) => {
-                  const href = `/news-room/${n.slug}`;
+                  const href = `/news/${n.slug}`;
                   return (
                     <Card key={n.id} className="overflow-hidden">
                       <Link href={href} className="block cursor-pointer">
@@ -292,7 +292,7 @@ export default async function NewsRoomPage({ searchParams }) {
 
                   <div className="mt-4">
                     <Link
-                      href="/news-room?page=1&size=20"
+                      href="/news?page=1&size=20"
                       className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 cursor-pointer"
                     >
                       Clear filters
@@ -311,7 +311,7 @@ export default async function NewsRoomPage({ searchParams }) {
 
                 <div className="divide-y divide-slate-200">
                   {categories.map((c) => {
-                    const href = `/news-room${buildQueryString({
+                    const href = `/news${buildQueryString({
                       page: 1,
                       size,
                       q,
@@ -331,7 +331,7 @@ export default async function NewsRoomPage({ searchParams }) {
                   })}
 
                   <Link
-                    href={`/news-room?page=1&size=${size}`}
+                    href={`/news?page=1&size=${size}`}
                     className="block px-5 py-4 text-sm text-blue-700 hover:bg-slate-50 cursor-pointer"
                   >
                     View All
@@ -349,7 +349,7 @@ export default async function NewsRoomPage({ searchParams }) {
 
                 <div className="divide-y divide-slate-200">
                   {topNews.slice(0, 6).map((x) => {
-                    const href = `/news-room/${x.slug}`;
+                    const href = `/news/${x.slug}`;
                     return (
                       <Link
                         key={x.id}

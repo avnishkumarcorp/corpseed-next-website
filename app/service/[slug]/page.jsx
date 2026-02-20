@@ -55,9 +55,9 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const title = data.service.seoTitle || data.service.title || "Service";
+  const title = data.title || "Service";
   const description =
-    data.service.seoDescription ||
+    data.metaDescription ||
     data.service.metaDescription ||
     data.service.summary ||
     "Corpseed service details and enquiry.";
@@ -213,7 +213,11 @@ export default async function ServicePage({ params }) {
               <div className="mb-6 w-full flex justify-end">
                 <PdfShareBar />
               </div>
-              <EnquiryForm serviceName={service.title} />
+              <EnquiryForm
+                serviceName={service.title}
+                serviceId={service?.id}
+                type={"service"}
+              />
             </div>
           </div>
         </div>

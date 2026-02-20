@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { X, CheckCircle2 } from "lucide-react";
-import { sendOtp,verifyOtp, submitPartnerEnquiry } from "../lib/enquiryOtp";
+import { sendOtp,verifyOtp, submitPartnerEnquiry, submitConsultNowEnquiry } from "../lib/enquiryOtp";
 
 function Input({ label, required, value, onChange, type = "text", placeholder }) {
   return (
@@ -40,6 +40,8 @@ export default function ConsultNowModal({
   open,
   onClose,
   title = "Consult Now",
+  consultNow = false,
+  categoryId
 }) {
   const [step, setStep] = useState(1); // 1=form, 2=otp, 3=success
   const [loading, setLoading] = useState(false);
@@ -118,24 +120,43 @@ export default function ConsultNowModal({
     }
   };
 
-  const handleVerifyAndSubmit = async () => {
-    setErr("");
-    if (!otp.trim()) {
-      setErr("Please enter OTP.");
+const handleVerifyAndSubmit = async () => {
+  setErr("");
+
+  if (!otp.trim()) {
+    setErr("Please enter OTP.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    // 1️⃣ VERIFY OTP
+    const v = await verifyOtp({ mobile, otp, name });
+
+    if (!v.ok) {
+      setErr(v.data || `OTP verification failed (${v.status})`);
+      setLoading(false);
       return;
     }
 
-    try {
-      setLoading(true);
+    // 2️⃣ CONDITIONAL API CALL
+    let response;
 
-      const v = await verifyOtp({ mobile, otp, name });
-      if (!v.ok) {
-        setErr(v.data || `OTP verification failed (${v.status})`);
-        setLoading(false);
-        return;
-      }
-
-      const p = await submitPartnerEnquiry({
+    if (consultNow) {
+      // 🔥 CONSULT NOW FLOW
+      response = await submitConsultNowEnquiry({
+        otp,
+        name,
+        email,
+        mobile,
+        message,
+        location: city,
+        categoryId
+      });
+    } else {
+      // 🔥 PARTNER FLOW (existing)
+      response = await submitPartnerEnquiry({
         otp,
         name,
         email,
@@ -143,20 +164,23 @@ export default function ConsultNowModal({
         message,
         location: city,
       });
-
-      if (!p.ok) {
-        setErr(p.data || `Submit failed (${p.status})`);
-        setLoading(false);
-        return;
-      }
-
-      setStep(3);
-      setLoading(false);
-    } catch (e) {
-      setErr("Something went wrong.");
-      setLoading(false);
     }
-  };
+
+    if (!response.ok) {
+      setErr(response.data || `Submit failed (${response.status})`);
+      setLoading(false);
+      return;
+    }
+
+    // 3️⃣ SUCCESS
+    setStep(3);
+    setLoading(false);
+
+  } catch (e) {
+    setErr("Something went wrong.");
+    setLoading(false);
+  }
+};
 
   if (!open) return null;
 

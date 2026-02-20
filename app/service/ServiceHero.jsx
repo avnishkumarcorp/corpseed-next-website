@@ -98,6 +98,7 @@ export default function ServiceHero({
               <EnquiryOtpFlow
                 triggerText="Get Free Consultation"
                 className="m-0"
+                page={title}
               />
             </div>
 

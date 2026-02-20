@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import SafeHtml from "../components/SafeHtml";
 import EnquiryForm from "../components/enquiry-form/EnquiryForm";
+import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 function Badge({ children }) {
   return (
@@ -441,7 +442,7 @@ export default function PressListClient({ apiData, page, size }) {
               </form>
             </div>
           </CardShell> */}
-          <EnquiryForm />
+          <EnquiryOtpInline page={"press-release"} />
         </aside>
       </div>
     </section>

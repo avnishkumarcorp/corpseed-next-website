@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
+import { createCallbackEnquiry } from "@/app/lib/callbackEnquiry";
 
 function cn(...s) {
   return s.filter(Boolean).join(" ");
@@ -28,9 +29,7 @@ function Modal({ title, subtitle, onClose, children }) {
       <div className="flex items-start justify-between border-b px-6 py-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          {subtitle && (
-            <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
-          )}
+          {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
         </div>
         <button
           onClick={onClose}
@@ -79,7 +78,7 @@ function OTPInput({ value, onChange, length = 4 }) {
 
 /* ---------------- MAIN COMPONENT ---------------- */
 
-export default function EnquiryOtpInline({ onVerified }) {
+export default function EnquiryOtpInline({ onVerified, page }) {
   const [name, setName] = React.useState("");
   const [mobile, setMobile] = React.useState("");
   const [whatsapp, setWhatsapp] = React.useState(true);
@@ -88,51 +87,87 @@ export default function EnquiryOtpInline({ onVerified }) {
   const [step, setStep] = React.useState("idle"); // idle | otp | success
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
-  const [resData,setResData]=useState()
+  const [resData, setResData] = useState();
 
   const cleanMobile = mobile.replace(/\D/g, "").slice(0, 10);
 
   /* -------- SUBMIT FORM -------- */
   const handleSubmit = async () => {
-  if (!name.trim()) return setError("Name is required.");
-  if (cleanMobile.length !== 10)
-    return setError("Enter valid 10 digit mobile number.");
+    if (!name.trim()) return setError("Name is required.");
+    if (cleanMobile.length !== 10)
+      return setError("Enter valid 10 digit mobile number.");
 
-  setError("");
-  setLoading(true);
-  const res = await sendOtp({ name, mobile: cleanMobile });
-  setLoading(false);
+    setError("");
+    setLoading(true);
+    const res = await sendOtp({ name, mobile: cleanMobile });
+    setLoading(false);
 
-  if (!res.ok) {
-    setError(res?.data?.message || "Failed to send OTP. Try again.");
-    return;
-  }
-  // ✅ res.data is already JSON object
-  setResData(JSON?.parse(res?.data));
-  setStep("otp");
-};
-
+    if (!res.ok) {
+      setError(res?.data?.message || "Failed to send OTP. Try again.");
+      return;
+    }
+    // ✅ res.data is already JSON object
+    setResData(JSON?.parse(res?.data));
+    setStep("otp");
+  };
 
   /* -------- VERIFY OTP -------- */
   const handleVerify = async () => {
-    if (otp.length !== 4) return setError("Enter 4 digit OTP.");
+    if (otp.length !== 4) {
+      return setError("Enter 4 digit OTP.");
+    }
 
     setLoading(true);
     setError("");
 
-    const res = await verifyOtp({ mobile: cleanMobile, otp,name:resData?.name });
-    setLoading(false);
+    try {
+      /* -------- VERIFY OTP -------- */
+      const verifyRes = await verifyOtp({
+        mobile: cleanMobile,
+        otp,
+        name: resData?.name || name,
+      });
 
-    if (res.status === 200) {
+      if (!verifyRes.ok && verifyRes.status !== 200) {
+        return setError("Invalid OTP. Please try again.");
+      }
+
+      /* -------- CALLBACK API USING HELPER -------- */
+      const callbackPayload = {
+        otp: otp.trim(),
+        name: name.trim(),
+        email: "NA", // <-- NOT empty
+        mobile: cleanMobile.trim(),
+        location: "NA", // <-- NOT empty
+        page: page || "unknown-page",
+        whatsApp: whatsapp ? 1 : 0,
+      };
+
+      const callbackRes = await createCallbackEnquiry(callbackPayload);
+
+      if (!callbackRes.ok) {
+        return setError("Callback request failed.");
+      }
+
+      /* -------- SUCCESS -------- */
       setStep("success");
-      onVerified?.({ name, mobile: cleanMobile, whatsapp });
-      setMobile("")
-      setName("")
-    } else {
-      setError("Invalid OTP. Please try again.");
+
+      onVerified?.({
+        name,
+        mobile: cleanMobile,
+        whatsapp,
+      });
+
+      setName("");
+      setMobile("");
+      setOtp("");
+    } catch (err) {
+      console.error("Callback Error:", err);
+      setError("Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <>
       {/* ===== ALWAYS VISIBLE FORM ===== */}

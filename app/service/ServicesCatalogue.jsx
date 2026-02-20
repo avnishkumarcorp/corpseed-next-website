@@ -8,6 +8,7 @@ import { ArrowRight, Sparkles, X } from "lucide-react";
 import ServiceSearchBox from "./ServiceSearchBox";
 import TalkToExpertCard from "./TalkToExpertCard";
 import ConsultNowModal from "../components/ConsultNowModal";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // ... keep your helpers safeText, clamp, normalizeLabel
 
@@ -25,16 +26,29 @@ function normalizeLabel(label = "") {
   return safeText(label).replace(/\s+/g, " ").trim();
 }
 
-export default function ServicesCatalogue({ apiData }) {
+export default function ServicesCatalogue({ apiData, activeSlug }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const categories = apiData?.allCategories || [];
   const pageTitle = apiData?.title || "All Categories";
   const pageDesc =
     apiData?.metaDescription ||
     "Select a category and explore services tailored to your needs.";
-
-  const [activeId, setActiveId] = useState(categories?.[0]?.id);
   const [query, setQuery] = useState("");
   const [consultOpen, setConsultOpen] = useState(false);
+
+  const slugFromUrl = searchParams.get("category");
+
+  const initialActiveId = useMemo(() => {
+    if (!activeSlug || activeSlug === "all") return null;
+
+    const matched = categories.find((c) => c.slug === activeSlug);
+
+    return matched?.id || null;
+  }, [activeSlug, categories]);
+
+  const [activeId, setActiveId] = useState(initialActiveId);
 
   const activeCategory = useMemo(() => {
     return categories.find((c) => c.id === activeId) || categories?.[0] || null;
@@ -70,14 +84,20 @@ export default function ServicesCatalogue({ apiData }) {
       });
     }
 
+    // 🔥 If no activeId → show ALL
+    if (!activeId) {
+      return allServices;
+    }
+
     const list = activeCategory?.serviceMiniResponseDTOS || [];
+
     return list.map((s) => ({
       ...s,
       categoryId: activeCategory?.id,
       categoryTitle: activeCategory?.title,
       categorySlug: activeCategory?.slug,
     }));
-  }, [normalizedQ, allServices, activeCategory]);
+  }, [normalizedQ, allServices, activeCategory, activeId]);
 
   const suggestions = useMemo(() => {
     if (!normalizedQ) return [];
@@ -115,7 +135,7 @@ export default function ServicesCatalogue({ apiData }) {
           <aside className="order-1 lg:order-none lg:col-span-3">
             <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
               <div className="sticky top-24">
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 max-h-[300px] overflow-auto">
+                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 max-h-[80vh] overflow-auto">
                   {(categories || []).map((c) => {
                     const active = !query && c.id === activeId;
                     const img = c.icon;
@@ -127,6 +147,7 @@ export default function ServicesCatalogue({ apiData }) {
                         onClick={() => {
                           setQuery("");
                           setActiveId(c.id);
+                          router.push(`/category/${c.slug}`);
                         }}
                         className={[
                           "group rounded-2xl border px-3 py-3 text-left transition cursor-pointer",
@@ -154,7 +175,9 @@ export default function ServicesCatalogue({ apiData }) {
                               />
                             ) : (
                               <span className="text-sm font-bold">
-                                {(c.subCategoryName || "C").slice(0, 1).toUpperCase()}
+                                {(c.subCategoryName || "C")
+                                  .slice(0, 1)
+                                  .toUpperCase()}
                               </span>
                             )}
                           </div>
@@ -180,7 +203,6 @@ export default function ServicesCatalogue({ apiData }) {
                 </div>
 
                 {/* ✅ Reusable CTA */}
-                <TalkToExpertCard onClick={() => setConsultOpen(true)} />
               </div>
             </div>
           </aside>
@@ -209,17 +231,16 @@ export default function ServicesCatalogue({ apiData }) {
                 )}
               </p>
 
-              <Link
-                href="/contact-us"
-                className="hidden rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50 sm:inline-flex cursor-pointer"
-              >
-                Talk to an expert
-              </Link>
+              <TalkToExpertCard
+                isCategory={true}
+                onClick={() => setConsultOpen(true)}
+              />
             </div>
 
             {/* Smooth transition wrapper */}
             <div className="mt-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <TalkToExpertCard onClick={() => setConsultOpen(true)} />
                 {filtered
                   .slice()
                   .sort(
@@ -283,6 +304,8 @@ export default function ServicesCatalogue({ apiData }) {
         open={consultOpen}
         onClose={() => setConsultOpen(false)}
         title="Consult Now"
+        consultNow={true}
+        categoryId={activeId}
       />
     </section>
   );

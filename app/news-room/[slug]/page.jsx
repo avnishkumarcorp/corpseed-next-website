@@ -126,7 +126,7 @@ function TocCard({ tocHtml }) {
   return (
     <div>
       {/* Desktop */}
-      <div className="hidden max-h-[420px] overflow-auto px-5 lg:block">
+      <div className="hidden px-5 lg:block">
         <SafeHtmlShadow html={tocHtml} />
       </div>
 
@@ -306,7 +306,7 @@ export default async function NewsRoomSlugPage({ params }) {
   const { tocHtml, bodyHtml } = splitTocAndBody(item.description || "");
 
   return (
-    <div className="bg-slate-50">
+    <div className="bg-white">
       {/* HERO */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">

@@ -148,7 +148,7 @@ export default async function IndustryPage({ params }) {
 
           <div className="lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
-              <EnquiryForm serviceName={data?.industry?.title} />
+              <EnquiryForm serviceName={data?.industry?.title} type={"industry"} industryId={data?.industry?.id} />
             </div>
           </div>
         </div>

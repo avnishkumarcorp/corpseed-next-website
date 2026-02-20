@@ -294,7 +294,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                 {author ? (
                   <span className="inline-flex items-center gap-2">
                     <User2 className="h-4 w-4" />
-                    {author?.name || "Corpseed"}
+                    {author?.firstName || "Corpseed"} {author?.lastName || "Corpseed"}
                   </span>
                 ) : null}
 

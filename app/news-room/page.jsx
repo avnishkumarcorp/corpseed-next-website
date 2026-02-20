@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Eye, Search } from "lucide-react";
 import { getNewsRoomList } from "../lib/newsRoom";
+import NewsSearchBox from "./NewsSearchBox";
 
 function Card({ children, className = "" }) {
   return (
@@ -163,32 +164,11 @@ export default async function NewsRoomPage({ searchParams }) {
               </div>
 
               {/* ✅ Search (SERVER-safe: GET form) */}
-              <form
-                action="/news-room"
-                method="GET"
-                className="w-full max-w-xl"
-              >
-                {/* preserve filters */}
-                {categorySlug ? (
-                  <input
-                    type="hidden"
-                    name="categorySlug"
-                    value={categorySlug}
-                  />
-                ) : null}
-                <input type="hidden" name="size" value={String(size)} />
-                <input type="hidden" name="page" value="1" />
-
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input
-                    name="q"
-                    defaultValue={q}
-                    placeholder="Search news..."
-                    className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-800 outline-none focus:border-blue-600"
-                  />
-                </div>
-              </form>
+              <NewsSearchBox
+                defaultValue={q}
+                size={size}
+                categorySlug={categorySlug}
+              />
             </div>
           </div>
         </div>
@@ -236,7 +216,7 @@ export default async function NewsRoomPage({ searchParams }) {
 
                         <div className="mt-2 text-xs text-slate-500 flex">
                           <span>
-                            {n.author?.firstName} {n.author?.lastName}
+                            {n.author?.name}
                           </span>
                           <span className="mx-1.5">|</span>
                           <span>Updated : {safeDate(n.postDate)} </span>

@@ -14,6 +14,7 @@ import {
 import { getPressReleaseBySlug } from "@/app/lib/pressRelease";
 import SafeHtml from "@/app/components/SafeHtml";
 import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
+import FeedbackBox from "@/app/components/FeedbackBox";
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
@@ -475,7 +476,10 @@ export default async function PressReleaseSlugPage({ params }) {
                   </div>
                 </Card>
               ) : null}
+
+              <FeedbackBox/>
             </div>
+            
           </aside>
         </div>
       </section>

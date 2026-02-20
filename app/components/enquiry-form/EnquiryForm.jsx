@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Phone, ShieldCheck } from "lucide-react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
 import { createPortal } from "react-dom";
+import { createServiceEnquiry } from "@/app/lib/serviceEnquiry";
 
 /* ---------------- MODAL HELPERS ---------------- */
 
@@ -31,10 +32,9 @@ function Backdrop({ open, onClose, children }) {
       />
       <div className="relative w-full max-w-md">{children}</div>
     </div>,
-    document.body
+    document.body,
   );
 }
-
 
 function Modal({ title, subtitle, onClose, children }) {
   return (
@@ -100,7 +100,12 @@ const isValidEmail = (email) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 };
 
-export default function EnquiryForm({ serviceName }) {
+export default function EnquiryForm({
+  serviceName,
+  serviceId,
+  type,
+  industryId,
+}) {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -125,8 +130,11 @@ export default function EnquiryForm({ serviceName }) {
   const [resData, setResData] = useState(null);
 
   const cleanMobile = useMemo(
-    () => String(form.mobile || "").replace(/\D/g, "").slice(0, 10),
-    [form.mobile]
+    () =>
+      String(form.mobile || "")
+        .replace(/\D/g, "")
+        .slice(0, 10),
+    [form.mobile],
   );
 
   const onChange = (e) => {
@@ -215,35 +223,91 @@ export default function EnquiryForm({ serviceName }) {
 
   /* -------- VERIFY OTP -------- */
   const handleVerify = async () => {
-    if (otp.length !== 4) return setError("Enter 4 digit OTP.");
+    if (otp.length !== 4) {
+      setError("Enter 4 digit OTP.");
+      return;
+    }
 
     setLoading(true);
     setError("");
 
-    const res = await verifyOtp({
-      mobile: cleanMobile,
-      otp,
-      name: resData?.name || form.name,
-    });
+    try {
+      /* ---------------- VERIFY OTP ---------------- */
+      const verifyRes = await verifyOtp({
+        mobile: cleanMobile,
+        otp,
+        name: resData?.name || form.name,
+      });
 
-    setLoading(false);
+      if (!verifyRes.ok) {
+        setError("Invalid OTP.");
+        return;
+      }
 
-    if (res.status === 200) {
+      /* ---------------- BUILD BASE PAYLOAD ---------------- */
+      const now = new Date().toISOString();
+
+      const basePayload = {
+        otp,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        mobile: cleanMobile,
+        city: form.location.trim(),
+        url: window.location.href, // ✅ backend expects pageUrl
+        postDate: now,
+        modifyDate: now,
+        message: form.message?.trim() || `Enquiry for ${serviceName}`,
+      };
+
+      /* ---------------- CALL CORRECT API ---------------- */
+
+      let enquiryRes;
+
+      if (type === "industry") {
+        enquiryRes = await fetch("/api/enquiry/industry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...basePayload,
+            pageUrl: basePayload.url,
+            industryId,
+          }),
+        });
+      } else if (type === "service") {
+        // default = service
+        enquiryRes = await fetch("/api/enquiry/service", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...basePayload,
+            serviceId,
+          }),
+        });
+      }
+
+      if (!enquiryRes.ok) {
+        setError("Enquiry failed.");
+        return;
+      }
+
       setStep("success");
-      setForm({ name: "", email: "", mobile: "", location: "", message: "" });
-      setFieldErrors({ email: "", mobile: "" });
-      setOtp("");
-      setResData(null);
-    } else {
-      setError("Invalid OTP. Please try again.");
+    } catch (err) {
+      console.error("Verify/Enquiry Error:", err);
+      setError("Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
       <div className="rounded-sm bg-white p-5 shadow-2xl border border-t border-gray-100">
-        <p className="text-lg font-normal text-center text-[#212529]">Enquiry Now</p>
-        <p className="text-lg font-normal text-blue-600 text-center">{serviceName}</p>
+        <p className="text-lg font-normal text-center text-[#212529]">
+          Enquiry Now
+        </p>
+        <p className="text-lg font-normal text-blue-600 text-center">
+          {serviceName}
+        </p>
 
         <form onSubmit={onSubmit} className="mt-5 space-y-4">
           <div>
@@ -260,7 +324,9 @@ export default function EnquiryForm({ serviceName }) {
 
           {/* ✅ Email with validation */}
           <div>
-            <label className="text-xs font-semibold text-gray-600">Email*</label>
+            <label className="text-xs font-semibold text-gray-600">
+              Email*
+            </label>
             <input
               name="email"
               type="email"
@@ -277,7 +343,9 @@ export default function EnquiryForm({ serviceName }) {
               }}
               className={[
                 "mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500",
-                fieldErrors.email ? "border-red-300 focus:border-red-500" : "border-gray-300",
+                fieldErrors.email
+                  ? "border-red-300 focus:border-red-500"
+                  : "border-gray-300",
               ].join(" ")}
               placeholder="Please enter your email id"
               required
@@ -289,12 +357,16 @@ export default function EnquiryForm({ serviceName }) {
 
           {/* ✅ Mobile numbers only */}
           <div>
-            <label className="text-xs font-semibold text-gray-600">Mobile*</label>
+            <label className="text-xs font-semibold text-gray-600">
+              Mobile*
+            </label>
 
             <div
               className={[
                 "mt-1 flex items-center gap-2 rounded-lg border px-3 py-2 focus-within:border-blue-500",
-                fieldErrors.mobile ? "border-red-300 focus-within:border-red-500" : "border-gray-300",
+                fieldErrors.mobile
+                  ? "border-red-300 focus-within:border-red-500"
+                  : "border-gray-300",
               ].join(" ")}
             >
               <Phone className="h-4 w-4 text-gray-500" />
@@ -317,7 +389,9 @@ export default function EnquiryForm({ serviceName }) {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-600">Location*</label>
+            <label className="text-xs font-semibold text-gray-600">
+              Location*
+            </label>
             <input
               name="location"
               value={form.location}
@@ -345,7 +419,8 @@ export default function EnquiryForm({ serviceName }) {
           <div className="flex items-start gap-2 text-xs text-gray-500">
             <ShieldCheck className="mt-0.5 h-4 w-4 text-green-600" />
             <p>
-              Your details are safe with us. By submitting you agree to our Terms & Privacy Policy.
+              Your details are safe with us. By submitting you agree to our
+              Terms & Privacy Policy.
             </p>
           </div>
         </form>

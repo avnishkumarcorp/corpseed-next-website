@@ -10,6 +10,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { PhoneCall, Star } from "lucide-react";
+import { createPortal } from "react-dom";
 
 // icons
 import industryImg from "../../../../public/home/Industry_Setup_Solutions_Image-02.png";
@@ -75,6 +76,17 @@ const DEFAULT_ITEMS = [
     pos: "bottomCenter",
   },
 ];
+
+export function Portal({ children }) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+}
 
 function useDebouncedValue(value, delay = 250) {
   const [debounced, setDebounced] = React.useState(value);
@@ -514,6 +526,7 @@ function HeroSearch({
   const inputRef = React.useRef(null);
   const abortRef = React.useRef(null);
   const popupRef = React.useRef(null);
+  const panelRef = React.useRef(null);
 
   const [open, setOpen] = React.useState(false);
   const [q, setQ] = React.useState("");
@@ -557,20 +570,25 @@ function HeroSearch({
       if (e.key === "Escape") setOpen(false);
     };
 
-    const onMouse = (e) => {
-      // ✅ if popup open and click is inside popup -> do nothing
+    const onMouseDown = (e) => {
+      // ✅ if voice popup open and click inside popup -> ignore
       if (voiceOpen && popupRef.current?.contains(e.target)) return;
 
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
-        setOpen(false);
-      }
+      // ✅ if click is inside input area -> ignore
+      if (wrapRef.current?.contains(e.target)) return;
+
+      // ✅ if click is inside dropdown panel (Portal) -> ignore
+      if (panelRef.current?.contains(e.target)) return;
+
+      // otherwise close
+      setOpen(false);
     };
 
     document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onMouse, true); // ✅ capture
+    document.addEventListener("mousedown", onMouseDown, true);
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onMouse, true);
+      document.removeEventListener("mousedown", onMouseDown, true);
     };
   }, [open, voiceOpen]);
 
@@ -630,6 +648,29 @@ function HeroSearch({
       // setVoiceOpen(false);
     }
   }, [voiceOpen, voice.listening, voice.interim]);
+
+  const [panelStyle, setPanelStyle] = React.useState(null);
+
+  React.useEffect(() => {
+    if (!showPanel) return;
+
+    const update = () => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setPanelStyle({ left: r.left, top: r.bottom + 8, width: r.width });
+    };
+
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [showPanel]);
+
+  console.log("sdjkjsdgsg", groups);
 
   return (
     <div ref={wrapRef} className="relative w-full max-w-xl">
@@ -747,118 +788,118 @@ function HeroSearch({
       </div>
 
       {/* Dropdown */}
-      {showPanel ? (
-        <div className="absolute left-0 right-0 z-50 mt-2">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-            <div className="h-1 w-full bg-gradient-to-r from-slate-900 via-blue-600 to-slate-900 opacity-70" />
+      {/* Dropdown */}
+      {showPanel && panelStyle ? (
+        <Portal>
+          <div
+            ref={panelRef}
+            style={{
+              position: "fixed",
+              left: panelStyle.left,
+              top: panelStyle.top,
+              width: panelStyle.width,
+              zIndex: 999999,
+            }}
+          >
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+              <div className="h-1 w-full bg-gradient-to-r from-slate-900 via-blue-600 to-slate-900 opacity-70" />
 
-            <div className="max-h-[52vh] overflow-y-auto p-4 [scrollbar-gutter:stable]">
-              {err ? (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                  {err}
-                </div>
-              ) : loading ? (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="space-y-2">
-                      <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
-                      <div className="h-3 w-56 animate-pulse rounded bg-slate-100" />
-                      <div className="h-3 w-48 animate-pulse rounded bg-slate-100" />
-                    </div>
-                  ))}
-                </div>
-              ) : !q.trim() ? (
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Start typing to search
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    We’ll show Services, Knowledge Center, Department Updates,
-                    and more.
-                  </p>
-                </div>
-              ) : groups.length ? (
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {groups.map(([groupTitle, list]) => (
-                    <div key={groupTitle} className="min-w-0">
-                      <div className="mb-3 flex items-center justify-between">
-                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                          {groupTitle}
-                        </p>
-                        <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] text-slate-600">
-                          {list.length}
-                        </span>
+              <div className="max-h-[52vh] overflow-y-auto p-4 [scrollbar-gutter:stable]">
+                {err ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                    {err}
+                  </div>
+                ) : loading ? (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+                        <div className="h-3 w-56 animate-pulse rounded bg-slate-100" />
+                        <div className="h-3 w-48 animate-pulse rounded bg-slate-100" />
                       </div>
-
-                      <div className="space-y-2">
-                        {list.slice(0, 6).map((x) => (
-                          <Link
-                            key={x?.url || x?.slug || x?.name}
-                            href={ensureInternalHref(x?.url || "#")}
-                            onClick={() => setOpen(false)}
-                            className="group block rounded-xl border border-slate-200 bg-white p-3 transition hover:border-slate-300 hover:shadow-sm cursor-pointer"
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <p className="truncate text-sm font-semibold text-slate-900">
-                                  {x?.name}
-                                </p>
-                                {x?.track ? (
-                                  <p className="mt-1 line-clamp-2 text-[12px] leading-5 text-slate-600">
-                                    {x.track}
-                                  </p>
-                                ) : null}
-                              </div>
-                              <span className="mt-0.5 text-slate-400 transition group-hover:translate-x-0.5">
-                                →
-                              </span>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-
-                      {list.length > 6 ? (
-                        <div className="mt-3">
-                          <Link
-                            href="/service"
-                            onClick={() => setOpen(false)}
-                            className="text-xs font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
-                          >
-                            View more →
-                          </Link>
+                    ))}
+                  </div>
+                ) : !q.trim() ? (
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Start typing to search
+                    </p>
+                    <p className="mt-1 text-sm text-slate-600">
+                      We’ll show Services, Knowledge Center, Department Updates,
+                      and more.
+                    </p>
+                  </div>
+                ) : groups.length ? (
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    {groups.map(([groupTitle, list]) => (
+                      <div key={groupTitle} className="min-w-0">
+                        <div className="mb-3 flex items-center justify-between">
+                          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                            {groupTitle}
+                          </p>
+                          <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] text-slate-600">
+                            {list.length}
+                          </span>
                         </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-slate-900">
-                    No results found for “{q.trim()}”.
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    Try “EPR”, “BIS”, “NOC”, “IMEI”…
-                  </p>
-                </div>
-              )}
-            </div>
 
-            <div className="sticky bottom-0 border-t border-slate-200 bg-white px-4 py-3">
-              <div className="flex items-center justify-between">
-                <p className="text-[11px] text-slate-600">
-                  Press <span className="font-semibold">Esc</span> to close
-                </p>
-                <Link
-                  href="/service"
-                  onClick={() => setOpen(false)}
-                  className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
-                >
-                  Go to Services →
-                </Link>
+                        <div className="space-y-2">
+                          {list.slice(0, 6).map((x) => (
+                            <Link
+                              key={x?.url || x?.slug || x?.name}
+                              href={x?.url}
+                              // onClick={() => setOpen(false)}
+                              className="group block rounded-xl border border-slate-200 bg-white p-3 transition hover:border-slate-300 hover:shadow-sm cursor-pointer"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-semibold text-slate-900">
+                                    {x?.name}
+                                  </p>
+                                  {x?.track ? (
+                                    <p className="mt-1 line-clamp-2 text-[12px] leading-5 text-slate-600">
+                                      {x.track}
+                                    </p>
+                                  ) : null}
+                                </div>
+                                <span className="mt-0.5 text-slate-400 transition group-hover:translate-x-0.5">
+                                  →
+                                </span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-semibold text-slate-900">
+                      No results found for “{q.trim()}”.
+                    </p>
+                    <p className="mt-1 text-sm text-slate-600">
+                      Try “EPR”, “BIS”, “NOC”, “IMEI”…
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-slate-200 bg-white px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] text-slate-600">
+                    Press <span className="font-semibold">Esc</span> to close
+                  </p>
+                  <Link
+                    href="/service"
+                    onClick={() => setOpen(false)}
+                    className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+                  >
+                    Go to Services →
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </Portal>
       ) : null}
     </div>
   );
@@ -879,14 +920,14 @@ export default function HomeHeroSection({
 
       <div className="relative mx-auto max-w-7xl px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-6 lg:pb-6">
         <div className="grid items-start gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center">
-            <Link
-              href={ctaHref}
+          <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center text-center lg:text-left">
+            <a
+              href="tel:+919999999999" // 👈 your real number
               className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm hover:bg-blue-700 cursor-pointer"
             >
               <span>{ctaText}</span>
               <PhoneCall className="h-4 w-4" />
-            </Link>
+            </a>
 
             <h1 className="mt-5 text-[3rem] font-semibold not-italic leading-[1.05] tracking-[0.03em] text-[#272d30]">
               {title.split("\n").map((line, i) => (

@@ -80,7 +80,7 @@ export default function CardCarousel({
   }, [data, sourceList]);
 
   // ---------- 3) Safe values ----------
-  const title ="Our Exclusive Services";
+  const title = "Our Exclusive Services";
 
   const ctaLabel = normalized?.cta?.label || "SEE ALL SERVICES";
   const ctaHref = normalized?.cta?.href || "/services";
@@ -167,7 +167,9 @@ function Tabs({ tabs = [], activeKey, onChange }) {
               onClick={() => onChange?.(key)}
               className={[
                 "relative whitespace-nowrap text-lg font-medium cursor-pointer",
-                isActive ? "text-blue-600" : "text-gray-800 hover:text-blue-600",
+                isActive
+                  ? "text-blue-600"
+                  : "text-gray-800 hover:text-blue-600",
               ].join(" ")}
             >
               {label}
@@ -347,11 +349,11 @@ function ServiceTile({ item }) {
       data-card
       className={[
         "snap-start",
-        "min-w-[200px] max-w-[200px] sm:min-w-[280px] sm:max-w-[280px]",
+        "min-w-[85%] max-w-[85%] sm:min-w-[280px] sm:max-w-[280px]",
         "rounded-2xl bg-white p-6",
         "shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
-        "flex flex-col",                 // ✅ IMPORTANT
-        "h-[260px] sm:h-[280px]",         // ✅ fixed height (adjust if you want)
+        "flex flex-col",
+        "min-h-[260px] sm:h-[280px]",
       ].join(" ")}
     >
       {/* Title */}
@@ -360,7 +362,7 @@ function ServiceTile({ item }) {
       </h5>
 
       {/* Description area (fixed space) */}
-      <p className="mt-4 text-sm leading-6 text-[#212529] line-clamp-6">
+      <p className="mt-2 text-sm leading-6 text-[#212529] line-clamp-6">
         {desc}
       </p>
 
@@ -376,4 +378,3 @@ function ServiceTile({ item }) {
     </div>
   );
 }
-

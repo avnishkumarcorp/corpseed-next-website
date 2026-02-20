@@ -265,10 +265,17 @@ export default function EnquiryOtpInline({ onVerified, page }) {
           subtitle="Our legal advisor will contact you shortly."
           onClose={() => setStep("idle")}
         >
-          <div className="flex flex-col items-center py-6">
-            <div className="h-20 w-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-4xl">
-              ✓
+          <div className="flex flex-col items-center py-8">
+            {/* Animated Success Icon */}
+            <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center animate-scaleIn">
+              <div className="h-14 w-14 rounded-full bg-green-600 flex items-center justify-center text-white text-3xl shadow-md">
+                ✓
+              </div>
             </div>
+
+            <p className="mt-5 text-sm text-gray-600 text-center">
+              Thank you for reaching out. Our team will get back to you shortly.
+            </p>
           </div>
         </Modal>
       </Backdrop>

@@ -1,11 +1,11 @@
 // app/components/header/HeaderClient.jsx
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-
+import { usePathname } from "next/navigation";
 import logo from "../../assets/CORPSEED.webp";
 
 import { NAV_ITEMS } from "./config";
@@ -18,8 +18,8 @@ const SearchPanel = dynamic(() => import("./SearchPanel"), { ssr: false });
 const MobileDrawer = dynamic(() => import("./MobileDrawer"), { ssr: false });
 
 export default function HeaderClient({ menuData = [] }) {
+  const pathname = usePathname();
   const menuMap = useMemo(() => buildMenuMap(menuData), [menuData]);
-
   const [openKey, setOpenKey] = useState(null);
   const closeTimerRef = useRef(null);
 
@@ -31,6 +31,7 @@ export default function HeaderClient({ menuData = [] }) {
 
   const open = (key) => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    setAllOpen(false); // 🔥 close All Corpseed
     setOpenKey(key);
   };
 
@@ -41,6 +42,7 @@ export default function HeaderClient({ menuData = [] }) {
 
   const openAll = () => {
     if (allCloseTimerRef.current) clearTimeout(allCloseTimerRef.current);
+    setOpenKey(null); // 🔥 close MegaPanel
     setAllOpen(true);
   };
 
@@ -48,6 +50,14 @@ export default function HeaderClient({ menuData = [] }) {
     if (allCloseTimerRef.current) clearTimeout(allCloseTimerRef.current);
     allCloseTimerRef.current = setTimeout(() => setAllOpen(false), 120);
   };
+
+  useEffect(() => {
+  // 🔥 Close all dropdowns when route changes
+  setOpenKey(null);
+  setAllOpen(false);
+  setSearchOpen(false);
+  setMobileOpen(false);
+}, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 bg-white">
@@ -66,7 +76,10 @@ export default function HeaderClient({ menuData = [] }) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden items-center gap-6 lg:flex" onMouseLeave={close}>
+          <nav
+            className="hidden items-center gap-6 lg:flex"
+            onMouseLeave={close}
+          >
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.key}
@@ -99,7 +112,11 @@ export default function HeaderClient({ menuData = [] }) {
               </button>
 
               <div className="ml-6 flex items-center gap-4">
-                <div className="relative" onMouseEnter={openAll} onMouseLeave={closeAll}>
+                <div
+                  className="relative"
+                  onMouseEnter={openAll}
+                  onMouseLeave={closeAll}
+                >
                   <button className="rounded-lg bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600 cursor-pointer">
                     All Corpseed
                   </button>
@@ -112,7 +129,12 @@ export default function HeaderClient({ menuData = [] }) {
             </div>
 
             <div onMouseEnter={() => open(openKey)} onMouseLeave={close}>
-              <MegaPanel open={!!openKey} navKey={openKey} menuMap={menuMap} loading={false} />
+              <MegaPanel
+                open={!!openKey}
+                navKey={openKey}
+                menuMap={menuMap}
+                loading={false}
+              />
             </div>
           </nav>
 
@@ -130,7 +152,11 @@ export default function HeaderClient({ menuData = [] }) {
 
       {/* Desktop search overlay (lazy loaded) */}
       {searchOpen ? (
-        <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} topOffset={72} />
+        <SearchPanel
+          open={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          topOffset={72}
+        />
       ) : null}
 
       {/* Mobile drawer (lazy loaded) */}

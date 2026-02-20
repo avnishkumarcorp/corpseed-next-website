@@ -2,21 +2,43 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { X, CheckCircle2 } from "lucide-react";
-import { sendOtp,verifyOtp, submitPartnerEnquiry, submitConsultNowEnquiry } from "../lib/enquiryOtp";
+import {
+  sendOtp,
+  verifyOtp,
+  submitPartnerEnquiry,
+  submitConsultNowEnquiry,
+  submitBookMeetingEnquiry,
+} from "../lib/enquiryOtp";
 
-function Input({ label, required, value, onChange, type = "text", placeholder }) {
+function Input({
+  label,
+  required,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+  error,
+}) {
   return (
     <label className="block">
       <span className="text-sm font-semibold text-slate-800">
         {label} {required ? <span className="text-red-500">*</span> : null}
       </span>
+
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        className={`mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm outline-none transition
+        ${
+          error
+            ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
+            : "border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        }`}
       />
+
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </label>
   );
 }
@@ -41,7 +63,8 @@ export default function ConsultNowModal({
   onClose,
   title = "Consult Now",
   consultNow = false,
-  categoryId
+  categoryId,
+  bookMeeting,
 }) {
   const [step, setStep] = useState(1); // 1=form, 2=otp, 3=success
   const [loading, setLoading] = useState(false);
@@ -52,8 +75,20 @@ export default function ConsultNowModal({
   const [mobile, setMobile] = useState("");
   const [city, setCity] = useState("");
   const [message, setMessage] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   const [otp, setOtp] = useState("");
+
+  const validateEmail = (value) => {
+    if (!value.trim()) {
+      setEmailError("");
+      return true; // optional field
+    }
+
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    setEmailError(valid ? "" : "Please enter a valid email address.");
+    return valid;
+  };
 
   const canSendOtp = useMemo(() => {
     return (
@@ -120,77 +155,93 @@ export default function ConsultNowModal({
     }
   };
 
-const handleVerifyAndSubmit = async () => {
-  setErr("");
+  const handleVerifyAndSubmit = async () => {
+    setErr("");
 
-  if (!otp.trim()) {
-    setErr("Please enter OTP.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    // 1️⃣ VERIFY OTP
-    const v = await verifyOtp({ mobile, otp, name });
-
-    if (!v.ok) {
-      setErr(v.data || `OTP verification failed (${v.status})`);
-      setLoading(false);
+    if (!otp.trim()) {
+      setErr("Please enter OTP.");
       return;
     }
 
-    // 2️⃣ CONDITIONAL API CALL
-    let response;
+    try {
+      setLoading(true);
 
-    if (consultNow) {
-      // 🔥 CONSULT NOW FLOW
-      response = await submitConsultNowEnquiry({
-        otp,
-        name,
-        email,
-        mobile,
-        message,
-        location: city,
-        categoryId
-      });
-    } else {
-      // 🔥 PARTNER FLOW (existing)
-      response = await submitPartnerEnquiry({
-        otp,
-        name,
-        email,
-        mobile,
-        message,
-        location: city,
-      });
-    }
+      // 1️⃣ VERIFY OTP
+      const v = await verifyOtp({ mobile, otp, name });
 
-    if (!response.ok) {
-      setErr(response.data || `Submit failed (${response.status})`);
+      if (!v.ok) {
+        setErr(v.data || `OTP verification failed (${v.status})`);
+        setLoading(false);
+        return;
+      }
+
+      // 2️⃣ CALL CORRECT ENQUIRY API
+      let response;
+
+      if (bookMeeting) {
+        response = await submitBookMeetingEnquiry({
+          name,
+          email,
+          mobile,
+          city,
+          message,
+          otp,
+          location: city,
+        });
+      } else if (consultNow) {
+        response = await submitConsultNowEnquiry({
+          otp,
+          name,
+          email,
+          mobile,
+          message,
+          location: city,
+          categoryId,
+          city, // 🔥 ADD THIS
+        });
+      } else {
+        response = await submitPartnerEnquiry({
+          otp,
+          name,
+          email,
+          mobile,
+          message,
+          location: city,
+        });
+      }
+
+      // 3️⃣ HANDLE HTTP ERROR
+      if (!response.ok) {
+        setErr(`Submit failed (${response.status})`);
+        setLoading(false);
+        return;
+      }
+
+      // 4️⃣ HANDLE BACKEND BUSINESS STATUS
+      const backendStatus = response.data?.status?.toLowerCase();
+
+      if (["success", "duplicate", "pass"].includes(backendStatus)) {
+        setStep(3);
+        setLoading(false);
+        return;
+      }
+
+      // 5️⃣ UNEXPECTED RESPONSE
+      setErr(response.data?.message || "Something went wrong.");
       setLoading(false);
-      return;
+    } catch (e) {
+      console.error("Submit Error:", e);
+      setErr("Something went wrong.");
+      setLoading(false);
     }
-
-    // 3️⃣ SUCCESS
-    setStep(3);
-    setLoading(false);
-
-  } catch (e) {
-    setErr("Something went wrong.");
-    setLoading(false);
-  }
-};
+  };
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[9999]">
       {/* backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* modal */}
       <div className="absolute left-1/2 top-1/2 w-[94vw] max-w-4xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl">
@@ -200,7 +251,8 @@ const handleVerifyAndSubmit = async () => {
             <h3 className="text-lg font-bold text-slate-900">{title}</h3>
             {step !== 3 ? (
               <p className="mt-1 text-sm text-slate-600">
-                Please fill the form and send us, we&apos;ll get back to you as soon as possible.
+                Please fill the form and send us, we&apos;ll get back to you as
+                soon as possible.
               </p>
             ) : null}
           </div>
@@ -216,7 +268,10 @@ const handleVerifyAndSubmit = async () => {
         </div>
 
         {/* body */}
-        <div className="px-6 py-5 max-h-[70vh] overflow-auto" style={{maxHeight:"60vh",overflow:'auto'}}>
+        <div
+          className="px-6 py-5 max-h-[70vh] overflow-auto"
+          style={{ maxHeight: "60vh", overflow: "auto" }}
+        >
           {err ? (
             <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {err}
@@ -224,7 +279,7 @@ const handleVerifyAndSubmit = async () => {
           ) : null}
 
           {step === 1 ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2" >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Input
                 label="Full Name"
                 required
@@ -235,9 +290,13 @@ const handleVerifyAndSubmit = async () => {
               <Input
                 label="Email Address"
                 value={email}
-                onChange={setEmail}
+                onChange={(val) => {
+                  setEmail(val);
+                  validateEmail(val);
+                }}
                 placeholder="Enter your email"
                 type="email"
+                error={emailError}
               />
               <Input
                 label="Mobile No"
@@ -267,7 +326,8 @@ const handleVerifyAndSubmit = async () => {
           {step === 2 ? (
             <div className="max-w-lg">
               <p className="text-sm text-slate-700">
-                OTP sent to <span className="font-semibold">{mobile}</span>. Please enter OTP to continue.
+                OTP sent to <span className="font-semibold">{mobile}</span>.
+                Please enter OTP to continue.
               </p>
 
               <div className="mt-4">
@@ -276,7 +336,7 @@ const handleVerifyAndSubmit = async () => {
                   required
                   value={otp}
                   onChange={setOtp}
-                  placeholder="6-digit OTP"
+                  placeholder="4-digit OTP"
                 />
               </div>
 

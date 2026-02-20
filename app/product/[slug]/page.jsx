@@ -4,6 +4,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { getProductBySlug } from "@/app/lib/products";
 import FeedbackBox from "@/app/components/FeedbackBox";
+import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 
 // your component (client) to render HTML safely
 const SafeHtmlShadow = dynamic(() => import("@/app/components/SafeHtmlShadow"));
@@ -172,7 +173,7 @@ export default async function ProductSlugPage({ params }) {
               </p>
             </div>
 
-            <EnquiryForm serviceName={product?.title || product?.name} />
+            <EnquiryOtpInline page={product?.title || product?.name}/>
 
             {/* if anything remains after marker */}
             {/* {after?.trim() ? (

@@ -37,18 +37,39 @@ function renderAboutGrid(list) {
     </div>
   );
 }
+function toSlug(str = "") {
+  return str
+    .normalize("NFD") // handle accents
+    .replace(/[\u0300-\u036f]/g, "") // remove accents
+    .toLowerCase()
+    .trim()
+    .replace(/[\/]/g, "-") // 🔥 replace "/" with "-"
+    .replace(/[^\w\s-]/g, "") // remove special chars
+    .replace(/\s+/g, "-") // spaces → hyphen
+    .replace(/-+/g, "-") // collapse multiple hyphens
+    .replace(/^-+|-+$/g, ""); // trim starting/ending hyphen
+}
 
 // ✅ helper: decide which "More" button to show
-function getMoreHref(items = []) {
+function getMoreHref(items = [], title) {
   const hasService = items.some(
     (it) => typeof it?.url === "string" && it.url.startsWith("/service"),
   );
+
   const hasIndustries = items.some(
     (it) => typeof it?.url === "string" && it.url.startsWith("/industries"),
   );
 
-  if (hasIndustries) return "/industries";
-  if (hasService) return "/service";
+  // 🔥 SERVICE → dynamic category page
+  if (hasService) {
+    return `/category/${toSlug(title)}`;
+  }
+
+  // 🔥 INDUSTRIES → fixed industries page
+  if (hasIndustries) {
+    return `/industries`;
+  }
+
   return "";
 }
 
@@ -142,7 +163,7 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                       const items = Array.isArray(list) ? list : [];
 
                       // ✅ detect "More" target
-                      const moreHref = getMoreHref(items);
+                      const moreHref = getMoreHref(items, groupTitle);
 
                       return (
                         <div
@@ -150,9 +171,19 @@ export default function MegaPanel({ open, navKey, menuMap, loading }) {
                           className="min-w-0 flex flex-col h-[220px]"
                         >
                           {/* Section Title */}
-                          <p className="text-sm font-semibold text-blue-500 tracking-tight mb-3">
-                            {groupTitle}
-                          </p>
+
+                          {moreHref?.includes("/category") ? (
+                            <Link
+                              href={moreHref}
+                              className="text-sm font-semibold text-blue-500 tracking-tight mb-3"
+                            >
+                              {groupTitle}
+                            </Link>
+                          ) : (
+                            <p className="text-sm font-semibold text-blue-500 tracking-tight mb-3">
+                              {groupTitle}
+                            </p>
+                          )}
 
                           {/* Scrollable List */}
                           <div className="flex-1 hover-scroll pr-2">

@@ -133,76 +133,77 @@ export default function ServicesCatalogue({ apiData, activeSlug }) {
         <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Categories */}
           <aside className="order-1 lg:order-none lg:col-span-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-              <div className="sticky top-24">
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 max-h-[80vh] overflow-auto">
-                  {(categories || []).map((c) => {
-                    const active = !query && c.id === activeId;
-                    const img = c.icon;
+            <div className="sticky top-24">
+              <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                {/* 🔥 Scrollable container */}
+                <div className="max-h-[calc(90vh-120px)] overflow-y-auto p-3">
+                  <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+                    {categories.map((c) => {
+                      const active = !query && c.id === activeId;
+                      const img = c.icon;
 
-                    return (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => {
-                          setQuery("");
-                          setActiveId(c.id);
-                          router.push(`/category/${c.slug}`);
-                        }}
-                        className={[
-                          "group rounded-2xl border px-3 py-3 text-left transition cursor-pointer",
-                          active
-                            ? "border-blue-200 bg-blue-50 shadow-sm"
-                            : "border-slate-200 bg-white hover:bg-slate-50",
-                        ].join(" ")}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={[
-                              "h-10 w-10 rounded-xl flex items-center justify-center overflow-hidden",
-                              active
-                                ? "bg-blue-600 text-white"
-                                : "bg-slate-100",
-                            ].join(" ")}
-                          >
-                            {img ? (
-                              <Image
-                                src={img}
-                                alt={c.subCategoryName || "category"}
-                                width={40}
-                                height={40}
-                                className="h-10 w-10 object-cover"
-                              />
-                            ) : (
-                              <span className="text-sm font-bold">
-                                {(c.subCategoryName || "C")
-                                  .slice(0, 1)
-                                  .toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="min-w-0">
-                            <p
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            setQuery("");
+                            setActiveId(c.id);
+                            router.push(`/category/${c.slug}`);
+                          }}
+                          className={[
+                            "group rounded-2xl border px-3 py-3 text-left transition cursor-pointer",
+                            active
+                              ? "border-blue-200 bg-blue-50 shadow-sm"
+                              : "border-slate-200 bg-white hover:bg-slate-50",
+                          ].join(" ")}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
                               className={[
-                                "text-sm font-semibold leading-5",
-                                active ? "text-blue-700" : "text-slate-800",
+                                "h-10 w-10 rounded-xl flex items-center justify-center overflow-hidden",
+                                active
+                                  ? "bg-blue-600 text-white"
+                                  : "bg-slate-100",
                               ].join(" ")}
                             >
-                              {c.subCategoryName}
-                            </p>
-                            <p className="mt-0.5 text-xs text-slate-500">
-                              {(c.serviceMiniResponseDTOS?.length || 0) +
-                                " services"}
-                            </p>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                              {img ? (
+                                <Image
+                                  src={img}
+                                  alt={c.subCategoryName || "category"}
+                                  width={40}
+                                  height={40}
+                                  className="h-10 w-10 object-cover"
+                                />
+                              ) : (
+                                <span className="text-sm font-bold">
+                                  {(c.subCategoryName || "C")
+                                    .slice(0, 1)
+                                    .toUpperCase()}
+                                </span>
+                              )}
+                            </div>
 
-                {/* ✅ Reusable CTA */}
+                            <div className="min-w-0">
+                              <p
+                                className={[
+                                  "text-sm font-semibold leading-5",
+                                  active ? "text-blue-700" : "text-slate-800",
+                                ].join(" ")}
+                              >
+                                {c.subCategoryName}
+                              </p>
+                              <p className="mt-0.5 text-xs text-slate-500">
+                                {(c.serviceMiniResponseDTOS?.length || 0) +
+                                  " services"}
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </aside>

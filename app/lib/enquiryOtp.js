@@ -84,19 +84,60 @@ export async function submitConsultNowEnquiry({
   mobile,
   message,
   location,
+  categoryId,
+  city,
 }) {
   const payload = {
     otp: String(otp || "").trim(),
     name: String(name || "").trim(),
     email: String(email || "").trim(),
     mobile: String(mobile || "").trim(),
+    city: String(city || "").trim(), // 🔥 ADD THIS
     message: String(message || "").trim(),
     location: String(location || "").trim(),
+    categoryId: categoryId || "",
     postDate: "",
     modifyDate: "",
   };
 
   const res = await fetch("/api/enquiry/consult-now", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => null);
+
+  return {
+    ok: res.ok,
+    status: res.status,
+    data,
+  };
+}
+
+
+
+export async function submitBookMeetingEnquiry({
+  name,
+  email,
+  mobile,
+  city,
+  message,
+  otp,
+  location,
+}) {
+  const payload = {
+    name: String(name || "").trim(),
+    email: String(email || "").trim(),
+    mobile: String(mobile || "").trim(),
+    city: String(city || "").trim(),
+    dateTime: "",   // 🔥 REQUIRED
+    message: String(message || "").trim(),
+    otp: String(otp || "").trim(),
+    location: String(location || "").trim(),
+  };
+
+  const res = await fetch("/api/enquiry/book-meeting", {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
@@ -106,6 +147,6 @@ export async function submitConsultNowEnquiry({
   return {
     ok: res.ok,
     status: res.status,
-    data: await res.text().catch(() => ""),
+    data: await res.json().catch(() => null),
   };
 }

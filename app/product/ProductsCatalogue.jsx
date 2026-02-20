@@ -328,6 +328,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
         open={consultOpen}
         onClose={() => setConsultOpen(false)}
         title="Consult Now"
+        bookMeeting={true}
       />
     </>
   );

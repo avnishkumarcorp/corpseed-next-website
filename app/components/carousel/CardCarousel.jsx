@@ -83,7 +83,7 @@ export default function CardCarousel({
   const title = "Our Exclusive Services";
 
   const ctaLabel = normalized?.cta?.label || "SEE ALL SERVICES";
-  const ctaHref = normalized?.cta?.href || "/services";
+  const ctaHref = normalized?.cta?.href || "/category/all";
 
   const tabs = Array.isArray(normalized?.tabs) ? normalized.tabs : [];
   const itemsByTab =

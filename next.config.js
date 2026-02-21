@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  devIndicators: {
-    buildActivity: false,
-    buildActivityPosition: "bottom-right",
-    appIsrStatus: false, // 🔥 add this
-  },
+  devIndicators: false,
+
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

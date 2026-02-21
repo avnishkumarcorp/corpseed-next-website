@@ -3,6 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   devIndicators: {
     buildActivity: false,
+    buildActivityPosition: "bottom-right",
+    appIsrStatus: false, // 🔥 add this
   },
   images: {
     remotePatterns: [

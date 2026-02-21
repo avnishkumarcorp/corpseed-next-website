@@ -45,3 +45,39 @@ export async function getAllCategories() {
   if (!res.ok) return null;
   return res.json();
 }
+
+
+
+
+
+export async function getServiceByCityAndSlug(city, slug) {
+  if (!city || !slug) return null;
+
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const url = `${base}/api/customer/service/${encodeURIComponent(
+    city
+  )}/${encodeURIComponent(slug)}`;
+
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      next: {
+        revalidate: 3600,
+        tags: [`service:${city}:${slug}`],
+      },
+      signal: controller.signal,
+    });
+
+    if (!res.ok) return null;
+
+    return await res.json();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(t);
+  }
+}

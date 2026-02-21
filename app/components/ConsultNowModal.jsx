@@ -81,8 +81,8 @@ export default function ConsultNowModal({
 
   const validateEmail = (value) => {
     if (!value.trim()) {
-      setEmailError("");
-      return true; // optional field
+      setEmailError("Email is required.");
+      return false;
     }
 
     const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -94,9 +94,11 @@ export default function ConsultNowModal({
     return (
       name.trim().length >= 2 &&
       mobile.trim().length >= 10 &&
-      city.trim().length >= 2
+      city.trim().length >= 2 &&
+      email.trim().length > 0 &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     );
-  }, [name, mobile, city]);
+  }, [name, mobile, city, email]);
 
   const resetAll = () => {
     setStep(1);
@@ -127,7 +129,8 @@ export default function ConsultNowModal({
   const handleSendOtp = async () => {
     setErr("");
     if (!canSendOtp) {
-      setErr("Please fill required fields (Name, Mobile, City).");
+      validateEmail(email); // trigger email error message
+      setErr("Please fill all required fields correctly.");
       return;
     }
 
@@ -289,6 +292,7 @@ export default function ConsultNowModal({
               />
               <Input
                 label="Email Address"
+                required
                 value={email}
                 onChange={(val) => {
                   setEmail(val);
@@ -348,15 +352,33 @@ export default function ConsultNowModal({
           ) : null}
 
           {step === 3 ? (
-            <div className="py-10 text-center">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 shadow-lg">
-                <CheckCircle2 className="h-10 w-10 text-white" />
+            <div className="py-12 text-center animate-fadeIn">
+              {/* Icon wrapper */}
+              <div className="relative mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-600 shadow-xl shadow-emerald-200/50">
+                {/* Soft pulse ring */}
+                <div className="absolute inset-0 rounded-full bg-emerald-400/30 animate-ping"></div>
+
+                {/* Icon */}
+                <CheckCircle2 className="relative h-12 w-12 text-white" />
               </div>
-              <p className="mt-6 text-lg font-semibold text-emerald-600">
-                Thanks so much for sharing your experience with us !!
+
+              {/* Title */}
+              <h3 className="mt-8 text-xl font-semibold text-slate-900">
+                Thank You! 🎉
+              </h3>
+
+              {/* Subtitle */}
+              <p className="mt-3 text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+                Your request has been submitted successfully. Our team will
+                reach out to you shortly.
               </p>
-              <p className="mt-2 text-sm text-blue-600">
-                We hope to see you again soon !!
+
+              {/* Small soft divider */}
+              <div className="mt-6 h-px w-24 mx-auto bg-gradient-to-r from-transparent via-emerald-400 to-transparent"></div>
+
+              {/* Optional small note */}
+              <p className="mt-4 text-xs text-slate-500">
+                We appreciate your trust in Corpseed.
               </p>
             </div>
           ) : null}

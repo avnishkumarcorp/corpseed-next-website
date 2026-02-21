@@ -353,7 +353,7 @@ function ServiceTile({ item }) {
         "rounded-2xl bg-white p-6",
         "shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
         "flex flex-col",
-        "min-h-[260px] sm:h-[280px]",
+        "min-h-[260px]",
       ].join(" ")}
     >
       {/* Title */}

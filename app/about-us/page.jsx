@@ -1,6 +1,9 @@
 import { getAboutUsData } from "../lib/about";
 import AboutUsClient from "./AboutUsClient";
 
+
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata() {
   const data = await getAboutUsData();
 

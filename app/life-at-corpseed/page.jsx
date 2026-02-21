@@ -12,6 +12,9 @@ import {
 import { getLifeAtCorpseed } from "../lib/life-at-corpseed";
 import LifeStoriesClient from "./LifeStoriesClient";
 
+
+export const dynamic = "force-dynamic";
+
 // ✅ dynamic SEO from API
 export async function generateMetadata() {
   const data = await getLifeAtCorpseed();

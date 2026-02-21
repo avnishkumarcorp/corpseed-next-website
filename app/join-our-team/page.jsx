@@ -9,6 +9,8 @@ function splitKeywords(metaKeyword) {
     .filter(Boolean);
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata() {
   const data = await getJoinOurTeamData();
 

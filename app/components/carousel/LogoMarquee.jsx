@@ -123,7 +123,7 @@ function buildLogoSrc(it, imageBaseUrl) {
 }
 
 export default function LogoMarquee({
-  apiUrl = "api/customer/clients",
+  apiUrl = "/api/customer/clients",
   imageBaseUrl = "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed",
   linkPrefix = "",
   openInNewTab = false,

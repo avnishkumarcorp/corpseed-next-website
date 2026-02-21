@@ -8,15 +8,10 @@ import { apiGet } from "./fetcher";
 // app/lib/life-at-corpseed.js
 
 export async function getLifeAtCorpseed({ page = 1, size = 5 } = {}) {
-  try {
-    return await apiGet(
-      `/api/updated-life-at-corpseed?page=${page}&size=${size}`,
-      { revalidate: 0 } // dynamic
-    );
-  } catch (e) {
-    console.error("getLifeAtCorpseed error:", e);
-    return null;
-  }
+  return await apiGet(
+    `/api/updated-life-at-corpseed?page=${page}&size=${size}`,
+    { revalidate: 60 } // 1 minute cache
+  );
 }
 
 /**

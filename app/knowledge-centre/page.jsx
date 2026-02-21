@@ -5,6 +5,8 @@ import { Eye, Search } from "lucide-react";
 import { getKnowledgeCentreList } from "../lib/knowledgeCentre";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
+export const dynamic = "force-dynamic";
+
 function Card({ children, className = "" }) {
   return (
     <div

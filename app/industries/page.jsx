@@ -8,6 +8,9 @@ import IndustryCaterTabs from "./IndustryCaterTabs";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 /* ================= META DATA ================= */
+
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata() {
   return {
     title: "Industries - Definition, Types, Sectors, & Facts - Corpseed",

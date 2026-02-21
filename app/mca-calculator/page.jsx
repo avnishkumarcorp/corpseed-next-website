@@ -2,6 +2,8 @@
 import { getMcaFeeCalculatorMeta } from "../lib/mcaCalculator";
 import McaCalculatorClient from "./McaCalculatorClient";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata() {
   const data = await getMcaFeeCalculatorMeta();
 

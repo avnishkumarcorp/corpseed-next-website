@@ -16,15 +16,15 @@ export async function GET(req) {
     }
 
     // Build upstream url safely
-    const upstream = new URL(apiUrl.replace(/^\//, ""), base.endsWith("/") ? base : base + "/");
+    const upstream = new URL(
+      apiUrl.replace(/^\//, ""),
+      base.endsWith("/") ? base : base + "/",
+    );
 
     const res = await fetch(upstream.toString(), {
       method: "GET",
-      // ✅ do NOT set Content-Type for GET (can trigger preflight/CORS in some setups)
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-store",
+      headers: { Accept: "application/json" },
+      next: { revalidate: 3600 },
     });
 
     const text = await res.text();

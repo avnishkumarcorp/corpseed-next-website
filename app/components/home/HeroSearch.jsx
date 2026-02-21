@@ -508,9 +508,9 @@ function HeroSearch({
   React.useEffect(() => {
     if (!open) return;
 
-    if (query.length < 2) return;
-
     const query = dq.trim();
+
+    if (query.length < 2) return;
     if (!query) {
       setApiData(null);
       setErr("");

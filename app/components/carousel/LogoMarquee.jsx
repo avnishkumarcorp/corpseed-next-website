@@ -38,7 +38,7 @@ async function fetchClientsOnce(apiUrl) {
     const proxyUrl = `/api/proxy/clients?apiUrl=${encodeURIComponent(apiUrl)}`;
 
     // ✅ don't attach AbortController to a shared cached request
-    const res = await fetch(proxyUrl, { cache: "no-store" });
+    const res = await fetch(proxyUrl, { cache: "force-cache" });
 
     if (!res.ok) throw new Error(`API failed: ${res.status}`);
 
@@ -443,15 +443,18 @@ export default function LogoMarquee({
                   >
                     <div
                       className="relative flex items-center justify-center opacity-80 transition-opacity duration-200 hover:opacity-100"
-                      style={{ height, width: itemWidth }}
+                      style={{ height }}
                       title={item.name}
                     >
                       <Image
                         src={item.src}
                         alt={item.name}
-                        fill
-                        sizes="(max-width: 768px) 120px, 160px"
-                        className="object-contain max-w-[95%] max-h-[95%]" // ✅ tighter
+                        width={120}
+                        height={46}
+                        sizes="120px"
+                        quality={60}
+                        className="h-full w-auto max-w-[120px] object-contain"
+                        loading="lazy"
                       />
                     </div>
                   </div>

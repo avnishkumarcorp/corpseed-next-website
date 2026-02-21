@@ -4,7 +4,7 @@ import complianceUpdateImg from "../../../../public/home/compliance_updates.png"
 
 const Feature = ({ icon, title, desc }) => (
   <div className="flex items-start gap-4">
-    <div  className="flex-shrink-0 h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white flex">
+    <div className="flex-shrink-0 h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white flex">
       {icon}
     </div>
 
@@ -98,7 +98,6 @@ export default function ComplianceUpdateSection() {
             <Image
               src={complianceUpdateImg}
               alt="Compliance updates dashboard"
-              priority
               className="w-[90%] max-w-[520px] object-contain"
             />
           </div>

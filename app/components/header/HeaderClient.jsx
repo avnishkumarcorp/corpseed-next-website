@@ -52,12 +52,12 @@ export default function HeaderClient({ menuData = [] }) {
   };
 
   useEffect(() => {
-  // 🔥 Close all dropdowns when route changes
-  setOpenKey(null);
-  setAllOpen(false);
-  setSearchOpen(false);
-  setMobileOpen(false);
-}, [pathname]);
+    // 🔥 Close all dropdowns when route changes
+    setOpenKey(null);
+    setAllOpen(false);
+    setSearchOpen(false);
+    setMobileOpen(false);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 bg-white">
@@ -70,6 +70,7 @@ export default function HeaderClient({ menuData = [] }) {
               alt="Corpseed"
               width={140}
               height={60}
+              sizes="140px"
               priority
               className="h-12 w-auto object-contain"
             />

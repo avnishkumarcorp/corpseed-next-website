@@ -5,6 +5,7 @@ export async function getUpdatedFooter() {
 
     const res = await fetch(url, {
       // change to `next: { revalidate: 3600 }` if you want caching
+      next: { revalidate: 60 * 60 },
       cache: "no-store",
       headers: { Accept: "application/json" },
     });

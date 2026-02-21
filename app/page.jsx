@@ -40,6 +40,8 @@ export async function generateMetadata() {
   };
 }
 
+export const revalidate = 300;
+
 export default async function HomePage() {
   const [homeData, pressList, latestBlogs, products] = await Promise.all([
     getHomeTestData(),
@@ -50,10 +52,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* ✅ Keep Hero in server for best LCP */}
       <HomeHeroSection data={homeData} />
-
-      {/* ✅ Everything else client-lazy */}
       <HomeClientSections
         homeData={homeData}
         newsData={pressList}

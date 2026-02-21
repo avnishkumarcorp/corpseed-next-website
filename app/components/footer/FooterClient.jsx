@@ -384,13 +384,15 @@ export default function FooterClient({ data }) {
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-slate-600">
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-32">
-                <Link href={"/"}>
+                <Link href="/" className="inline-block">
                   <Image
                     src={footerLogo}
                     alt="Corpseed"
-                    fill
-                    priority
-                    className="object-contain"
+                    width={128}
+                    height={48}
+                    sizes="128px"
+                    className="h-12 w-auto object-contain"
+                    // ✅ footer is not LCP; remove priority
                   />
                 </Link>
               </div>

@@ -58,8 +58,13 @@ export default function HomeClientSections({
       <section className="mx-auto max-w-full px-4 py-6 bg-white">
         <LogoMarquee speed={60} />
       </section>
-      <CardCarousel data={homeData} />
-      <ComplianceUpdateSection data={homeData} />
+      <div className="min-h-[350px]">
+        <CardCarousel data={homeData} />
+      </div>
+
+      <div className="min-h-[450px]">
+        <ComplianceUpdateSection data={homeData} />
+      </div>
       <VirtualMeetingSection data={homeData} />
       <OurSupportSection data={homeData} />
       <NewsSection data={newsData} />

@@ -165,7 +165,7 @@ function NewsSlide({ slide }) {
               src={imgUrl}
               alt={slide?.title || "News"}
               fill
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 768px) 100vw, 620px"
               className="object-contain object-center"
             />
           )}

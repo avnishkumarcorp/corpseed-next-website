@@ -10,8 +10,10 @@ export default function MobileStickyFooter() {
 
   const phoneNumber = "919311255283";
 
+  const callNumber = "917558640644";
+
   const handleCall = () => {
-    window.location.href = `tel:+${phoneNumber}`;
+    window.location.href = `tel:+${callNumber}`;
   };
 
   const handleWhatsApp = () => {
@@ -29,7 +31,6 @@ export default function MobileStickyFooter() {
       "_blank",
     );
   };
-
 
   return (
     <>
@@ -96,4 +97,3 @@ export default function MobileStickyFooter() {
     </>
   );
 }
-

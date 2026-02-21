@@ -2,7 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   devIndicators: false,
-
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

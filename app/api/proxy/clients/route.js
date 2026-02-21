@@ -14,41 +14,49 @@ export async function GET(req) {
       );
     }
 
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const base = process.env.API_BASE_URL;
 
     if (!base) {
+      console.error("API_BASE_URL is not defined");
       return NextResponse.json(
-        { error: "NEXT_PUBLIC_API_BASE_URL missing" },
+        { error: "Server configuration error" },
         { status: 500 }
       );
     }
 
-    // 🔥 Always ensure single slash joining
-    const cleanBase = base.replace(/\/+$/, "");
-    const cleanPath = apiUrl.replace(/^\/+/, "");
-
-    const upstream = `${cleanBase}/${cleanPath}`;
+    // If apiUrl is already absolute, use it directly
+    const upstream = apiUrl.startsWith("http")
+      ? apiUrl
+      : `${base.replace(/\/+$/, "")}/${apiUrl.replace(/^\/+/, "")}`;
 
     console.log("Proxying to:", upstream);
 
     const res = await fetch(upstream, {
-      headers: { Accept: "application/json" },
-      next: { revalidate: 3600 },
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store", // always fresh from backend
     });
 
-    const text = await res.text();
+    const contentType =
+      res.headers.get("content-type") || "application/json";
 
-    return new NextResponse(text, {
+    const body = await res.text();
+
+    return new NextResponse(body, {
       status: res.status,
       headers: {
-        "Content-Type":
-          res.headers.get("content-type") || "application/json",
+        "Content-Type": contentType,
       },
     });
-  } catch (e) {
-    console.error("Proxy error:", e);
+  } catch (error) {
+    console.error("Proxy error:", error);
+
     return NextResponse.json(
-      { error: "Proxy failed", message: String(e?.message || e) },
+      {
+        error: "Proxy failed",
+        message: error?.message || "Unknown error",
+      },
       { status: 500 }
     );
   }

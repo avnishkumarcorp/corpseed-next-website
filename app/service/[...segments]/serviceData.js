@@ -7,9 +7,7 @@ import {
 
 export const getServiceData = cache(async (slug, state = null) => {
   if (state) {
-    console.log("jkhjdhgkjfdj          state")
     return getServiceByCityAndSlug(state, slug);
   }
-console.log("jkhjdhgkjfdj          ")
   return getServiceBySlug(slug);
 });

@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Phone, Info } from "lucide-react";
 import EnquiryDrawer from "./EnquiryDrawer";
 
 export default function MobileStickyFooter() {
@@ -19,52 +18,78 @@ export default function MobileStickyFooter() {
     const slug =
       pathname === "/"
         ? ""
-        : pathname
-            .split("/")
-            .pop()
-            ?.replaceAll("-", " ")
-            ?.toUpperCase();
+        : pathname.split("/").pop()?.replaceAll("-", " ")?.toUpperCase();
 
     const msg = slug
       ? `Hi Corpseed, I am looking for ${slug}. I want to know more about it.`
       : "Hi Corpseed, I want to know about Corpseed and its services.";
 
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(
+      `https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`,
+      "_blank",
+    );
   };
+
 
   return (
     <>
       {/* footer (hide while drawer open, optional) */}
 
-        <div className="fixed bottom-0 left-0 right-0 z-[9999] md:hidden">
-          <div className="border-t border-slate-300 bg-white/95 backdrop-blur-md">
-            <div className="grid grid-cols-3 items-center py-2">
-              <button
-                onClick={handleCall}
-                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow"
-                style={{ cursor: "pointer" }}
-              >
-                <Phone size={20} />
-              </button>
+      <div className="fixed bottom-0 left-0 right-0 z-[9999] md:hidden">
+        <div className="border-t border-slate-200 bg-white">
+          <div className="grid grid-cols-3 items-center">
+            {/* CALL */}
+            <button onClick={handleCall} className="flex justify-center">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 transition active:scale-95">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V21c0 .55-.45 1-1 1C10.07 22 2 13.93 2 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z" />
+                </svg>
+              </div>
+            </button>
 
-              <button
-                onClick={handleWhatsApp}
-                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white shadow"
-                style={{ cursor: "pointer" }}
-              >
-                <WhatsAppIcon size={22} className="text-white" />
-              </button>
+            {/* WHATSAPP (CENTERED & CLEAN) */}
+            <button
+              onClick={handleWhatsApp}
+              className="flex justify-center mobile-contact"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#25D366] transition active:scale-95">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  fill="currentColor"
+                  className="bi bi-whatsapp"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"></path>
+                </svg>
+              </div>
+            </button>
 
-              <button
-                onClick={() => setOpen(true)}
-                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow"
-                style={{ cursor: "pointer" }}
-              >
-                <Info size={20} />
-              </button>
-            </div>
+            {/* INFO */}
+            <button
+              onClick={() => setOpen(true)}
+              className="flex justify-center"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 transition active:scale-95">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  id="Info"
+                  height="18"
+                  width="18"
+                >
+                  <path
+                    d="M12.432 0c1.34 0 2.01.912 2.01 1.957 0 1.305-1.164 2.512-2.679 2.512-1.269 0-2.009-.75-1.974-1.99C9.789 1.436 10.67 0 12.432 0zM8.309 20c-1.058 0-1.833-.652-1.093-3.524l1.214-5.092c.211-.814.246-1.141 0-1.141-.317 0-1.689.562-2.502 1.117l-.528-.88c2.572-2.186 5.531-3.467 6.801-3.467 1.057 0 1.233 1.273.705 3.23l-1.391 5.352c-.246.945-.141 1.271.106 1.271.317 0 1.357-.392 2.379-1.207l.6.814C12.098 19.02 9.365 20 8.309 20z"
+                    fill="#ffffff"
+                    className="color000000 svgShape"
+                  ></path>
+                </svg>
+              </div>
+            </button>
           </div>
         </div>
+      </div>
 
       {/* ✅ Always mounted drawer */}
       <EnquiryDrawer open={open} onClose={() => setOpen(false)} />
@@ -72,27 +97,3 @@ export default function MobileStickyFooter() {
   );
 }
 
-
-
-export function WhatsAppIcon({ size = 22, className = "" }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      <path
-        fill="currentColor"
-        d="M19.11 17.6c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8.98-.15.17-.3.19-.55.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.25-1.5-1.4-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.3.38-.45.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.57-1.38-.78-1.89-.2-.48-.4-.41-.57-.42-.15-.01-.32-.01-.49-.01-.17 0-.45.06-.69.32-.23.25-.9.88-.9 2.14 0 1.25.92 2.46 1.05 2.63.13.17 1.8 2.74 4.36 3.85.61.26 1.08.42 1.45.54.61.19 1.17.16 1.61.1.49-.07 1.47-.6 1.68-1.21.21-.6.21-1.12.15-1.21-.06-.1-.23-.16-.48-.29Z"
-      />
-      <path
-        fill="currentColor"
-        d="M16.02 3.2C9.26 3.2 3.78 8.68 3.78 15.44c0 2.14.56 4.22 1.62 6.05L3.2 28.8l7.49-1.97c1.77.97 3.77 1.48 5.83 1.48h.01c6.76 0 12.24-5.48 12.24-12.24S22.78 3.2 16.02 3.2Zm0 22.02h-.01c-1.87 0-3.7-.52-5.29-1.5l-.38-.23-4.45 1.17 1.19-4.34-.25-.4a9.95 9.95 0 0 1-1.53-5.28c0-5.52 4.49-10 10.02-10a9.95 9.95 0 0 1 7.08 2.93 9.95 9.95 0 0 1 2.94 7.08c0 5.53-4.49 10-10.02 10Z"
-      />
-    </svg>
-  );
-}

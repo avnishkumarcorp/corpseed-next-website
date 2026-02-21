@@ -79,8 +79,6 @@ export async function generateMetadata({ params }) {
 
 export default async function ServicePage({ params }) {
   const { segments } = (await params) ?? [];
-
-  console.log("Segments:", segments);
   let state = null;
   let slug = null;
 

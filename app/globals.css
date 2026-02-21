@@ -5598,7 +5598,6 @@ html {
   text-decoration: underline;
 }
 
-
 .vediosec {
   background: #fff;
   padding: 10px;
@@ -5652,7 +5651,7 @@ li {
   list-style-type: inherit;
 }
 
-.bootstrap-scope img{
+.bootstrap-scope img {
   max-width: 100%;
 }
 
@@ -5689,16 +5688,16 @@ li {
   font-size: 24px;
 }
 
-.blog-desc h1, h2, h3, h4, h5, h6 {
+.blog-desc h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   letter-spacing: 0.2px !important;
   margin-bottom: 0.5rem !important;
   font-weight: 500 !important;
 }
-
-
-
-
-
 
 /* Root */
 .antdDrawerRoot {
@@ -5736,12 +5735,11 @@ li {
   padding: 12px;
 }
 
-
 /* ✅ PANEL: fit to form content (NOT full height) */
 .antdDrawerPanelFit {
-  width: 420px;                 /* same like screenshot */
-  max-width: 92vw;              /* mobile safe */
-  height: auto;                 /* fit content */
+  width: 420px; /* same like screenshot */
+  max-width: 92vw; /* mobile safe */
+  height: auto; /* fit content */
   max-height: calc(100vh - 24px); /* avoid overflow */
   background: #fff;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
@@ -5792,8 +5790,6 @@ li {
   overflow-y: auto;
 }
 
-
-
 /* Show scrollbar only on hover (still scrollable) */
 .hover-scroll {
   overflow: hidden; /* hide bar by default */
@@ -5824,7 +5820,6 @@ li {
   background: rgba(100, 116, 139, 0.5);
 }
 
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -5839,3 +5834,15 @@ li {
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
 }
+
+.chat-contact,
+.mobile-contact {
+  border-radius: 20px;
+  padding: 10px 0px;
+  font-weight: 400;
+  background-color: white;
+  color: white;
+  width: 100%;
+}
+
+

@@ -670,7 +670,6 @@ function HeroSearch({
     };
   }, [showPanel]);
 
-  console.log("sdjkjsdgsg", groups);
 
   return (
     <div ref={wrapRef} className="relative w-full max-w-xl">

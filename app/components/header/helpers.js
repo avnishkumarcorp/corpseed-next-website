@@ -34,10 +34,14 @@ export function useDebouncedValue(value, delay = 250) {
 export function normalizeGroups(apiData) {
   if (!apiData || typeof apiData !== "object") return [];
 
-  const entries = Object.entries(apiData).map(([k, v]) => [
-    k,
-    Array.isArray(v) ? v : [],
-  ]);
+  const entries = Object.entries(apiData)
+    .filter(([key]) =>
+      key?.toLowerCase() !== "product based services"
+    ) // ✅ remove product based services
+    .map(([k, v]) => [
+      k,
+      Array.isArray(v) ? v : [],
+    ]);
 
   const known = [];
   const unknown = [];
@@ -49,9 +53,13 @@ export function normalizeGroups(apiData) {
   }
 
   known.sort(
-    (a, b) => GRID_KEYS_ORDER.indexOf(a[0]) - GRID_KEYS_ORDER.indexOf(b[0]),
+    (a, b) =>
+      GRID_KEYS_ORDER.indexOf(a[0]) -
+      GRID_KEYS_ORDER.indexOf(b[0])
   );
+
   unknown.sort((a, b) => a[0].localeCompare(b[0]));
+
   return [...known, ...unknown];
 }
 

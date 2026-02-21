@@ -579,7 +579,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
               </div>
             ) : groups.length ? (
               <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-                {groups.map(([groupTitle, list]) => (
+                {groups?.map(([groupTitle, list]) => (
                   <div key={groupTitle} className="min-w-0">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-blue-600 tracking-tight">
@@ -590,21 +590,21 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                       </span>
                     </div>
 
-                    <ul className="mt-3 space-y-2 pl-1">
+                    <ul className="space-y-2 pl-1">
                       {list.slice(0, 7).map((x) => (
                         <li key={x?.url || x?.slug || x?.name}>
                           <Link
                             href={ensureInternalHref(x?.url || "#")}
-                            className="block rounded-lg px-2 py-2 text-[13px] leading-5
+                            className="block rounded-lg px-2 text-[13px] leading-5
                                        text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
                             onClick={onClose}
                           >
                             <div className="font-medium">{x?.name}</div>
-                            {x?.track ? (
+                            {/* {x?.track ? (
                               <div className="text-[12px] text-slate-500">
                                 {x.track}
                               </div>
-                            ) : null}
+                            ) : null} */}
                           </Link>
                         </li>
                       ))}
@@ -645,7 +645,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                 Press <span className="font-semibold">Esc</span> to close
               </p>
               <Link
-                href="/service"
+                href="/category/all"
                 onClick={onClose}
                 className="text-xs font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
               >

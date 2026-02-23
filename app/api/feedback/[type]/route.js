@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req, { params }) {
   try {
-    const { type } = params;
+    const { type } = await params;
     const { comment = "", ratingValue = "", location = "" } = await req.json();
 
     const base = process.env.NEXT_PUBLIC_API_BASE_URL;

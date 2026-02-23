@@ -5,17 +5,17 @@ import DOMPurify from "isomorphic-dompurify";
 import styles from "./SafeHtml.module.css";
 
 const LEGACY_BASE =
-  process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://www.corpseed.com";
+  process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://www.admin.corpseed.com";
 
 // ✅ Only CSS here (remove JS from this list)
 const CSS_URLS = [
-  "https://www.corpseed.com/assets/css/bootstrap.min.css",
-  "https://www.corpseed.com/assets/css/main.css",
-  "https://www.corpseed.com/chat_boat/css/main.css",
-  "https://www.corpseed.com/assets/css/owl.carousel.min.css",
-  "https://www.corpseed.com/assets/css/intlTelInput.css",
-  "https://www.corpseed.com/chat_boat/css/chatBot.css",
-  "https://www.corpseed.com/assets/css/temp.css",
+  "https://www.admin.corpseed.com/assets/css/bootstrap.min.css",
+  "https://www.admin.corpseed.com/assets/css/main.css",
+  "https://www.admin.corpseed.com/chat_boat/css/main.css",
+  "https://www.admin.corpseed.com/assets/css/owl.carousel.min.css",
+  "https://www.admin.corpseed.com/assets/css/intlTelInput.css",
+  "https://www.admin.corpseed.com/chat_boat/css/chatBot.css",
+  "https://www.admin.corpseed.com/assets/css/temp.css",
 ];
 
 // Turn any relative/partial URL into absolute corpseed URL

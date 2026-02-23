@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { apiGet } from "@/app/lib/fetcher";
 
 const CLIENTS_CACHE = {
   promise: null,
@@ -35,24 +36,18 @@ async function fetchClientsOnce(apiUrl) {
   if (CLIENTS_CACHE.promise) return CLIENTS_CACHE.promise;
 
   CLIENTS_CACHE.promise = (async () => {
-    const proxyUrl = `/api/proxy/clients?apiUrl=${encodeURIComponent(apiUrl)}`;
+    const json = await apiGet(apiUrl);
 
-    // ✅ don't attach AbortController to a shared cached request
-    const res = await fetch(proxyUrl, { cache: "force-cache" });
-
-    if (!res.ok) throw new Error(`API failed: ${res.status}`);
-
-    const json = await res.json();
     const arr = Array.isArray(json?.data)
       ? json.data
       : Array.isArray(json)
-        ? json
-        : json?.data || [];
+      ? json
+      : [];
 
-    CLIENTS_CACHE.data = Array.isArray(arr) ? arr : [];
+    CLIENTS_CACHE.data = arr;
     CLIENTS_CACHE.error = null;
     CLIENTS_CACHE.ts = Date.now();
-    return CLIENTS_CACHE.data;
+    return arr;
   })().catch((err) => {
     CLIENTS_CACHE.error = err;
     CLIENTS_CACHE.promise = null;
@@ -123,7 +118,7 @@ function buildLogoSrc(it, imageBaseUrl) {
 }
 
 export default function LogoMarquee({
-  apiUrl = "/api/customer/clients",
+  apiUrl="/api/customer/clients",
   imageBaseUrl = "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed",
   linkPrefix = "",
   openInNewTab = false,

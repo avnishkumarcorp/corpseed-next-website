@@ -4,7 +4,6 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { apiGet } from "@/app/lib/fetcher";
 
 const CLIENTS_CACHE = {
   promise: null,
@@ -36,13 +35,15 @@ async function fetchClientsOnce(apiUrl) {
   if (CLIENTS_CACHE.promise) return CLIENTS_CACHE.promise;
 
   CLIENTS_CACHE.promise = (async () => {
-    const json = await apiGet(apiUrl);
+    const res = await fetch(apiUrl, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch clients");
+    const json = await res.json();
 
     const arr = Array.isArray(json?.data)
       ? json.data
       : Array.isArray(json)
-      ? json
-      : [];
+        ? json
+        : [];
 
     CLIENTS_CACHE.data = arr;
     CLIENTS_CACHE.error = null;
@@ -118,7 +119,7 @@ function buildLogoSrc(it, imageBaseUrl) {
 }
 
 export default function LogoMarquee({
-  apiUrl="/api/customer/clients",
+  apiUrl = "/api/customer/clients",
   imageBaseUrl = "https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed",
   linkPrefix = "",
   openInNewTab = false,

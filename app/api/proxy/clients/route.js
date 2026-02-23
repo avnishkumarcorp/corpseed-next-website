@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic"; // important for proxies
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const apiUrl = searchParams.get("apiUrl");
 
     if (!apiUrl) {
-      return NextResponse.json({ error: "Missing apiUrl" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing apiUrl" },
+        { status: 400 }
+      );
     }
 
     const base = process.env.API_BASE_URL;
@@ -21,19 +27,41 @@ export async function GET(req) {
       ? apiUrl
       : `${base.replace(/\/$/, "")}/${apiUrl.replace(/^\//, "")}`;
 
-    const res = await fetch(upstream);
-    const data = await res.text();
+    // ✅ Add timeout protection
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
-    return new NextResponse(data, {
+    const res = await fetch(upstream, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    const contentType =
+      res.headers.get("content-type") || "application/json";
+
+    const body = await res.text();
+
+    return new NextResponse(body, {
       status: res.status,
       headers: {
-        "Content-Type": res.headers.get("content-type") || "application/json",
+        "Content-Type": contentType,
       },
     });
-  } catch (e) {
+  } catch (error) {
+    console.error("Proxy error:", error);
+
     return NextResponse.json(
-      { error: "Proxy failed", message: e.message },
-      { status: 500 }
+      {
+        error: "Upstream API failed",
+        message: error.message,
+      },
+      { status: 502 } // use 502, not 500
     );
   }
 }

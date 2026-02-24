@@ -20,7 +20,7 @@ import envBgRight from "../../../../public/home/Environmental2_Image-03-03.png";
 import dynamic from "next/dynamic";
 
 const HeroSearch = dynamic(() => import("../HeroSearch"), {
-  ssr: false,
+  ssr: true,
 });
 
 export function Portal({ children }) {
@@ -54,11 +54,11 @@ export default function HomeHeroSection({
         <div className="absolute -right-40 top-20 h-[520px] w-[520px] rounded-full bg-indigo-100/50 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-6 lg:pb-6">
+      <div className="relative mx-auto max-w-[92%] px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-6 lg:pb-6">
         <div className="grid items-start gap-10 lg:grid-cols-12">
           <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center text-center lg:text-left">
             <a
-              href="tel:+919999999999" // 👈 your real number
+              href="tel:+917558640644" // 👈 your real number
               className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm hover:bg-blue-700 cursor-pointer"
             >
               <span>{ctaText}</span>
@@ -74,8 +74,8 @@ export default function HomeHeroSection({
             </h1>
 
             <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
-              <p className="text-[16px] tracking-[0.05rem] font-light">
-                <span className="text-blue-500">
+              <p className="text-[16px] text-[#212529] tracking-[0.05rem] font-medium">
+                <span className="!text-blue-500">
                   Regulatory, Sustainability, Environmental, Legal{" "}
                 </span>
                 &amp; Plant Setup Compliance Advisory Platform For Individuals,
@@ -103,7 +103,7 @@ export default function HomeHeroSection({
 
           {/* Right side kept as-is (your cards) */}
           <div className="lg:col-span-6 hidden lg:block">
-            <div className="ml-auto w-full max-w-[640px]">
+            <div className="ml-auto w-full">
               <div className="flex flex-col gap-6">
                 {/* Row 1 */}
                 <div className="flex justify-center gap-6">

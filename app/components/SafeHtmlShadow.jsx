@@ -124,6 +124,11 @@ export default function SafeHtmlShadow({ html }) {
     // ✅ Put your overrides + absolute checklist icon
     const base = document.createElement("style");
     base.textContent = `
+
+    p,h1,h2,h3,h4,h5,h6{
+  color: #212529;
+}
+
       :host { display: block; }
       .content-scope { font-size:16px; line-height:1.75; }
       img { max-width: 100%; height: auto; }
@@ -167,8 +172,8 @@ export default function SafeHtmlShadow({ html }) {
         line-height: 28px;
       }
 
-      .content-scope ul { list-style: none; padding-left: 0; margin-left: 0; }
-  .content-scope li { position: relative; padding-left: 24px; }
+      .content-scope ul { list-style: none; padding-left: 0; margin-left: 0;color: #212529; }
+  .content-scope li { position: relative; padding-left: 24px;color: #212529; }
 
   .content-scope li::before {
     content: "";
@@ -179,6 +184,7 @@ export default function SafeHtmlShadow({ html }) {
     height: 15px;
     background: url("${iconUrl}") no-repeat center;
     background-size: cover;
+    color: #212529;
   }
       .page-header h2 {
         font-weight: 400;
@@ -220,6 +226,7 @@ export default function SafeHtmlShadow({ html }) {
     background-size: cover !important;
     border-radius: 50% !important;
     margin-bottom: 0.2rem !important;
+    color: #212529;
 }
 
 #main-toc ul li, #main-toc ol li{

@@ -100,7 +100,7 @@ export default function NewsSection({ data }) {
             onClick={prev}
             disabled={loading || slides.length < 2}
             className={[
-              "hidden md:flex absolute left-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
+              "hidden md:flex absolute left-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full text-[#212529] bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
               loading || slides.length < 2
                 ? "opacity-40 cursor-not-allowed"
                 : "hover:bg-white",
@@ -123,7 +123,7 @@ export default function NewsSection({ data }) {
             onClick={next}
             disabled={loading || slides.length < 2}
             className={[
-              "hidden md:flex absolute right-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
+              "hidden md:flex absolute right-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full text-[#212529] bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
               loading || slides.length < 2
                 ? "opacity-40 cursor-not-allowed"
                 : "hover:bg-white",

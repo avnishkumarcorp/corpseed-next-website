@@ -181,11 +181,11 @@ export default function EnquiryOtpInline({ onVerified, page }) {
             placeholder="Name *"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="h-11 w-full rounded-xl border border-gray-200 px-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none"
+            className="h-11 w-full rounded-xl border border-gray-200 px-3 text-sm text-[#212529] focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none"
           />
 
           <div className="flex rounded-xl border border-gray-200 overflow-hidden focus-within:ring-4 focus-within:ring-blue-100 focus-within:border-blue-500">
-            <div className="flex items-center text-nowrap gap-1 bg-gray-50 px-3 text-sm ">
+            <div className="flex items-center text-nowrap gap-1 bg-gray-50 px-3 text-sm text-[#212529]">
               🇮🇳 +91
             </div>
             <input
@@ -193,12 +193,12 @@ export default function EnquiryOtpInline({ onVerified, page }) {
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
               inputMode="numeric"
-              className="h-11 w-full px-3 text-sm outline-none"
+              className="h-11 w-full px-3 text-sm outline-none text-[#212529]"
             />
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span>Get updates on WhatsApp</span>
+            <span className="text-[#212529]">Get updates on WhatsApp</span>
             <button
               onClick={() => setWhatsapp(!whatsapp)}
               className={cn(

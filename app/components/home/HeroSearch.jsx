@@ -187,243 +187,86 @@ function VoicePopup({
  * - Fallback to MediaRecorder if not (Android Chrome)
  * - Auto-stops if no speech for `silenceMs` (default 8000)
  */
-function useVoiceSearch({ onText, silenceMs = 8000, lang = "en-IN" }) {
-  const recRef = React.useRef(null);
-
-  const mediaRef = React.useRef({
-    stream: null,
-    recorder: null,
-    chunks: [],
-  });
-
-  const silenceTimerRef = React.useRef(null);
+function useVoiceSearch({ onText, lang = "en-IN" }) {
+  const recognitionRef = React.useRef(null);
 
   const [supported, setSupported] = React.useState(false);
   const [listening, setListening] = React.useState(false);
   const [error, setError] = React.useState("");
   const [interim, setInterim] = React.useState("");
 
-  const resetSilenceTimer = React.useCallback(() => {
-    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-    silenceTimerRef.current = setTimeout(() => {
-      // ✅ 8 sec no speech => stop
-      stop();
-      setError("Stopped (no speech detected).");
-    }, silenceMs);
-  }, [silenceMs]);
-
   React.useEffect(() => {
     if (typeof window === "undefined") return;
+
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    setSupported(Boolean(SR) || Boolean(navigator?.mediaDevices?.getUserMedia));
-  }, []);
+    if (!SR) {
+      setSupported(false);
+      return;
+    }
 
-  // setup SpeechRecognition
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return;
+    setSupported(true);
 
-    const rec = new SR();
-    rec.continuous = false;
-    rec.interimResults = true;
-    rec.lang = lang;
+    const recognition = new SR();
+    recognition.lang = lang;
+    recognition.interimResults = true;
+    recognition.continuous = false;
 
-    rec.onstart = () => {
+    recognition.onstart = () => {
+      setListening(true);
       setError("");
       setInterim("");
-      setListening(true);
-      resetSilenceTimer();
     };
 
-    rec.onend = () => {
+    recognition.onend = () => {
       setListening(false);
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = null;
     };
 
-    rec.onerror = (e) => {
+    recognition.onerror = (e) => {
       setListening(false);
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-
-      setError(
-        e?.error === "not-allowed"
-          ? "Mic permission denied. Allow microphone access."
-          : e?.error === "no-speech"
-            ? "No speech detected."
-            : "Voice search failed.",
-      );
+      if (e.error === "not-allowed") {
+        setError("Microphone permission denied.");
+      } else {
+        setError("Voice search failed.");
+      }
     };
 
-    rec.onspeechstart = () => {
-      // user started speaking
-      resetSilenceTimer();
-    };
-
-    rec.onspeechend = () => {
-      // speech ended, start timer again
-      resetSilenceTimer();
-    };
-
-    rec.onresult = (event) => {
-      resetSilenceTimer();
-
-      let interimText = "";
+    recognition.onresult = (event) => {
       let finalText = "";
+      let interimText = "";
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0]?.transcript || "";
+        const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) finalText += transcript;
         else interimText += transcript;
       }
 
-      const merged = (finalText || interimText).trim();
-      setInterim(merged);
+      setInterim(interimText);
 
-      if (finalText.trim()) {
+      if (finalText) {
         onText?.(finalText.trim());
-        stop(); // ✅ once final text => stop
+        recognition.stop();
       }
     };
 
-    recRef.current = rec;
+    recognitionRef.current = recognition;
 
     return () => {
-      try {
-        rec.stop();
-      } catch {}
-      recRef.current = null;
+      recognition.stop();
     };
-  }, [lang, onText, resetSilenceTimer]);
+  }, [lang, onText]);
 
-  const stopMediaRecorder = () => {
+  const start = () => {
+    if (!recognitionRef.current) return;
     try {
-      const { recorder, stream } = mediaRef.current;
-      if (recorder && recorder.state !== "inactive") recorder.stop();
-      if (stream) stream.getTracks().forEach((t) => t.stop());
+      recognitionRef.current.start();
     } catch {}
-    mediaRef.current.stream = null;
-    mediaRef.current.recorder = null;
-    mediaRef.current.chunks = [];
   };
 
-  const stop = React.useCallback(() => {
-    // stop SR
-    try {
-      recRef.current?.stop();
-    } catch {}
-
-    // stop fallback recorder
-    stopMediaRecorder();
-
-    setListening(false);
-    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-    silenceTimerRef.current = null;
-  }, []);
-
-  const startRecorderFallback = async () => {
-    setError("");
-    setInterim("");
-
-    // Android Chrome: HTTPS needed (or localhost)
-    if (
-      typeof window !== "undefined" &&
-      window.location.protocol !== "https:" &&
-      window.location.hostname !== "localhost"
-    ) {
-      setError("Voice search needs HTTPS on mobile browsers.");
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-
-      mediaRef.current.stream = stream;
-      mediaRef.current.recorder = recorder;
-      mediaRef.current.chunks = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data?.size) mediaRef.current.chunks.push(e.data);
-      };
-
-      recorder.onstart = () => {
-        setListening(true);
-        resetSilenceTimer(); // ✅ start silence timer immediately
-      };
-
-      recorder.onstop = async () => {
-        try {
-          const blob = new Blob(mediaRef.current.chunks, {
-            type: "audio/webm",
-          });
-          const fd = new FormData();
-          fd.append("audio", blob, "voice.webm");
-
-          const res = await fetch("/api/speech-to-text", {
-            method: "POST",
-            body: fd,
-          });
-
-          if (!res.ok) throw new Error("stt_failed");
-          const json = await res.json();
-          const text = String(json?.text || "").trim();
-          if (text) onText?.(text);
-        } catch {
-          setError("Voice search failed. Please try again.");
-        } finally {
-          setListening(false);
-        }
-      };
-
-      recorder.start();
-
-      // ✅ if no one speaks for 8 seconds, stop recorder too
-      // (we can't detect speech in recorder easily, so this is a strict timeout)
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = setTimeout(() => {
-        stop();
-        setError("Stopped (no speech detected).");
-      }, silenceMs);
-    } catch {
-      setError("Mic permission denied. Please allow microphone access.");
-      setListening(false);
-    }
+  const stop = () => {
+    recognitionRef.current?.stop();
   };
 
-  const start = async () => {
-    setError("");
-    setInterim("");
-
-    // try SpeechRecognition first
-    if (recRef.current) {
-      try {
-        recRef.current.start();
-        return;
-      } catch {
-        // fallback below
-      }
-    }
-
-    await startRecorderFallback();
-  };
-
-  // cleanup on unmount
-  React.useEffect(() => {
-    return () => {
-      stop();
-    };
-  }, [stop]);
-
-  return {
-    supported,
-    listening,
-    error,
-    interim,
-    start,
-    stop,
-    clearError: () => setError(""),
-  };
+  return { supported, listening, error, interim, start, stop };
 }
 
 function HeroSearch({

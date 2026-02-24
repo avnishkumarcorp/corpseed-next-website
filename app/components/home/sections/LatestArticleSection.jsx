@@ -144,7 +144,7 @@ export default function LatestArticlesSection({
             disabled={loading || !canPrev}
             className={[
               "hidden md:flex absolute left-0 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2",
-              "h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
+              "h-11 w-11 items-center justify-center rounded-full text-[#212529] bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
               loading || !canPrev
                 ? "opacity-40 cursor-not-allowed"
                 : "hover:bg-slate-50",
@@ -169,7 +169,7 @@ export default function LatestArticlesSection({
             style={{ right: "-16px" }}
             className={[
               "hidden md:flex absolute right-0 top-1/2 z-30 translate-x-1/2 -translate-y-1/2",
-              "h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
+              "h-11 w-11 items-center justify-center rounded-full text-[#212529] bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
               loading || !canNext
                 ? "opacity-40 cursor-not-allowed"
                 : "hover:bg-slate-50",

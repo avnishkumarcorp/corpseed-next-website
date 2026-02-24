@@ -5,6 +5,7 @@ import { getHomeTestData } from "./lib/home";
 import { getLatestBlogs } from "./lib/knowledgeCentre";
 import { getLatestProducts } from "./lib/products";
 import { getLatestUpdatedPressRelease } from "./lib/pressRelease";
+import { getClients } from "./lib/clients";
 
 // ✅ Home Page SEO (Meta)
 export async function generateMetadata() {
@@ -43,11 +44,12 @@ export async function generateMetadata() {
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [homeData, pressList, latestBlogs, products] = await Promise.all([
+  const [homeData, pressList, latestBlogs, products,clients] = await Promise.all([
     getHomeTestData(),
     getLatestUpdatedPressRelease(),
     getLatestBlogs(),
     getLatestProducts(),
+    getClients()
   ]);
 
   return (
@@ -58,6 +60,7 @@ export default async function HomePage() {
         newsData={pressList}
         latestBlogs={latestBlogs}
         products={products}
+         clients={clients}
       />
     </>
   );

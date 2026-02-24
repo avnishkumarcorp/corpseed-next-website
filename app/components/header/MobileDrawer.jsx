@@ -17,47 +17,6 @@ import {
 
 /* ----------------------------- Voice Popup UI ----------------------------- */
 
-function MicIcon({ active = false }) {
-  return (
-    <div
-      className={[
-        "flex h-16 w-16 items-center justify-center rounded-full border bg-white shadow-sm",
-        active ? "border-blue-300 ring-4 ring-blue-100" : "border-slate-200",
-      ].join(" ")}
-    >
-      <svg
-        width="26"
-        height="26"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M19 11a7 7 0 0 1-14 0"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M12 18v3"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-  );
-}
-
 function VoicePopup({
   open,
   listening,
@@ -191,157 +150,84 @@ function VoicePopup({
 
 /* ----------------------------- Voice Helpers ----------------------------- */
 
-function useVoiceSearch({ onText, silenceMs = 8000 }) {
+function useVoiceSearch({ onText }) {
   const recognitionRef = useRef(null);
-  const silenceTimerRef = useRef(null);
-  const streamRef = useRef(null);
 
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const [error, setError] = useState("");
-
   const [popupOpen, setPopupOpen] = useState(false);
-
-  const clearSilenceTimer = () => {
-    if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
-    silenceTimerRef.current = null;
-  };
-
-  const armSilenceTimer = () => {
-    clearSilenceTimer();
-    silenceTimerRef.current = window.setTimeout(() => {
-      // auto-stop after silence
-      stop();
-    }, silenceMs);
-  };
-
-  const stopTracks = () => {
-    try {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-      }
-    } catch {}
-  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const SpeechRecognition =
+    const SR =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    setSupported(Boolean(SpeechRecognition));
-    if (!SpeechRecognition) return;
+    if (!SR) {
+      setSupported(false);
+      return;
+    }
 
-    const rec = new SpeechRecognition();
-    rec.continuous = false;
-    rec.interimResults = true;
+    setSupported(true);
+
+    const rec = new SR();
     rec.lang = "en-IN";
+    rec.interimResults = false;
+    rec.continuous = false;
 
     rec.onstart = () => {
-      setError("");
       setListening(true);
+      setError("");
       setPopupOpen(true);
-      armSilenceTimer(); // start silence timer as soon as listening begins
     };
 
     rec.onend = () => {
       setListening(false);
-      clearSilenceTimer();
-      stopTracks();
     };
 
     rec.onerror = (e) => {
+      setListening(false);
+
       const msg =
-        e?.error === "not-allowed"
-          ? "Mic permission denied. Allow microphone access."
-          : e?.error === "service-not-allowed"
-            ? "Mic blocked by browser. Check site permissions."
-            : e?.error === "no-speech"
-              ? "No speech detected."
-              : e?.error === "network"
-                ? "Voice service unavailable. Check internet."
-                : "Voice search failed.";
+        e.error === "not-allowed"
+          ? "Microphone permission denied."
+          : e.error === "no-speech"
+          ? "No speech detected."
+          : "Voice search failed.";
 
       setError(msg);
-      setListening(false);
-      clearSilenceTimer();
-      stopTracks();
       setPopupOpen(true);
     };
 
-    // some browsers fire these
-    rec.onspeechstart = () => armSilenceTimer();
-    rec.onspeechend = () => armSilenceTimer();
-    rec.onsoundstart = () => armSilenceTimer();
-    rec.onsoundend = () => armSilenceTimer();
-
     rec.onresult = (event) => {
-      // any result means "activity" => reset silence timer
-      armSilenceTimer();
+      const text =
+        event.results?.[0]?.[0]?.transcript?.trim() || "";
 
-      let interim = "";
-      let finalText = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0]?.transcript || "";
-        if (event.results[i].isFinal) finalText += transcript;
-        else interim += transcript;
+      if (text) {
+        onText?.(text);
       }
 
-      const next = (finalText || interim).trim();
-      if (next) onText?.(next);
+      rec.stop();
     };
 
     recognitionRef.current = rec;
 
     return () => {
-      clearSilenceTimer();
-      stopTracks();
       try {
-        rec.onstart = rec.onend = rec.onerror = rec.onresult = null;
         rec.stop();
       } catch {}
-      recognitionRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onText, silenceMs]);
+  }, [onText]);
 
-  const start = async () => {
+  const start = () => {
+    if (!recognitionRef.current) return;
     setError("");
-
-    if (
-      typeof window !== "undefined" &&
-      window.location.protocol !== "https:" &&
-      window.location.hostname !== "localhost"
-    ) {
-      setError("Voice search requires HTTPS on Android Chrome.");
-      setPopupOpen(true);
-      return;
-    }
-
-    if (!supported || !recognitionRef.current) {
-      setError("Voice search not supported in this browser.");
-      setPopupOpen(true);
-      return;
-    }
-
-    // ✅ Preflight permission prompt (keep stream alive)
-    try {
-      if (navigator?.mediaDevices?.getUserMedia) {
-        streamRef.current = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-      }
-    } catch (e) {
-      setError("Mic permission denied. Allow microphone access.");
-      setPopupOpen(true);
-      return;
-    }
+    setPopupOpen(true);
 
     try {
       recognitionRef.current.start();
-    } catch (e) {
+    } catch {
       try {
         recognitionRef.current.stop();
         recognitionRef.current.start();
@@ -350,16 +236,11 @@ function useVoiceSearch({ onText, silenceMs = 8000 }) {
   };
 
   const stop = () => {
-    clearSilenceTimer();
-    try {
-      recognitionRef.current?.stop();
-    } catch {}
+    recognitionRef.current?.stop();
     setListening(false);
-    stopTracks(); // ✅ stop mic stream here
   };
 
   const closePopup = () => {
-    // Closing popup MUST stop listening
     stop();
     setPopupOpen(false);
   };
@@ -376,7 +257,6 @@ function useVoiceSearch({ onText, silenceMs = 8000 }) {
     closePopup,
   };
 }
-
 /* ----------------------------- Search Inline ----------------------------- */
 
 function MobileSearchInline({ onNavigate }) {

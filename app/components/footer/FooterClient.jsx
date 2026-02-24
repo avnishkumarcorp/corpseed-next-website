@@ -6,42 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import footerLogo from "../../assets/logo-footer.png";
 
-function LinkedInIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 24V7h5v17H0zM7 7h4.8v2.3h.1c.7-1.3 2.4-2.7 5-2.7 5.3 0 6.3 3.5 6.3 8V24h-5v-7.8c0-1.9 0-4.3-2.6-4.3-2.6 0-3 2-3 4.1V24H7V7z" />
-    </svg>
-  );
-}
-function FacebookIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M22.68 0H1.32C.59 0 0 .59 0 1.32v21.36C0 23.41.59 24 1.32 24h11.5v-9.3H9.69V11.1h3.13V8.4c0-3.1 1.9-4.8 4.67-4.8 1.33 0 2.47.1 2.8.14v3.24h-1.92c-1.5 0-1.8.71-1.8 1.76v2.3h3.6l-.47 3.6h-3.13V24h6.14c.73 0 1.32-.59 1.32-1.32V1.32C24 .59 23.41 0 22.68 0z" />
-    </svg>
-  );
-}
-function YouTubeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M23.5 6.2s-.2-1.6-.8-2.3c-.8-.8-1.7-.8-2.1-.9C17.5 2.7 12 2.7 12 2.7s-5.5 0-8.6.3c-.4.1-1.3.1-2.1.9-.6.7-.8 2.3-.8 2.3S0 8 0 9.8v1.4c0 1.8.2 3.6.2 3.6s.2 1.6.8 2.3c.8.8 1.9.8 2.4.9 1.7.2 7.1.3 7.1.3s5.5 0 8.6-.3c.4-.1 1.3-.1 2.1-.9.6-.7.8-2.3.8-2.3s.2-1.8.2-3.6V9.8c0-1.8-.2-3.6-.2-3.6zM9.5 14.8V7.9l6.2 3.4-6.2 3.5z" />
-    </svg>
-  );
-}
-function InstagramIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.9.2 2.4.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.5.3 1.2.4 2.4.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.9-.4 2.4-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.5.2-1.2.3-2.4.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.9-.2-2.4-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.5-.3-1.2-.4-2.4-.1-1.2-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-1.2.2-1.9.4-2.4.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.5-.2 1.2-.3 2.4-.4 1.2-.1 1.6-.1 4.8-.1zM12 6.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm5.6-9.9a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6z" />
-    </svg>
-  );
-}
-function XIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.9 2H22l-7.5 8.6L23 22h-6.2l-4.9-6.4L6.3 22H2l7.9-9.1L1 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L7.2 3.9H5.4L17.8 20z" />
-    </svg>
-  );
-}
-
 const ABOUT_US_COL = {
   title: "About Us",
   links: [
@@ -387,12 +351,11 @@ export default function FooterClient({ data }) {
                 <Link href="/" className="inline-block">
                   <Image
                     src={footerLogo}
-                    alt="Corpseed"
-                    width={128}
-                    height={48}
-                    sizes="128px"
-                    className="h-12 w-auto object-contain"
-                    // ✅ footer is not LCP; remove priority
+                    alt="Corpseed_footer"
+                    width={88}
+                    height={58}
+                    sizes="(max-width: 768px) 88px, 88px"
+                    className="object-contain"
                   />
                 </Link>
               </div>

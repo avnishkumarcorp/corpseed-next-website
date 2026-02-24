@@ -5845,4 +5845,41 @@ h6 {
   width: 100%;
 }
 
+p,h1,h2,h3,h4,h5,h6{
+  color: #212529;
+}
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-10%); } /* fixed pixel shift */
+}
+
+.animate-marquee {
+  animation-name: marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+@keyframes productsScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-products-scroll {
+  animation: productsScroll 10s linear infinite;
+  will-change: transform;
+}

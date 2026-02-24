@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 
 // ✅ these can be ssr:false because this file is a Client Component
 const LogoMarquee = dynamic(() => import("../carousel/LogoMarquee"), {
-  ssr: false,
   loading: () => (
     <section className="mx-auto max-w-7xl px-4 py-10">
       <div className="h-[110px] rounded-xl border border-gray-200 bg-white" />
@@ -52,11 +51,12 @@ export default function HomeClientSections({
   newsData,
   latestBlogs,
   products,
+  clients,
 }) {
   return (
     <>
-      <section className="mx-auto max-w-full px-4 py-6 bg-white">
-        <LogoMarquee speed={60} />
+      <section className="mx-auto max-w-full px-4 bg-white">
+        <LogoMarquee items={clients} speed={60} />
       </section>
       <div className="min-h-[350px]">
         <CardCarousel data={homeData} />

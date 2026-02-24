@@ -13,6 +13,7 @@ import StepsTimelineSection from "../StepsTimelineSection";
 import PdfShareBar from "@/app/components/PdfShareBar";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
+import { getClients } from "@/app/lib/clients";
 
 // ✅ Route-level caching
 export const revalidate = 3600;
@@ -79,6 +80,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ServicePage({ params }) {
   const { segments } = (await params) ?? [];
+  const clients = await getClients();
   let state = null;
   let slug = null;
 
@@ -199,7 +201,7 @@ export default async function ServicePage({ params }) {
       />
 
       <section className="mx-auto max-w-full px-4 py-10 bg-white">
-        <LogoMarquee speed={60} />
+        <LogoMarquee speed={60} items={clients} />
       </section>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">

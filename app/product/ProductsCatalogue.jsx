@@ -195,7 +195,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                             filter: slug,
                             q: "",
                           })}
-                          className={`block rounded-xl border px-3 py-2 text-sm cursor-pointer ${
+                          className={`block rounded-xl border px-3 py-2 text-sm cursor-pointer text-[#212529] ${
                             active
                               ? "border-blue-200 bg-blue-50 text-blue-700"
                               : "border-gray-200 hover:bg-slate-50"

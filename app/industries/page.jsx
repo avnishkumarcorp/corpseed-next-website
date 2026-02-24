@@ -6,6 +6,7 @@ import heroImg from "../assets/industry.webp";
 import LogoMarquee from "../components/carousel/LogoMarquee";
 import IndustryCaterTabs from "./IndustryCaterTabs";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
+import { getClients } from "../lib/clients";
 
 /* ================= META DATA ================= */
 
@@ -59,15 +60,15 @@ function FeaturedCard({ item }) {
   return (
     <div className="rounded-2xl bg-[#1f2e63] text-white shadow-sm overflow-hidden">
       <div className="p-6">
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-lg font-semibold !text-white">
           {item?.title || item?.industryName}
         </h3>
-        <p className="mt-3 text-sm text-white/85 leading-6">
+        <p className="mt-3 text-sm !text-white/85 leading-6">
           {clamp(item?.summary, 140)}
         </p>
         <Link
           href={href}
-          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-white/90 cursor-pointer"
+          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold !text-white hover:text-white/90 cursor-pointer"
         >
           KNOW MORE ›
         </Link>
@@ -103,6 +104,7 @@ function NewsCard({ title, item, hrefBase }) {
 
 /* ================= PAGE ================= */
 export default async function IndustriesPage() {
+  const clients = await getClients();
   let data;
 
   try {
@@ -140,8 +142,8 @@ export default async function IndustriesPage() {
             <div className="inline-flex rounded-md bg-blue-600 px-3 py-1 text-xs font-semibold">
               INCLUDES FREE SUPPORT
             </div>
-            <h1 className="mt-4 text-4xl font-bold">Industries</h1>
-            <p className="mt-4 text-sm leading-6 text-white/90">
+            <h1 className="mt-4 text-4xl font-bold !text-white">Industries</h1>
+            <p className="mt-4 text-sm leading-6 !text-white/90">
               Industry is a group of diverse organizations involved in the
               manufacture, production, or processing of the same type of product
               and service. All industries are part of the goods- producing
@@ -193,8 +195,8 @@ export default async function IndustriesPage() {
       </section>
 
       {/* CLIENTS */}
-      <section className="mx-auto max-w-full px-4 py-10 bg-white">
-        <LogoMarquee speed={60} />
+      <section className="mx-auto max-w-full px-4 bg-white">
+        <LogoMarquee speed={60} items={clients} />
       </section>
 
       {/* FEATURED */}

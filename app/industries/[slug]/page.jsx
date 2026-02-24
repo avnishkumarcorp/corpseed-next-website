@@ -5,11 +5,12 @@ import ServiceTabs from "@/app/service/ServiceTabs";
 import LogoMarquee from "@/app/components/carousel/LogoMarquee";
 import { getIndustryBySlug } from "@/app/lib/industry";
 import IndustryHeroSection from "./IndustryHeroSection";
+import { getClients } from "@/app/lib/clients";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getIndustryBySlug(slug);
-
+  
   const title = data?.title || data?.industry?.metaTitle || "Industry";
 
   const description =
@@ -58,6 +59,7 @@ function JsonLd({ data }) {
 export default async function IndustryPage({ params }) {
   const { slug } = await params;
   const data = await getIndustryBySlug(slug);
+  const clients = await getClients();
 
   if (!data) return null;
 
@@ -141,11 +143,11 @@ export default async function IndustryPage({ params }) {
                 INCLUDES FREE SUPPORT
               </span>
 
-              <h2 className="mt-4 text-3xl font-bold sm:text-4xl lg:text-5xl">
+              <h2 className="mt-4 text-3xl font-bold sm:text-4xl lg:text-5xl !text-white">
                 {data?.industry?.title}
               </h2>
 
-              <p className="mt-6 max-w-2xl text-base leading-7 text-gray-200">
+              <p className="mt-6 max-w-2xl text-base leading-7 !text-gray-200">
                 {data?.industry?.summary}
               </p>
             </div>
@@ -197,8 +199,8 @@ export default async function IndustryPage({ params }) {
         videoText="Click to Watch & Know More"
       />
 
-      <section className="mx-auto max-w-full px-4 py-10 bg-white">
-        <LogoMarquee speed={60} />
+      <section className="mx-auto max-w-full px-4 bg-white">
+        <LogoMarquee speed={60} items={clients} />
       </section>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">

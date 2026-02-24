@@ -68,7 +68,7 @@ export default function IndustryCaterTabs({ items = [] }) {
 
                 <span
                   className={[
-                    "text-slate-400 transition-transform",
+                    "!text-slate-400 transition-transform",
                     isActive ? "translate-x-0" : "",
                   ].join(" ")}
                 >
@@ -102,9 +102,9 @@ export default function IndustryCaterTabs({ items = [] }) {
 
         {/* content */}
         <div className="relative h-full p-8 max-w-[520px] flex flex-col justify-start text-white">
-          <h3 className="text-2xl font-bold">{active?.title}</h3>
+          <h3 className="text-2xl font-bold !text-white">{active?.title}</h3>
 
-          <p className="mt-3 text-sm leading-6 text-white/90">
+          <p className="mt-3 text-sm leading-6 !text-white/90">
             {clamp(active?.summary, 300)}
           </p>
 

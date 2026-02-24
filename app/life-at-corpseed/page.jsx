@@ -12,9 +12,6 @@ import {
 import { getLifeAtCorpseed } from "../lib/life-at-corpseed";
 import LifeStoriesClient from "./LifeStoriesClient";
 
-
-export const dynamic = "force-dynamic";
-
 // ✅ dynamic SEO from API
 export async function generateMetadata() {
   const data = await getLifeAtCorpseed();
@@ -30,24 +27,6 @@ export async function generateMetadata() {
 
 export default async function LifeAtCorpseedPage() {
   const data = await getLifeAtCorpseed();
-
-  const peopleStories = (data?.lifeUsers || []).map((u, idx) => ({
-    id: u.id,
-    title: u.title,
-    slug: u.slug,
-    desc: u.summary,
-    tags: (u.categories || []).map((x) => (x?.startsWith("#") ? x : `#${x}`)),
-    image: u.pictureName,
-    reverse: idx % 2 === 1,
-  }));
-
-  const communities = (data?.blogs || []).map((b) => ({
-    id: b.id,
-    title: b.title,
-    slug: b.slug,
-    desc: b.summary,
-    image: b.image,
-  }));
 
   return (
     <main className="bg-white text-slate-800">
@@ -72,11 +51,11 @@ export default async function LifeAtCorpseedPage() {
                   #People Of Corpseed
                 </div>
 
-                <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
+                <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold !text-white leading-tight">
                   Find Yourself at Corpseed
                 </h1>
 
-                <p className="mt-3 text-base md:text-lg text-white/85 max-w-2xl leading-relaxed">
+                <p className="mt-3 text-base md:text-lg !text-white/85 max-w-2xl leading-relaxed">
                   Discover careers, culture, and people shaping the future.
                 </p>
 

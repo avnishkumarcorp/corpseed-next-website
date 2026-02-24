@@ -335,7 +335,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                 />
 
                 {/* 🎤 MIC BUTTON -> opens popup */}
-                <button
+                {/* <button
                   type="button"
                   onClick={() => {
                     if (voiceOpen) closeVoicePopup();
@@ -386,7 +386,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                       strokeLinejoin="round"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
 
               <div className="flex items-center gap-2">

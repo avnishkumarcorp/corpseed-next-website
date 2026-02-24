@@ -474,7 +474,7 @@ function HeroSearch({
         />
 
         {/* 🎤 Mic button -> opens popup + starts listening */}
-        <button
+        {/* <button
           type="button"
           onClick={() => {
             if (voiceOpen) closeVoicePopup();
@@ -514,7 +514,7 @@ function HeroSearch({
               strokeLinejoin="round"
             />
           </svg>
-        </button>
+        </button> */}
 
         {/* Clear */}
         {q ? (

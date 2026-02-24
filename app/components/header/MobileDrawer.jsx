@@ -161,8 +161,7 @@ function useVoiceSearch({ onText }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const SR =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SR) {
       setSupported(false);
@@ -193,16 +192,15 @@ function useVoiceSearch({ onText }) {
         e.error === "not-allowed"
           ? "Microphone permission denied."
           : e.error === "no-speech"
-          ? "No speech detected."
-          : "Voice search failed.";
+            ? "No speech detected."
+            : "Voice search failed.";
 
       setError(msg);
       setPopupOpen(true);
     };
 
     rec.onresult = (event) => {
-      const text =
-        event.results?.[0]?.[0]?.transcript?.trim() || "";
+      const text = event.results?.[0]?.[0]?.transcript?.trim() || "";
 
       if (text) {
         onText?.(text);
@@ -341,7 +339,7 @@ function MobileSearchInline({ onNavigate }) {
           />
 
           {/* 🎤 Mic button */}
-          <button
+          {/* <button
             type="button"
             onClick={() => {
               voice.setError("");
@@ -388,7 +386,7 @@ function MobileSearchInline({ onNavigate }) {
                 strokeLinejoin="round"
               />
             </svg>
-          </button>
+          </button> */}
 
           {q ? (
             <button

@@ -125,7 +125,7 @@ export default async function IndustriesPage() {
   const law = (data?.latestLawUpdates || [])[0];
 
   return (
-    <main>
+    <main className="bg-white">
       {/* HERO */}
       <div className="relative h-[420px] w-full overflow-hidden">
         <Image
@@ -200,7 +200,7 @@ export default async function IndustriesPage() {
       </section>
 
       {/* FEATURED */}
-      <Section title="Industries" className="pb-10 bg-white">
+      <Section title="Industries" className="pb-6 bg-white">
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           {featured.slice(0, 3).map((x) => (
             <FeaturedCard key={x?.id || x?.slug} item={x} />
@@ -209,13 +209,13 @@ export default async function IndustriesPage() {
       </Section>
 
       {/* CATER */}
-      <Section className="pb-12 bg-white">
+      <Section className="pb-8 bg-white">
         <IndustryCaterTabs items={highlighted} />
       </Section>
 
       {/* NEWS */}
-      <Section title="Industries Latest News" className="pb-16 bg-white">
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <Section title="Industries Latest News" className="pb-8 bg-white">
+        <div className="mt-6 grid gap-6 lg:grid-cols-3 bg-white">
           <NewsCard
             title="Knowledge-Center"
             item={blog}

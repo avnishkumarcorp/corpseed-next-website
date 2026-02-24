@@ -277,7 +277,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                     filter,
                     q,
                   })}
-                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 cursor-pointer"
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm !text-[#212529] hover:bg-slate-50 cursor-pointer"
                 >
                   Prev
                 </Link>
@@ -291,7 +291,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                       className={`rounded-xl border px-3 py-2 text-sm cursor-pointer ${
                         active
                           ? "border-blue-200 bg-blue-600 text-white"
-                          : "border-gray-200 bg-white hover:bg-slate-50"
+                          : "border-gray-200 bg-white hover:bg-slate-50 !text-[#212529]"
                       }`}
                     >
                       {n}
@@ -306,7 +306,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                     filter,
                     q,
                   })}
-                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm hover:bg-slate-50 cursor-pointer"
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm !text-[#212529] hover:bg-slate-50 cursor-pointer"
                 >
                   Next
                 </Link>

@@ -171,7 +171,7 @@ export default function EnquiryOtpInline({ onVerified, page }) {
   return (
     <>
       {/* ===== ALWAYS VISIBLE FORM ===== */}
-      <div className="bg-white p-5">
+      <div className="bg-white border border-gray-100 p-5">
         <h3 className="text-base font-semibold text-gray-900">
           Schedule a call back
         </h3>

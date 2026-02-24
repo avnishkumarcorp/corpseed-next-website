@@ -69,7 +69,7 @@ function Pagination({ currentPage, totalPages, q, filter, tag }) {
       {safeCurrent > 1 && (
         <Link
           href={mkHref(1)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm !text-[#212529]"
         >
           First
         </Link>
@@ -79,7 +79,7 @@ function Pagination({ currentPage, totalPages, q, filter, tag }) {
       {safeCurrent > 1 && (
         <Link
           href={mkHref(safeCurrent - 1)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm !text-[#212529]"
         >
           Previous
         </Link>
@@ -93,7 +93,7 @@ function Pagination({ currentPage, totalPages, q, filter, tag }) {
           className={`rounded-lg px-3 py-2 text-sm ${
             p === safeCurrent
               ? "bg-blue-600 text-white"
-              : "border border-slate-200 bg-white"
+              : "border border-slate-200 bg-white !text-[#212529]"
           }`}
         >
           {p}
@@ -104,7 +104,7 @@ function Pagination({ currentPage, totalPages, q, filter, tag }) {
       {safeCurrent < safeTotal && (
         <Link
           href={mkHref(safeCurrent + 1)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm !text-[#212529]"
         >
           Next
         </Link>
@@ -114,7 +114,7 @@ function Pagination({ currentPage, totalPages, q, filter, tag }) {
       {safeCurrent < safeTotal && (
         <Link
           href={mkHref(safeTotal)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm !text-[#212529]"
         >
           Last
         </Link>

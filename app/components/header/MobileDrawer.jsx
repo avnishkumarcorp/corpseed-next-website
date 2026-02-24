@@ -335,7 +335,7 @@ function MobileSearchInline({ onNavigate }) {
               voice.setError("");
             }}
             placeholder="Search services, updates, blogs…"
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm
+            className="w-full rounded-xl border text-[#212529] border-slate-200 bg-white px-3 py-3 text-sm
                        outline-none transition
                        focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />

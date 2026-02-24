@@ -1,12 +1,13 @@
 import React from "react";
 import { Portal } from "./sections/HomeHeroSection";
+import Link from "next/link";
 
 const GRID_KEYS_ORDER = [
   "Services",
-  "Product Based Services",
+  // "Product Based Services",
   "Knowledge Center",
   "Knowledge Centre",
-  "Department Updates",
+  // "Department Updates",
   "Compliance Updates",
   "Industries",
 ];
@@ -51,16 +52,6 @@ function normalizeGroups(apiData) {
   );
   unknown.sort((a, b) => a[0].localeCompare(b[0]));
   return [...known, ...unknown];
-}
-
-function ensureInternalHref(url) {
-  if (!url) return "#";
-  try {
-    const u = new URL(url, "https://www.corpseed.com");
-    return `${u.pathname}${u.search}${u.hash}`;
-  } catch {
-    return url;
-  }
 }
 
 /** ✅ Voice popup (Google-like) */
@@ -608,14 +599,14 @@ function HeroSearch({
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                  <p className="truncate text-sm font-semibold text-slate-900">
+                                  <p className="text-sm font-semibold text-slate-900">
                                     {x?.name}
                                   </p>
-                                  {x?.track ? (
+                                  {/* {x?.track ? (
                                     <p className="mt-1 line-clamp-2 text-[12px] leading-5 text-slate-600">
                                       {x.track}
                                     </p>
-                                  ) : null}
+                                  ) : null} */}
                                 </div>
                                 <span className="mt-0.5 text-slate-400 transition group-hover:translate-x-0.5">
                                   →

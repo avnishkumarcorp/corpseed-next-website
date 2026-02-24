@@ -67,7 +67,7 @@ export function Chevron({ open }) {
   return (
     <span
       className={[
-        "inline-flex items-center justify-center",
+        "inline-flex text-gray-600 items-center justify-center",
         "transition-transform duration-200",
         open ? "rotate-90" : "rotate-0",
       ].join(" ")}

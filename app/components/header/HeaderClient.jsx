@@ -143,7 +143,7 @@ export default function HeaderClient({ menuData = [] }) {
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="lg:hidden inline-flex items-center justify-center text-xl rounded-lg px-3 py-2 hover:bg-slate-50 cursor-pointer"
+            className="lg:hidden inline-flex items-center justify-center text-xl rounded-lg px-3 py-2 text-[#212529] hover:bg-slate-50 cursor-pointer"
             aria-label="Open menu"
           >
             ☰

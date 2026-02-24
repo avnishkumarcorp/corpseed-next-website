@@ -156,7 +156,7 @@ export default async function IndustriesPage() {
 
       {/* INTRO + ENQUIRY FORM (ABOVE LOGO MARQUEE) */}
       <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid gap-10 lg:grid-cols-[2fr_1fr] lg:items-start">
             {/* Left content */}
             <div className="text-slate-700 leading-7 w-full">

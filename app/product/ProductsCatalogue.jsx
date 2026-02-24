@@ -242,7 +242,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
                 <button
                   type="button"
                   onClick={() => setConsultOpen(true)}
-                  className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50 cursor-pointer"
+                  className="rounded-xl border border-gray-200 bg-white !text-[#212529] px-4 py-2 text-sm font-semibold hover:bg-slate-50 cursor-pointer"
                 >
                   Talk to an expert
                 </button>

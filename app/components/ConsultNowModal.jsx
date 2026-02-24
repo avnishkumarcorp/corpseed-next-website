@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { X, CheckCircle2 } from "lucide-react";
 import {
@@ -9,6 +8,7 @@ import {
   submitConsultNowEnquiry,
   submitBookMeetingEnquiry,
 } from "../lib/enquiryOtp";
+import { createPortal } from "react-dom";
 
 function Input({
   label,
@@ -30,7 +30,7 @@ function Input({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm outline-none transition
+        className={`mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm outline-none transition text-[#212529]
         ${
           error
             ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100"
@@ -241,7 +241,7 @@ export default function ConsultNowModal({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[9999]">
       {/* backdrop */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
@@ -417,6 +417,7 @@ export default function ConsultNowModal({
           </div>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

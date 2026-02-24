@@ -23,7 +23,7 @@ export default function IndustryHeroSection({
       <div className="absolute -top-24 right-[-120px] h-[360px] w-[360px] rounded-full bg-blue-100 blur-3xl" />
       <div className="absolute -bottom-28 left-[-140px] h-[360px] w-[360px] rounded-full bg-indigo-100 blur-3xl" /> */}
 
-      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-7">
             <Link href={"/service/epr-for-e-waste-management"}>

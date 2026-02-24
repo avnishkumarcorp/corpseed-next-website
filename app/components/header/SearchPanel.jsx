@@ -88,8 +88,7 @@ function useVoiceSearch({ onText, lang = "en-IN" }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const SR =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SR) {
       setSupported(false);
@@ -120,8 +119,8 @@ function useVoiceSearch({ onText, lang = "en-IN" }) {
         e.error === "not-allowed"
           ? "Microphone permission denied."
           : e.error === "no-speech"
-          ? "No speech detected."
-          : "Voice search failed.";
+            ? "No speech detected."
+            : "Voice search failed.";
 
       setError(msg);
     };
@@ -330,7 +329,7 @@ export default function SearchPanel({ open, onClose, topOffset = 72 }) {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Search services, knowledge, updates… (e.g., IMEI, EPR, BIS)"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm !text-[#212529]
                              outline-none transition
                              focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />

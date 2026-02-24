@@ -4,7 +4,11 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
-export default function ProductsControls({ initialFilter = "", services = [], size = 20 }) {
+export default function ProductsControls({
+  initialFilter = "",
+  services = [],
+  size = 20,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -85,7 +89,7 @@ export default function ProductsControls({ initialFilter = "", services = [], si
                 setValue(e.target.value);
               }}
               placeholder="Search products (e.g., BIS, EPR, Certification...)"
-              className="w-full rounded-2xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-sm text-gray-900 outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50"
+              className="w-full rounded-2xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-sm !text-gray-900 outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50"
             />
             {isPending ? (
               <div className="mt-2 text-[11px] text-gray-500">Updating…</div>
@@ -98,7 +102,7 @@ export default function ProductsControls({ initialFilter = "", services = [], si
             <button
               type="button"
               onClick={clearAll}
-              className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 cursor-pointer"
+              className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold !text-gray-800 hover:bg-gray-50 cursor-pointer"
             >
               Clear
             </button>

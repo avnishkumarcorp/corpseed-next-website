@@ -6,6 +6,7 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "www.corpseed.com" },
+      { protocol: "https", hostname: "www.admin.corpseed.com" },
       { protocol: "https", hostname: "corpseed.com" },
       { protocol: "https", hostname: "encrypted-tbn0.gstatic.com" },
       {

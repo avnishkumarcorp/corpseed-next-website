@@ -30,9 +30,7 @@ export default function Loading() {
         </div>
 
         {/* Optional text */}
-        <p className="mt-5 text-sm font-medium text-white/90">
-          Loading...
-        </p>
+        <p className="mt-5 text-sm font-medium !text-white/90">Loading...</p>
       </div>
     </div>
   );

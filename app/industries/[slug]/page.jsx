@@ -1,20 +1,20 @@
 // app/service/[slug]/page.js
 import { clamp, getIndustryBySlug } from "@/app/lib/industry";
-import { getClients } from "@/app/lib/clients";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import ServiceTabs from "@/app/service/ServiceTabs";
+import ServiceContent from "@/app/service/ServiceContent";
+import ServiceFaqs from "@/app/service/ServiceFaqs";
+import Image from "next/image";
 
-const ServiceFaqs = dynamic(() => import("@/app/service/ServiceFaqs"));
 const IndustryCaterTabs = dynamic(() => import("../IndustryCaterTabs"));
 const IndustryHeroSection = dynamic(() => import("./IndustryHeroSection"));
-const LogoMarquee = dynamic(
-  () => import("@/app/components/carousel/LogoMarquee"),
+const ClientsMarquee = dynamic(
+  () => import("@/app/components/clients/ClientsMarquee"),
 );
-const ServiceTabs = dynamic(() => import("@/app/service/ServiceTabs"));
 const EnquiryForm = dynamic(
   () => import("@/app/components/enquiry-form/EnquiryForm"),
 );
-const ServiceContent = dynamic(() => import("@/app/service/ServiceContent"));
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -129,7 +129,6 @@ function NewsCard({ title, item, hrefBase }) {
 export default async function IndustryPage({ params }) {
   const { slug } = await params;
   const data = await getIndustryBySlug(slug);
-  const clients = await getClients();
 
   const featured = data?.industries || [];
 
@@ -194,17 +193,15 @@ export default async function IndustryPage({ params }) {
       <JsonLd data={breadcrumbSchema} />
       {faqSchema ? <JsonLd data={faqSchema} /> : null}
 
-      {/* Your existing UI */}
-
-      <section className="relative w-full overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src={data?.industry?.image} // replace with your actual image path
-            alt="Industry Background"
-            className="h-full w-full object-cover"
-          />
-        </div>
+      <section className="relative w-full overflow-hidden min-h-[420px] md:min-h-[520px]">
+        <Image
+          src={data?.industry?.image}
+          alt="Industry Background"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
 
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center">
@@ -222,41 +219,6 @@ export default async function IndustryPage({ params }) {
                 {data?.industry?.summary}
               </p>
             </div>
-
-            {/* Right CTA Card */}
-            {/* <div className="lg:col-span-5 lg:flex lg:justify-end">
-              <div className="w-full max-w-[420px] rounded-xl bg-white p-6 shadow-xl">
-                <p className="text-lg font-semibold text-gray-900">
-                  Why wait. Start now!
-                </p>
-
-                <div className="mt-4 flex items-center gap-3 text-blue-600 font-medium">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 5h2l3 7-1.5 3h9.5M6 5h15M9 12h6"
-                    />
-                  </svg>
-                  <span>Call 7558640644 - Harshita</span>
-                </div>
-
-                <p className="mt-3 text-sm text-gray-500">
-                  We’re available 24/7
-                </p>
-
-                <button className="mt-6 w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">
-                  Get Started
-                </button>
-              </div>
-            </div> */}
           </div>
         </div>
       </section>
@@ -270,8 +232,8 @@ export default async function IndustryPage({ params }) {
         videoText="Click to Watch & Know More"
       />
 
-      <section className="mx-auto max-w-full px-4 bg-white">
-        <LogoMarquee speed={60} items={clients} />
+      <section className="mx-auto max-w-full px-4 bg-white min-h-[120px]">
+        <ClientsMarquee />
       </section>
 
       <Section title="Industries" className="pb-6 bg-white">
@@ -294,7 +256,7 @@ export default async function IndustryPage({ params }) {
             </div>
           </div>
 
-          <div className="lg:col-span-4">
+          <div className="hidden lg:block lg:col-span-4">
             <div className="sticky top-[88px] pb-10">
               <EnquiryForm
                 serviceName={data?.industry?.title}
@@ -302,6 +264,15 @@ export default async function IndustryPage({ params }) {
                 industryId={data?.industry?.id}
               />
             </div>
+          </div>
+
+          {/* Mobile form at bottom (lazy) */}
+          <div className="lg:hidden mt-8">
+            <EnquiryForm
+              serviceName={data?.industry?.title}
+              type={"industry"}
+              industryId={data?.industry?.id}
+            />
           </div>
         </div>
       </div>

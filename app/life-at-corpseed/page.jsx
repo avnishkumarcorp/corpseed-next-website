@@ -60,10 +60,10 @@ export default async function LifeAtCorpseedPage() {
                 </p>
 
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-slate-900 font-semibold hover:bg-slate-100 transition cursor-pointer">
+                  {/* <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-slate-900 font-semibold hover:bg-slate-100 transition cursor-pointer">
                     <Play className="w-4 h-4" />
                     Watch Video
-                  </button>
+                  </button> */}
 
                   <Link
                     href="#people"

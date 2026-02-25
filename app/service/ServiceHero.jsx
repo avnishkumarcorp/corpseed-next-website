@@ -1,5 +1,6 @@
 "use client";
 import { Phone, Star } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 
 const VideoPopup = dynamic(() => import("../components/VideoPopup"), {

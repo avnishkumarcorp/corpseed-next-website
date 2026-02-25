@@ -5,7 +5,10 @@ import Link from "next/link";
 import { FileText, MessageCircle, Shield, ArrowRight } from "lucide-react";
 import TalkToExpertCard from "../service/TalkToExpertCard";
 import ConsultNowModal from "../components/ConsultNowModal";
-
+import beginFrom from "../assets/begin-from.webp";
+import ceo from "../assets/ceo.webp";
+import sustainability from "../assets/Sustainability-02.png";
+import environmental from "../assets/Environmental_main_image-03.png";
 
 function Section({ children, className = "" }) {
   return (
@@ -23,7 +26,7 @@ const AboutUsClient = () => {
       <section className="relative overflow-hidden">
         <div className="relative h-[58vh] min-h-[420px] md:h-[62vh] lg:h-[78vh] lg:min-h-[640px]">
           <Image
-            src="https://www.corpseed.com/assets/images/begin-from.webp"
+            src={beginFrom}
             alt="About Us Hero"
             fill
             priority
@@ -40,24 +43,27 @@ const AboutUsClient = () => {
           <div className="absolute inset-0 flex items-center">
             <div className="mx-auto max-w-7xl px-6 w-full">
               <div className="max-w-3xl">
-                <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white/90 text-sm backdrop-blur">
+                <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 !text-white/90 text-sm backdrop-blur">
                   Corpseed <span className="opacity-70">•</span> About
                 </p>
 
-                <h1 className="mt-5 text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.05] tracking-tight">
+                <h1 className="mt-5 text-4xl sm:text-5xl md:text-6xl font-bold !text-white leading-[1.05] tracking-tight">
                   About Us
                 </h1>
 
-                <p className="mt-4 text-white/90 text-base md:text-lg leading-relaxed max-w-2xl">
+                <p className="mt-4 !text-white/90 text-base md:text-lg leading-relaxed max-w-2xl">
                   At Corpseed, we believe in simplifying business compliance
                   through innovative AI-driven solutions.
                 </p>
 
                 <div className="mt-7 flex flex-wrap gap-3">
-                  <TalkToExpertCard isAboutUs={true} onClick={() => setConsultOpen(true)} />
+                  <TalkToExpertCard
+                    isAboutUs={true}
+                    onClick={() => setConsultOpen(true)}
+                  />
                   <Link
                     href="#begin"
-                    className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold transition cursor-pointer backdrop-blur inline-flex items-center gap-2"
+                    className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/15 !text-white font-semibold transition cursor-pointer backdrop-blur inline-flex items-center gap-2"
                   >
                     Explore <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -116,7 +122,7 @@ const AboutUsClient = () => {
       <section className="relative overflow-hidden">
         <div className="relative h-[420px] md:h-[520px] lg:h-[560px]">
           <Image
-            src="https://www.corpseed.com/assets/images/ceo.webp"
+            src={ceo}
             alt="CEO Letter Background"
             fill
             className="object-cover"
@@ -127,11 +133,11 @@ const AboutUsClient = () => {
           <div className="absolute inset-0 flex items-center">
             <div className="mx-auto max-w-7xl px-6 w-full">
               <div className="max-w-3xl text-white">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight !text-white">
                   A letter from our <br /> CEO
                 </h2>
 
-                <p className="mt-4 text-white/90 text-sm sm:text-base md:text-lg leading-relaxed">
+                <p className="mt-4 !text-white/90 text-sm sm:text-base md:text-lg leading-relaxed">
                   Read about how the Corpseed team is committed to empowering
                   startups, SMEs, and enterprises through technology-driven
                   compliance solutions. Our mission is to simplify complex
@@ -193,7 +199,7 @@ const AboutUsClient = () => {
             <div className="rounded-2xl border border-gray-300 bg-slate-50 p-6 shadow-sm">
               <div className="relative w-full h-[260px] md:h-[340px] rounded-xl overflow-hidden">
                 <Image
-                  src="https://www.corpseed.com/assets/img/Designs/Sustainability-02.png"
+                  src={sustainability}
                   alt="What We Stand For"
                   fill
                   className="object-cover"
@@ -224,8 +230,8 @@ const AboutUsClient = () => {
       <Section className="bg-slate-50">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <div className="lg:col-span-5">
-            <div className="h-full rounded-2xl p-10 bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-sm">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold leading-snug">
+            <div className="h-full rounded-2xl p-10 bg-gradient-to-br from-blue-600 to-blue-500 !text-white shadow-sm">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold leading-snug !text-white">
                 Our Mission <br />
                 Simplify Business <br />
                 Compliance
@@ -254,7 +260,7 @@ const AboutUsClient = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <div className="lg:col-span-5">
             <div className="h-full rounded-2xl p-10 bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-sm">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold leading-snug">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold leading-snug !text-white">
                 Our Vision <br />
                 Simplify Business <br />
                 Compliance
@@ -291,7 +297,7 @@ const AboutUsClient = () => {
           <div className="bg-white rounded-2xl overflow-hidden border border-gray-300 shadow-sm hover:shadow-md transition">
             <div className="relative w-full h-[240px] md:h-[320px]">
               <Image
-                src="https://www.corpseed.com/assets/images/begin-from.webp"
+                src={beginFrom}
                 alt="A Startup in 2017"
                 fill
                 className="object-cover"
@@ -323,7 +329,7 @@ const AboutUsClient = () => {
           <div className="bg-white rounded-2xl overflow-hidden border border-gray-300 shadow-sm hover:shadow-md transition">
             <div className="relative w-full h-[240px] md:h-[320px]">
               <Image
-                src="https://www.corpseed.com/assets/images/ceo.webp"
+                src={ceo}
                 alt="From CEO Desk"
                 fill
                 className="object-cover"
@@ -399,18 +405,21 @@ const AboutUsClient = () => {
         <div className="rounded-3xl border border-gray-300 bg-gradient-to-br from-black to-gray-900 text-white p-10 md:p-14">
           <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-10">
             <div className="max-w-xl">
-              <h2 className="text-3xl mb-2 md:text-4xl lg:text-5xl font-semibold leading-tight">
+              <h2 className="text-3xl mb-2 md:text-4xl lg:text-5xl font-semibold leading-tight !text-white">
                 Join Our Compliance <br /> Experts Team
               </h2>
 
-              <Link href={"/join-our-team"} className="mt-6 bg-white text-black px-7 py-3 rounded-full text-sm font-semibold hover:bg-gray-200 transition cursor-pointer">
+              <Link
+                href={"/join-our-team"}
+                className="mt-6 !bg-white text-black px-7 py-3 rounded-full text-sm font-semibold hover:bg-gray-200 transition cursor-pointer"
+              >
                 View Career Opportunities
               </Link>
             </div>
 
             <div className="flex justify-center w-full lg:w-1/2">
               <Image
-                src="https://www.corpseed.com/assets/img/Designs/Environmental_main_image-03.png"
+                src={environmental}
                 alt="Join our team"
                 width={460}
                 height={460}

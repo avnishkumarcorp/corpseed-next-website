@@ -5,10 +5,7 @@ export async function POST(req) {
   try {
     payload = await req.json();
   } catch {
-    return NextResponse.json(
-      { message: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
   }
 
   const data = {
@@ -23,7 +20,7 @@ export async function POST(req) {
   if (!data.name || !data.mobile) {
     return NextResponse.json(
       { message: "name and mobile are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -34,7 +31,7 @@ export async function POST(req) {
 
   const res = await fetch(backendUrl, {
     method: "POST",
-    cache: "no-store",
+    next: { revalidate: 300 },
     headers: {
       "Content-Type": "application/json",
     },

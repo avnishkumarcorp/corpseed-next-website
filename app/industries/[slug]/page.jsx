@@ -1,4 +1,4 @@
-// app/service/[slug]/page.js
+// app/industries/[slug]/page.js
 import { clamp, getIndustryBySlug } from "@/app/lib/industry";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -6,6 +6,8 @@ import ServiceTabs from "@/app/service/ServiceTabs";
 import ServiceContent from "@/app/service/ServiceContent";
 import ServiceFaqs from "@/app/service/ServiceFaqs";
 import Image from "next/image";
+
+export const revalidate = 300;
 
 const IndustryCaterTabs = dynamic(() => import("../IndustryCaterTabs"));
 const IndustryHeroSection = dynamic(() => import("./IndustryHeroSection"));
@@ -16,9 +18,13 @@ const EnquiryForm = dynamic(
   () => import("@/app/components/enquiry-form/EnquiryForm"),
 );
 
+async function getIndustryData(slug) {
+  return getIndustryBySlug(slug);
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const data = await getIndustryBySlug(slug);
+  const data = await getIndustryData(slug);
 
   const title = data?.title || data?.industry?.metaTitle || "Industry";
 
@@ -128,7 +134,7 @@ function NewsCard({ title, item, hrefBase }) {
 
 export default async function IndustryPage({ params }) {
   const { slug } = await params;
-  const data = await getIndustryBySlug(slug);
+  const data = await getIndustryData(slug);
 
   const featured = data?.industries || [];
 

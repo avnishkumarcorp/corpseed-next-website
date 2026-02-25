@@ -1,7 +1,12 @@
 // lib/newsRoom.js
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function getNewsRoomList({ page = 1, size = 20, q = "", categorySlug = "" }) {
+export async function getNewsRoomList({
+  page = 1,
+  size = 20,
+  q = "",
+  categorySlug = "",
+}) {
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("size", String(size));
@@ -12,7 +17,7 @@ export async function getNewsRoomList({ page = 1, size = 20, q = "", categorySlu
 
   const res = await fetch(url, {
     // news list changes often → keep it fresh
-        cache: "no-store",
+    next: { revalidate: 300 },
   });
   if (!res.ok) return null;
   return res.json();
@@ -39,7 +44,7 @@ export async function getNewsBySlug(slug) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        next: { revalidate: 300 },
       },
     );
 
@@ -47,7 +52,12 @@ export async function getNewsBySlug(slug) {
       if (res.status === 404) return null;
 
       const errText = await res.text().catch(() => "");
-      console.error("getNewsBySlug API Error:", res.status, res.statusText, errText);
+      console.error(
+        "getNewsBySlug API Error:",
+        res.status,
+        res.statusText,
+        errText,
+      );
       return null;
     }
 

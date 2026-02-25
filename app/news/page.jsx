@@ -1,9 +1,11 @@
 // app/news-room/page.jsx
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, Search } from "lucide-react";
+import { Eye } from "lucide-react";
 import { getNewsRoomList } from "../lib/newsRoom";
 import NewsSearchBox from "./NewsSearchBox";
+
+export const revalidate = 300;
 
 function Card({ children, className = "" }) {
   return (
@@ -215,9 +217,7 @@ export default async function NewsRoomPage({ searchParams }) {
                         </Link>
 
                         <div className="mt-2 text-xs text-slate-500 flex">
-                          <span>
-                            {n.author?.name}
-                          </span>
+                          <span>{n.author?.name}</span>
                           <span className="mx-1.5">|</span>
                           <span>Updated : {safeDate(n.postDate)} </span>
                           {n?.visited != null ? (

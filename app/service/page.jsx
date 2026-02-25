@@ -1,6 +1,8 @@
 import { getAllCategories } from "../lib/service";
 import ServicesCatalogue from "./ServicesCatalogue";
 
+export const revalidate = 300;
+
 export async function generateMetadata() {
   const data = await getAllCategories();
 

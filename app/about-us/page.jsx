@@ -1,8 +1,7 @@
 import { getAboutUsData } from "../lib/about";
 import AboutUsClient from "./AboutUsClient";
 
-
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata() {
   const data = await getAboutUsData();
@@ -26,8 +25,6 @@ export async function generateMetadata() {
     keywords, // Next.js supports array or string
   };
 }
-
-
 
 export default function AboutUsPage() {
   return <AboutUsClient />;

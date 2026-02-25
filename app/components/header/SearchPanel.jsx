@@ -177,7 +177,7 @@ function useVoiceSearch({ onText, lang = "en-IN" }) {
 
 export default function SearchPanel({ open, onClose, topOffset = 72 }) {
   const [q, setQ] = useState("");
-  const dq = useDebouncedValue(q, 500);
+  const dq = useDebouncedValue(q, 100);
 
   const [loading, setLoading] = useState(false);
   const [apiData, setApiData] = useState(null);

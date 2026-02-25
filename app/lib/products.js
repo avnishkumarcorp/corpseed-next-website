@@ -60,7 +60,7 @@ export async function getProductBySlug(slug) {
     const res = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {

@@ -10,13 +10,18 @@ import {
   Newspaper,
   BookOpen,
 } from "lucide-react";
-
 import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 import FeedbackBox from "@/app/components/FeedbackBox";
 import SocialRail from "@/app/components/ShareRailClient"; // ✅ keep using external component
-import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
+import dynamic from "next/dynamic";
+
+export const revalidate = 300;
+
+const BlogContentClient = dynamic(
+  () => import("@/app/components/BlogContentClient"),
+);
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
@@ -67,11 +72,7 @@ function TocCard({ tocHtml }) {
 
   return (
     <>
-      {/* Desktop */}
-      {/* <div className="hidden max-h-[420px] overflow-auto px-5 py-4 lg:block"> */}
-      <SafeHtmlShadow html={tocHtml} />
-      {/* </div> */}
-
+      <BlogContentClient html={tocHtml} />
       {/* Mobile */}
       <div className="block px-5 py-4 lg:hidden">
         <details className="group">
@@ -82,7 +83,7 @@ function TocCard({ tocHtml }) {
             </span>
           </summary>
           <div className="mt-3 max-h-[320px] overflow-auto pr-1">
-            <SafeHtmlShadow html={tocHtml} />
+            <BlogContentClient html={tocHtml} />
           </div>
         </details>
       </div>
@@ -294,7 +295,8 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                 {author ? (
                   <span className="inline-flex items-center gap-2">
                     <User2 className="h-4 w-4" />
-                    {author?.firstName || "Corpseed"} {author?.lastName || "Corpseed"}
+                    {author?.firstName || "Corpseed"}{" "}
+                    {author?.lastName || "Corpseed"}
                   </span>
                 ) : null}
 
@@ -322,15 +324,15 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               {/* Main */}
               <div className="space-y-6 bg-white">
                 {/* <Card className="overflow-hidden"> */}
-                  <div className="bg-white flex flex-col gap-6">
-                    <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
-                      <SafeHtmlShadow html={bodyHtml} />
-                    </div>
-
-                    <div className="border border-[#e5e5e5] shadow-[0_0_0_12px_#f8f9fa]">
-                      <EnquiryOtpInline />
-                    </div>
+                <div className="bg-white flex flex-col gap-6">
+                  <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
+                    <BlogContentClient html={bodyHtml} />
                   </div>
+
+                  <div className="border border-[#e5e5e5] shadow-[0_0_0_12px_#f8f9fa]">
+                    <EnquiryOtpInline />
+                  </div>
+                </div>
                 {/* </Card> */}
 
                 {author ? (

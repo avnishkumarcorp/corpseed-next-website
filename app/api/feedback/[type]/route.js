@@ -9,7 +9,7 @@ export async function POST(req, { params }) {
     if (!base) {
       return NextResponse.json(
         { message: "NEXT_PUBLIC_API_BASE_URL missing" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -22,7 +22,7 @@ export async function POST(req, { params }) {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     const text = await res.text().catch(() => "");
@@ -30,7 +30,7 @@ export async function POST(req, { params }) {
   } catch (e) {
     return NextResponse.json(
       { message: "Feedback proxy error", error: String(e?.message || e) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

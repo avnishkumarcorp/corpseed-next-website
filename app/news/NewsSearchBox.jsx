@@ -21,7 +21,11 @@ function normalizeMapToList(mapObj) {
     .filter((x) => x.slug && x.title);
 }
 
-export default function NewsSearchBox({ defaultValue = "", size, categorySlug }) {
+export default function NewsSearchBox({
+  defaultValue = "",
+  size,
+  categorySlug,
+}) {
   const router = useRouter();
 
   const [value, setValue] = useState(defaultValue || "");
@@ -69,7 +73,7 @@ export default function NewsSearchBox({ defaultValue = "", size, categorySlug })
 
         const res = await fetch(
           `/api/search/news/epr?q=${encodeURIComponent(trimmed)}`,
-          { signal: abortRef.current.signal, cache: "no-store" },
+          { signal: abortRef.current.signal, next: { revalidate: 300 } },
         );
 
         const json = await res.json().catch(() => ({}));
@@ -118,10 +122,10 @@ export default function NewsSearchBox({ defaultValue = "", size, categorySlug })
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIdx((p) => Math.min(items.length - 1, (p < 0 ? 0 : p + 1)));
+      setActiveIdx((p) => Math.min(items.length - 1, p < 0 ? 0 : p + 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActiveIdx((p) => Math.max(0, (p < 0 ? 0 : p - 1)));
+      setActiveIdx((p) => Math.max(0, p < 0 ? 0 : p - 1));
     } else if (e.key === "Enter") {
       // If a dropdown item is selected, go directly to slug page
       if (activeIdx >= 0 && items[activeIdx]) {
@@ -161,7 +165,11 @@ export default function NewsSearchBox({ defaultValue = "", size, categorySlug })
         <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <p className="text-xs font-semibold text-slate-600">
-              {loading ? "Searching…" : items.length ? "Suggestions" : "No results"}
+              {loading
+                ? "Searching…"
+                : items.length
+                  ? "Suggestions"
+                  : "No results"}
             </p>
 
             {trimmed ? (

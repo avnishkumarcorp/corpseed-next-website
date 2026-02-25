@@ -2,6 +2,8 @@
 import ProductsCatalogue from "./ProductsCatalogue";
 import { getProductsPageCached } from "../lib/products.cached";
 
+export const revalidate = 300;
+
 export async function generateMetadata({ searchParams }) {
   const sp = await searchParams;
   const page = Number(sp?.page || 1);
@@ -39,6 +41,12 @@ export default async function ProductsPage({ searchParams }) {
   const data = await getProductsPageCached({ page, size, filter, q });
 
   return (
-    <ProductsCatalogue data={data} page={page} size={size} filter={filter} q={q} />
+    <ProductsCatalogue
+      data={data}
+      page={page}
+      size={size}
+      filter={filter}
+      q={q}
+    />
   );
 }

@@ -277,7 +277,7 @@ function HeroSearch({
 
   const [open, setOpen] = React.useState(false);
   const [q, setQ] = React.useState("");
-  const dq = useDebouncedValue(q, 400);
+  const dq = useDebouncedValue(q, 100);
 
   const [loading, setLoading] = React.useState(false);
   const [apiData, setApiData] = React.useState(null);
@@ -581,7 +581,7 @@ function HeroSearch({
                     {groups.map(([groupTitle, list]) => (
                       <div key={groupTitle} className="min-w-0">
                         <div className="mb-3 flex items-center justify-between">
-                          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                             {groupTitle}
                           </p>
                           <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] text-slate-600">
@@ -599,7 +599,7 @@ function HeroSearch({
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                  <p className="text-sm font-semibold text-slate-900">
+                                  <p className="text-sm text-slate-900">
                                     {x?.name}
                                   </p>
                                   {/* {x?.track ? (

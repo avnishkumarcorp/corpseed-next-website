@@ -1,16 +1,14 @@
 import { apiGet } from "./fetcher";
 
-
-
-export async function getPressReleaseData({page,size,filter}) {
+export async function getPressReleaseData({ page, size, filter }) {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-press-release?page=${page}&size=${size}&filter=${filter}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store", // good for dynamic content; change if needed
-      }
+        next: { revalidate: 300 }, // good for dynamic content; change if needed
+      },
     );
 
     if (!res.ok) {
@@ -28,8 +26,6 @@ export async function getPressReleaseData({page,size,filter}) {
   }
 }
 
-
-
 export async function getPressReleaseBySlug(slug) {
   if (!slug) return null;
   try {
@@ -38,8 +34,8 @@ export async function getPressReleaseBySlug(slug) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store", // good for dynamic content; change if needed
-      }
+        next: { revalidate: 300 }, // good for dynamic content; change if needed
+      },
     );
     if (!res.ok) {
       if (res.status === 404) return null;
@@ -54,7 +50,6 @@ export async function getPressReleaseBySlug(slug) {
   }
 }
 
-
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 async function safeJson(res) {
@@ -65,8 +60,6 @@ async function safeJson(res) {
   }
 }
 
-
-
 export async function getLatestNews() {
   try {
     return await apiGet("/api/news/latest", { revalidate: 300 });
@@ -75,8 +68,6 @@ export async function getLatestNews() {
     return [];
   }
 }
-
-
 
 export async function getLatestUpdatedPressRelease() {
   try {
@@ -95,10 +86,9 @@ export async function getLatestUpdatedPressRelease() {
     }
 
     const data = await res.json();
-    return Array.isArray(data) ? data : data?.data ?? [];
+    return Array.isArray(data) ? data : (data?.data ?? []);
   } catch (e) {
     console.error("getLatestUpdatedPressRelease error:", e);
     return [];
   }
 }
-

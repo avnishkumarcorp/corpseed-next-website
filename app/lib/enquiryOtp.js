@@ -15,7 +15,7 @@ export async function sendOtp({
 
   const res = await fetch("/api/enquiry/send-otp", {
     method: "POST",
-    cache: "no-store",
+    next: { revalidate: 300 },
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -27,24 +27,22 @@ export async function sendOtp({
   };
 }
 
-
-
-
-
-export async function verifyOtp({ mobile, otp,name }) {
+export async function verifyOtp({ mobile, otp, name }) {
   const cleanMobile = String(mobile || "").trim();
   const cleanOtp = String(otp || "").trim();
   const cleanName = String(name || "").trim();
 
   const res = await fetch(
     `/api/enquiry/verify-otp/${encodeURIComponent(cleanMobile)}/${encodeURIComponent(cleanOtp)}?name=${encodeURIComponent(cleanName)}`,
-    { method: "GET", cache: "no-store" }
+    { method: "GET", next: { revalidate: 300 } },
   );
 
-  return { ok: res.ok, status: res.status, data: await res.text().catch(() => "") };
+  return {
+    ok: res.ok,
+    status: res.status,
+    data: await res.text().catch(() => ""),
+  };
 }
-
-
 
 export async function submitPartnerEnquiry({
   otp,
@@ -65,15 +63,17 @@ export async function submitPartnerEnquiry({
 
   const res = await fetch("/api/enquiry/partner", {
     method: "POST",
-    cache: "no-store",
+    next: { revalidate: 300 },
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
-  return { ok: res.ok, status: res.status, data: await res.text().catch(() => "") };
+  return {
+    ok: res.ok,
+    status: res.status,
+    data: await res.text().catch(() => ""),
+  };
 }
-
-
 
 // app/lib/enquiry.js
 
@@ -115,8 +115,6 @@ export async function submitConsultNowEnquiry({
   };
 }
 
-
-
 export async function submitBookMeetingEnquiry({
   name,
   email,
@@ -131,7 +129,7 @@ export async function submitBookMeetingEnquiry({
     email: String(email || "").trim(),
     mobile: String(mobile || "").trim(),
     city: String(city || "").trim(),
-    dateTime: "",   // 🔥 REQUIRED
+    dateTime: "", // 🔥 REQUIRED
     message: String(message || "").trim(),
     otp: String(otp || "").trim(),
     location: String(location || "").trim(),
@@ -139,7 +137,7 @@ export async function submitBookMeetingEnquiry({
 
   const res = await fetch("/api/enquiry/book-meeting", {
     method: "POST",
-    cache: "no-store",
+    next: { revalidate: 300 },
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -150,8 +148,6 @@ export async function submitBookMeetingEnquiry({
     data: await res.json().catch(() => null),
   };
 }
-
-
 
 export async function submitContactUsEnquiry({
   otp,
@@ -189,20 +185,13 @@ export async function submitContactUsEnquiry({
   };
 }
 
-
-
-export async function submitStartupGuideEnquiry({
-  otp,
-  name,
-  email,
-  mobile,
-}) {
+export async function submitStartupGuideEnquiry({ otp, name, email, mobile }) {
   const payload = {
     otp: String(otp || "").trim(),
     name: String(name || "").trim(),
     email: String(email || "").trim(),
     mobile: String(mobile || "").trim(),
-    url: "https://www.corpseed.com/",   // 🔥 EXACT FIELD FROM SWAGGER
+    url: "https://www.corpseed.com/", // 🔥 EXACT FIELD FROM SWAGGER
     postDate: "",
     modifyDate: "",
   };
@@ -210,7 +199,7 @@ export async function submitStartupGuideEnquiry({
   const res = await fetch("/api/enquiry/startup-guide", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: 300 },
     body: JSON.stringify(payload),
   });
 

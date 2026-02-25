@@ -7,7 +7,7 @@ export async function getLegalPageBySlug(slug) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        next: { revalidate: 300 },
       },
     );
 

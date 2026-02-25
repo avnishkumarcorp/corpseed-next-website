@@ -3,6 +3,7 @@ import { getPressReleaseData } from "../lib/pressRelease";
 import PressListClient from "./PressListClient";
 import banner from "../assets/press-release.webp";
 
+export const revalidate = 300;
 export async function generateMetadata({ searchParams }) {
   const page = await Number(searchParams?.page ?? 1);
   const size = await Number(searchParams?.size ?? 10);

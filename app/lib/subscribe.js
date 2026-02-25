@@ -8,9 +8,7 @@ export async function subscribeEmail(email) {
     return { ok: false, message: "Email is required." };
   }
 
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.API_BASE_URL;
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL;
 
   if (!base) {
     return { ok: false, message: "API base URL is missing." };
@@ -23,9 +21,9 @@ export async function subscribeEmail(email) {
     const res = await fetch(url, {
       method: "POST",
       headers: {
-        Accept: "application/json",   // ✅ FIXED
+        Accept: "application/json", // ✅ FIXED
       },
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     const text = await res.text();

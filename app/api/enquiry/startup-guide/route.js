@@ -4,8 +4,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const backendUrl =
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/enquiry/startup-guide`;
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/enquiry/startup-guide`;
 
     const backendRes = await fetch(backendUrl, {
       method: "POST",
@@ -13,7 +12,7 @@ export async function POST(req) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     const text = await backendRes.text();
@@ -29,7 +28,7 @@ export async function POST(req) {
 
     return NextResponse.json(
       { status: "fail", message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

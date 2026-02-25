@@ -5,17 +5,9 @@ import dynamic from "next/dynamic";
 import { getProductBySlug } from "@/app/lib/products";
 import FeedbackBox from "@/app/components/FeedbackBox";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
+export const revalidate = 300;
 
-// your component (client) to render HTML safely
 const SafeHtmlShadow = dynamic(() => import("@/app/components/SafeHtmlShadow"));
-
-// your existing enquiry form (client component)
-const EnquiryForm = dynamic(
-  () => import("@/app/components/enquiry-form/EnquiryForm"),
-);
-
-// marker present in your description
-const FORM_MARKER = "--------------Blog Contact Form-------------";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -173,7 +165,7 @@ export default async function ProductSlugPage({ params }) {
               </p>
             </div>
 
-            <EnquiryOtpInline page={product?.title || product?.name}/>
+            <EnquiryOtpInline page={product?.title || product?.name} />
 
             {/* if anything remains after marker */}
             {/* {after?.trim() ? (

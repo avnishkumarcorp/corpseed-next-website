@@ -1,5 +1,4 @@
-const BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "";
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "";
 
 if (!BASE) {
   console.warn("⚠️ NEXT_PUBLIC_API_BASE_URL is not defined");
@@ -14,7 +13,7 @@ export async function apiGet(path) {
       headers: {
         Accept: "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {

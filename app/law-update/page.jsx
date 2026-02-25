@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { getLawUpdatesList, stripHtml } from "../lib/lawUpdates";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 function normalizeSearchParams(searchParams) {
   const params = new URLSearchParams();

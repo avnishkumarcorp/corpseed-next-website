@@ -12,6 +12,8 @@ import PdfShareBar from "@/app/components/PdfShareBar";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 
+export const revalidate = 300;
+
 const ClientsMarquee = nextDynamic(
   () => import("@/app/components/clients/ClientsMarquee"),
   {

@@ -1,4 +1,3 @@
-
 import { getJoinOurTeamData } from "../lib/career";
 import CareerClient from "./CareerClient";
 
@@ -9,7 +8,7 @@ function splitKeywords(metaKeyword) {
     .filter(Boolean);
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata() {
   const data = await getJoinOurTeamData();

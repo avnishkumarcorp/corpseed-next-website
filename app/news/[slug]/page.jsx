@@ -19,6 +19,8 @@ import SafeHtml from "@/app/components/SafeHtml";
 import { getNewsBySlug } from "@/app/lib/newsRoom";
 import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
 
+export const revalidate = 300;
+
 function safeText(v, fallback = "") {
   if (v == null) return fallback;
   return String(v);
@@ -266,8 +268,6 @@ function AuthorCard({ author }) {
   );
 }
 
-
-
 /** ✅ SEO from API (news slug) */
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -383,54 +383,54 @@ export default async function NewsRoomSlugPage({ params }) {
               {/* Main */}
               <div className="space-y-6">
                 {/* <Card className="overflow-hidden"> */}
-                  <div className="p-5 sm:p-7">
-                    <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
-                      <SafeHtmlShadow html={bodyHtml} />
-                    </div>
+                <div className="p-5 sm:p-7">
+                  <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
+                    <SafeHtmlShadow html={bodyHtml} />
+                  </div>
 
-                    {/* Mobile share */}
-                    <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Share
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <a
-                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                            pageUrl,
-                          )}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label="Facebook"
-                          title="Facebook"
-                        >
-                          <Facebook className="h-5 w-5" />
-                        </a>
-                        <a
-                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                            pageUrl,
-                          )}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label="LinkedIn"
-                          title="LinkedIn"
-                        >
-                          <Linkedin className="h-5 w-5" />
-                        </a>
-                        <a
-                          className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-                          href={`mailto:?subject=${encodeURIComponent(
-                            item.title,
-                          )}&body=${encodeURIComponent(pageUrl)}`}
-                          aria-label="Email"
-                          title="Email"
-                        >
-                          <Mail className="h-5 w-5" />
-                        </a>
-                      </div>
+                  {/* Mobile share */}
+                  <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Share
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <a
+                        className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
+                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                          pageUrl,
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="Facebook"
+                        title="Facebook"
+                      >
+                        <Facebook className="h-5 w-5" />
+                      </a>
+                      <a
+                        className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
+                        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                          pageUrl,
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="LinkedIn"
+                        title="LinkedIn"
+                      >
+                        <Linkedin className="h-5 w-5" />
+                      </a>
+                      <a
+                        className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
+                        href={`mailto:?subject=${encodeURIComponent(
+                          item.title,
+                        )}&body=${encodeURIComponent(pageUrl)}`}
+                        aria-label="Email"
+                        title="Email"
+                      >
+                        <Mail className="h-5 w-5" />
+                      </a>
                     </div>
                   </div>
+                </div>
                 {/* </Card> */}
                 {author ? (
                   <div className="mt-10">

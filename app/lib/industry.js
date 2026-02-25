@@ -6,7 +6,7 @@ export async function getIndustriesPage() {
   const res = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
-    cache: "no-store",
+    next: { revalidate: 300 },
   });
 
   if (!res.ok) {
@@ -34,9 +34,6 @@ export function clamp(s, n = 140) {
   return v.length > n ? v.slice(0, n) + "..." : v;
 }
 
-
-
-
 export async function getIndustryBySlug(slug) {
   if (!slug) return null;
 
@@ -46,8 +43,8 @@ export async function getIndustryBySlug(slug) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store", // good for dynamic content; change if needed
-      }
+        next: { revalidate: 300 }, // good for dynamic content; change if needed
+      },
     );
 
     if (!res.ok) {

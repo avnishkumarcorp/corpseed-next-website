@@ -21,10 +21,13 @@ export async function GET(req) {
 
     const base = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    const res = await fetch(`${base}/api/updated-news?${backendParams.toString()}`, {
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${base}/api/updated-news?${backendParams.toString()}`,
+      {
+        headers: { Accept: "application/json" },
+        next: { revalidate: 300 },
+      },
+    );
 
     const text = await res.text();
 
@@ -40,9 +43,12 @@ export async function GET(req) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, message: e?.message || "Error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ ok: false, message: e?.message || "Error" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 }

@@ -2,7 +2,7 @@ export const NAV_ITEMS = [
   { label: "About", key: "Who We Are" },
   { label: "Environmental Compliance", key: "Environment & Sustainability" },
   { label: "Factory Setup", key: "Project Planning & Setup" },
-  { label: "Compliance", key: "Compliance Solutions" },
+  { label: "Regulatory Compliance", key: "Compliance Solutions" },
   { label: "Industries Setup", key: "Industries Solutions" },
 ];
 

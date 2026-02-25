@@ -34,13 +34,6 @@ export function Portal({ children }) {
   return createPortal(children, document.body);
 }
 
-
-
-
-
-
-
-
 export default function HomeHeroSection({
   title = "Tailored Solutions\nFor Your Business",
   ratingText = "Rated 4.9 stars ratings by 15000+ Customers like you",
@@ -48,15 +41,15 @@ export default function HomeHeroSection({
   ctaText = "CALL FOR FREE CONSULTATION",
 }) {
   return (
-    <section className="relative bg-white overflow-x-hidden">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+    <section className="relative bg-white overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
         <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-blue-100/50 blur-3xl" />
         <div className="absolute -right-40 top-20 h-[520px] w-[520px] rounded-full bg-indigo-100/50 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-[92%] px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-6 lg:pb-6">
-        <div className="grid items-start gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center text-center lg:text-left">
+      <div className="relative z-10 mx-auto max-w-[92%] px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-6 lg:pb-6">
+        <div className="grid items-start gap-10 lg:grid-cols-12 overflow-hidden">
+          <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center text-center lg:text-left min-w-0">
             <a
               href="tel:+917558640644" // 👈 your real number
               className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm hover:bg-blue-700 cursor-pointer"
@@ -102,7 +95,7 @@ export default function HomeHeroSection({
           </div>
 
           {/* Right side kept as-is (your cards) */}
-          <div className="lg:col-span-6 hidden lg:block">
+          <div className="lg:col-span-6 hidden lg:block min-w-0">
             <div className="ml-auto w-full">
               <div className="flex flex-col gap-6">
                 {/* Row 1 */}

@@ -1,9 +1,19 @@
 "use client";
 import { Phone, Star } from "lucide-react";
-import VideoPopup from "../components/VideoPopup";
-import EnquiryOtpFlow from "../components/otp/EnquiryOtpFlow";
-import ConsultNowModal from "../components/ConsultNowModal";
 import { useState } from "react";
+
+const VideoPopup = dynamic(() => import("../components/VideoPopup"), {
+  ssr: false,
+});
+
+const EnquiryOtpFlow = dynamic(
+  () => import("../components/otp/EnquiryOtpFlow"),
+  { ssr: false },
+);
+
+const ConsultNowModal = dynamic(() => import("../components/ConsultNowModal"), {
+  ssr: false,
+});
 
 export default function ServiceHero({
   title,
@@ -17,12 +27,7 @@ export default function ServiceHero({
 
   return (
     <section className="relative overflow-hidden ">
-      {/* subtle gradient backdrop */}
-      {/* <div className="absolute inset-0 bg-gradient-to-b from-blue-50 via-white to-white" />
-      <div className="absolute -top-24 right-[-120px] h-[360px] w-[360px] rounded-full bg-blue-100 blur-3xl" />
-      <div className="absolute -bottom-28 left-[-140px] h-[360px] w-[360px] rounded-full bg-indigo-100 blur-3xl" /> */}
-
-      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-7">
             <div className="inline-flex items-center border border-gray-200 px-3 py-1 text-white text-xs font-semibold bg-[#2b63f9]">

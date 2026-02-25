@@ -135,8 +135,6 @@ export default async function IndustriesPage() {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/50" />
-
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="text-white max-w-xl">
             <div className="inline-flex rounded-md bg-blue-600 px-3 py-1 text-xs font-semibold">

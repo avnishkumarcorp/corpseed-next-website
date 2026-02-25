@@ -114,7 +114,7 @@ function AuthorCard({ author }) {
 function ShareRow({ url, title }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="mr-1 inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
+      <span className="mr-1 inline-flex items-center gap-2 text-xs font-semibold !text-slate-500">
         <Share2 className="h-4 w-4" />
         Share:
       </span>
@@ -264,11 +264,8 @@ export async function generateMetadata({ params }) {
 export default async function PressReleaseSlugPage({ params }) {
   const { slug } = await params; // ✅ no await
   const apiData = await getPressReleaseBySlug(slug);
-
   if (!apiData?.press) return notFound();
-
   const press = apiData.press;
-
   const topPress = apiData?.topPress || [];
   const latestPress = apiData?.latestPress || [];
   const topBlog = apiData?.topBlog || [];
@@ -303,12 +300,12 @@ export default async function PressReleaseSlugPage({ params }) {
                 <p className="text-xs font-semibold tracking-widest text-white/80">
                   WWW.CORPSEED.COM
                 </p>
-                <h1 className="mt-2 text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
+                <h1 className="mt-2 text-2xl font-bold leading-tight tracking-tight !text-white sm:text-3xl md:text-4xl">
                   {press.title}
                 </h1>
 
-                <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-white/85">
-                  <Pill className="border-white/20 bg-white/10 text-white">
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-sm !text-white/85">
+                  <Pill className="border-white/20 bg-white/10 !text-white">
                     PRESS RELEASE
                   </Pill>
 
@@ -477,9 +474,8 @@ export default async function PressReleaseSlugPage({ params }) {
                 </Card>
               ) : null}
 
-              <FeedbackBox/>
+              <FeedbackBox />
             </div>
-            
           </aside>
         </div>
       </section>

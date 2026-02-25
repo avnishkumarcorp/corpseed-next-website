@@ -301,7 +301,7 @@ export default function EnquiryForm({
 
   return (
     <>
-      <div className="rounded-sm bg-white p-5 shadow-2xl border border-t border-gray-100">
+      <div className="rounded-sm bg-white p-5 shadow-sm border border-t border-gray-100">
         <p className="text-lg font-normal text-center text-[#212529]">
           Enquiry Now
         </p>

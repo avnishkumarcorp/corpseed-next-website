@@ -347,13 +347,13 @@ export default function FooterClient({ data }) {
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-slate-600">
             <div className="flex items-center gap-3">
-              <div className="relative h-12 w-32">
+              <div className="relative h-12 w-32 flex items-center">
                 <Link href="/" className="inline-block">
                   <Image
                     src={footerLogo}
                     alt="Corpseed_footer"
-                    width={88}
-                    height={58}
+                    width={120}
+                    height={80}
                     sizes="(max-width: 768px) 88px, 88px"
                     className="object-contain"
                   />

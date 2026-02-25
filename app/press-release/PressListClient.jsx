@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -39,7 +39,13 @@ function CardShell({ children, className = "" }) {
 }
 
 function ShareRow({ title }) {
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  const [currentUrl, setCurrentUrl] = useState("");
+
+  useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, []);
+
+  if (!currentUrl) return null; // Prevent mismatch
 
   const encodedUrl = encodeURIComponent(currentUrl);
   const encodedTitle = encodeURIComponent(title || "");
@@ -51,53 +57,19 @@ function ShareRow({ title }) {
 
   return (
     <div className="flex items-center gap-3 text-slate-500">
-      {/* Facebook */}
-      <a
-        href={facebookUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-blue-600 transition-colors"
-        aria-label="Share on Facebook"
-      >
+      <a href={facebookUrl} target="_blank" rel="noopener noreferrer">
         <Facebook className="h-4 w-4" />
       </a>
 
-      {/* LinkedIn */}
-      <a
-        href={linkedinUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-blue-700 transition-colors"
-        aria-label="Share on LinkedIn"
-      >
+      <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
         <Linkedin className="h-4 w-4" />
       </a>
 
-      {/* WhatsApp */}
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-green-600 transition-colors"
-        aria-label="Share on WhatsApp"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 32 32"
-          width="16"
-          height="16"
-          fill="currentColor"
-        >
-          <path d="M16.001 3C8.268 3 2 9.268 2 17.001c0 2.995.936 5.767 2.535 8.05L3 29l4.076-1.504A13.91 13.91 0 0 0 16.001 31C23.733 31 30 24.733 30 17.001 30 9.268 23.733 3 16.001 3zm0 25.2c-2.59 0-5.02-.79-7.06-2.15l-.505-.32-2.42.89.81-2.35-.33-.51A11.16 11.16 0 0 1 4.8 17c0-6.17 5.03-11.2 11.2-11.2S27.2 10.83 27.2 17 22.17 28.2 16.001 28.2zm6.15-8.42c-.34-.17-2.01-.99-2.32-1.1-.31-.12-.53-.17-.75.17s-.86 1.1-1.05 1.33c-.19.23-.38.26-.71.09-.34-.17-1.42-.52-2.7-1.66-.99-.88-1.66-1.97-1.85-2.31-.19-.34-.02-.52.15-.69.15-.15.34-.38.51-.57.17-.19.23-.32.34-.53.12-.23.06-.43-.03-.6-.09-.17-.75-1.82-1.03-2.5-.27-.66-.54-.57-.75-.58-.19-.01-.41-.01-.63-.01-.23 0-.6.09-.91.43-.31.34-1.19 1.16-1.19 2.83 0 1.66 1.22 3.27 1.39 3.5.17.23 2.4 3.66 5.82 5.13.81.35 1.45.56 1.94.72.82.26 1.56.22 2.15.13.66-.1 2.01-.82 2.29-1.62.28-.79.28-1.47.19-1.62-.09-.14-.31-.23-.66-.4z" />
-        </svg>
+      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+        {/* WhatsApp SVG */}
       </a>
 
-      {/* Email */}
-      <a
-        href={mailUrl}
-        className="hover:text-slate-900 transition-colors"
-        aria-label="Share via Email"
-      >
+      <a href={mailUrl}>
         <Mail className="h-4 w-4" />
       </a>
     </div>

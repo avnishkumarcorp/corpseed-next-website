@@ -428,7 +428,7 @@ function MobileSearchInline({ onNavigate }) {
             ))}
           </div>
         ) : groups.length ? (
-          <div className="mt-3 space-y-4">
+          <div className="mt-3 space-y-4 max-h-[80vh] overflow-auto">
             {groups.slice(0, 4).map(([groupTitle, list]) => (
               <div key={groupTitle} className="rounded-xl bg-slate-50 p-3">
                 <div className="flex items-center justify-between">
@@ -450,11 +450,11 @@ function MobileSearchInline({ onNavigate }) {
                                    text-slate-700 hover:bg-white hover:text-slate-900 cursor-pointer"
                       >
                         <div className="font-medium">{x?.name}</div>
-                        {x?.track ? (
+                        {/* {x?.track ? (
                           <div className="text-[12px] text-slate-500">
                             {x.track}
                           </div>
-                        ) : null}
+                        ) : null} */}
                       </Link>
                     </li>
                   ))}

@@ -1,12 +1,10 @@
 import { ChevronDown } from "lucide-react";
 import SafeHtmlShadow from "../components/SafeHtmlShadow";
-
-// small helper to keep only displayStatus === "1" and not deleted (optional)
 const normalizeFaqs = (faqs) => {
   const list = Array.isArray(faqs) ? faqs : [];
   return list
     .filter((f) => String(f?.displayStatus) === "1")
-    .filter((f) => Number(f?.deleteStatus) !== 1) // keep safe; adjust if needed
+    .filter((f) => Number(f?.deleteStatus) !== 1)
     .map((f) => ({
       id: f?.uuid || f?.id,
       question: (f?.title || "").trim(),
@@ -52,8 +50,7 @@ export default function ServiceFaqs({
                   </span>
                 </summary>
 
-                <div className="px-2 pb-2 pt-4 text-sm sm:text-base text-gray-700 leading-relaxed bg-white">
-                  {/* ✅ answer is HTML from API */}
+                <div className="px-2 pb-2 text-sm sm:text-base text-gray-700 leading-relaxed bg-white">
                   <SafeHtmlShadow html={item.answerHtml} />
                 </div>
               </details>

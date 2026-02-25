@@ -1,16 +1,25 @@
 // app/service/[slug]/page.js
-import ServiceContent from "@/app/service/ServiceContent";
-import EnquiryForm from "@/app/components/enquiry-form/EnquiryForm";
-import ServiceTabs from "@/app/service/ServiceTabs";
-import LogoMarquee from "@/app/components/carousel/LogoMarquee";
-import { getIndustryBySlug } from "@/app/lib/industry";
-import IndustryHeroSection from "./IndustryHeroSection";
+import { clamp, getIndustryBySlug } from "@/app/lib/industry";
 import { getClients } from "@/app/lib/clients";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const ServiceFaqs = dynamic(() => import("@/app/service/ServiceFaqs"));
+const IndustryCaterTabs = dynamic(() => import("../IndustryCaterTabs"));
+const IndustryHeroSection = dynamic(() => import("./IndustryHeroSection"));
+const LogoMarquee = dynamic(
+  () => import("@/app/components/carousel/LogoMarquee"),
+);
+const ServiceTabs = dynamic(() => import("@/app/service/ServiceTabs"));
+const EnquiryForm = dynamic(
+  () => import("@/app/components/enquiry-form/EnquiryForm"),
+);
+const ServiceContent = dynamic(() => import("@/app/service/ServiceContent"));
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getIndustryBySlug(slug);
-  
+
   const title = data?.title || data?.industry?.metaTitle || "Industry";
 
   const description =
@@ -56,10 +65,73 @@ function JsonLd({ data }) {
   );
 }
 
+function Section({ title, children, className = "" }) {
+  return (
+    <section className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${className}`}>
+      {title && (
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          {title}
+        </h2>
+      )}
+      {children}
+    </section>
+  );
+}
+
+function FeaturedCard({ item }) {
+  const href = `/industries/${item?.slug}`;
+
+  return (
+    <div className="rounded-2xl bg-[#1f2e63] text-white shadow-sm overflow-hidden">
+      <div className="p-6">
+        <h3 className="text-lg font-semibold !text-white">
+          {item?.title || item?.industryName}
+        </h3>
+        <p className="mt-3 text-sm !text-white/85 leading-6">
+          {clamp(item?.summary, 140)}
+        </p>
+        <Link
+          href={href}
+          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold !text-white hover:text-white/90 cursor-pointer"
+        >
+          KNOW MORE ›
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/* ================= NEWS CARD ================= */
+function NewsCard({ title, item, hrefBase }) {
+  const href = item?.slug ? `${hrefBase}/${item.slug}` : hrefBase;
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+      <h3 className="text-lg font-bold text-slate-900">{title}</h3>
+      <p className="mt-2 italic text-slate-700">{clamp(item?.title, 42)}</p>
+      <p className="mt-3 text-sm text-slate-600 leading-6">
+        {clamp(
+          item?.summary?.replace(/<[^>]*>/g, " ") ||
+            "Read the latest update and know what’s new.",
+          120,
+        )}
+      </p>
+      <Link
+        href={href}
+        className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+      >
+        KNOW MORE ›
+      </Link>
+    </div>
+  );
+}
+
 export default async function IndustryPage({ params }) {
   const { slug } = await params;
   const data = await getIndustryBySlug(slug);
   const clients = await getClients();
+
+  const featured = data?.industries || [];
 
   if (!data) return null;
 
@@ -132,7 +204,6 @@ export default async function IndustryPage({ params }) {
             alt="Industry Background"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/60" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
@@ -203,6 +274,14 @@ export default async function IndustryPage({ params }) {
         <LogoMarquee speed={60} items={clients} />
       </section>
 
+      <Section title="Industries" className="pb-6 bg-white">
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          {featured.slice(0, 3).map((x) => (
+            <FeaturedCard key={x?.id || x?.slug} item={x} />
+          ))}
+        </div>
+      </Section>
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">
@@ -226,6 +305,12 @@ export default async function IndustryPage({ params }) {
           </div>
         </div>
       </div>
+      <Section className="pb-8 bg-white">
+        <IndustryCaterTabs items={data?.industry10} />
+      </Section>
+      <Section className="pb-8 bg-white">
+        <ServiceFaqs faqs={data.faqs} />
+      </Section>
 
       {/* <section className="border-t border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

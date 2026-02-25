@@ -1,8 +1,6 @@
-// app/service/[slug]/page.js
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import nextDynamic from "next/dynamic";
-
 import ServiceHero from "../ServiceHero";
 import ServiceTabs from "../ServiceTabs";
 import ServiceContent from "../ServiceContent";
@@ -13,16 +11,9 @@ import StepsTimelineSection from "../StepsTimelineSection";
 import PdfShareBar from "@/app/components/PdfShareBar";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { getClients } from "@/app/lib/clients";
 
-// ✅ Route-level caching
-export const revalidate = 3600;
-export const dynamic = "force-static";
-
-// ✅ If these are heavy client components, lazy-load them.
-// If LogoMarquee / EnquiryForm are server components, remove dynamic() and import normally.
-const LogoMarquee = nextDynamic(
-  () => import("@/app/components/carousel/LogoMarquee"),
+const ClientsMarquee = nextDynamic(
+  () => import("@/app/components/clients/ClientsMarquee"),
   {
     ssr: true,
     loading: () => <div className="h-10" />,
@@ -80,7 +71,6 @@ export async function generateMetadata({ params }) {
 
 export default async function ServicePage({ params }) {
   const { segments } = (await params) ?? [];
-  const clients = await getClients();
   let state = null;
   let slug = null;
 
@@ -95,18 +85,8 @@ export default async function ServicePage({ params }) {
 
   const data = await getServiceData(slug, state);
   if (!data?.service) notFound();
-
   const service = data.service;
   const serviceCities = data.serviceCityMapResponseDTOS;
-
-  // const { slug } = await params;
-  // const data = await getServiceData(slug);
-
-  // if (!data?.service) notFound();
-
-  // const service = data.service;
-
-  // ✅ Keep JSON-LD small (avoid huge HTML in schema)
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -200,8 +180,8 @@ export default async function ServicePage({ params }) {
         videoText="Click to Watch & Know More"
       />
 
-      <section className="mx-auto max-w-full px-4 py-10 bg-white">
-        <LogoMarquee speed={60} items={clients} />
+      <section className="mx-auto max-w-full px-4 bg-white">
+        <ClientsMarquee />
       </section>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
@@ -248,7 +228,7 @@ export default async function ServicePage({ params }) {
                   key={city.id}
                   href={`/service/${city.cityName
                     .toLowerCase()
-                    .replace(/\s+/g, "-")}/${city?.slug}`}
+                    .replace(/\s+/g, "-")}/${slug}`}
                   className="group flex items-center justify-center gap-2 font-medium text-slate-700 transition"
                 >
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 transition group-hover:scale-110" />

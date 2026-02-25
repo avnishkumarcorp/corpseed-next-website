@@ -1,9 +1,6 @@
-"use client";
-
 import dynamic from "next/dynamic";
 
-// ✅ these can be ssr:false because this file is a Client Component
-const LogoMarquee = dynamic(() => import("../carousel/LogoMarquee"), {
+const ClientsMarquee = dynamic(() => import("../clients/ClientsMarquee"), {
   loading: () => (
     <section className="mx-auto max-w-7xl px-4 py-10">
       <div className="h-[110px] rounded-xl border border-gray-200 bg-white" />
@@ -12,7 +9,6 @@ const LogoMarquee = dynamic(() => import("../carousel/LogoMarquee"), {
 });
 
 const CardCarousel = dynamic(() => import("../carousel/CardCarousel"), {
-  ssr: false,
   loading: () => (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="h-56 rounded-xl border border-gray-200 bg-white" />
@@ -22,28 +18,17 @@ const CardCarousel = dynamic(() => import("../carousel/CardCarousel"), {
 
 const ComplianceUpdateSection = dynamic(
   () => import("./sections/ComplianceUpdateSection"),
-  { ssr: false },
 );
 const VirtualMeetingSection = dynamic(
   () => import("./sections/VirtualMeetingSection"),
-  { ssr: false },
 );
-const OurSupportSection = dynamic(
-  () => import("./sections/OurSupportSection"),
-  {
-    ssr: false,
-  },
-);
-const NewsSection = dynamic(() => import("./sections/NewsSection"), {
-  ssr: false,
-});
+const OurSupportSection = dynamic(() => import("./sections/OurSupportSection"));
+const NewsSection = dynamic(() => import("./sections/NewsSection"));
 const LatestArticlesSection = dynamic(
   () => import("./sections/LatestArticleSection"),
-  { ssr: false },
 );
 const LatestProductsSection = dynamic(
   () => import("./sections/LatestProductsSection"),
-  { ssr: false },
 );
 
 export default function HomeClientSections({
@@ -51,12 +36,11 @@ export default function HomeClientSections({
   newsData,
   latestBlogs,
   products,
-  clients,
 }) {
   return (
     <>
       <section className="mx-auto max-w-full px-4 bg-white">
-        <LogoMarquee items={clients} speed={60} />
+        <ClientsMarquee />
       </section>
       <div className="min-h-[350px]">
         <CardCarousel data={homeData} />

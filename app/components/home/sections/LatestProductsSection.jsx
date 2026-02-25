@@ -24,7 +24,7 @@ export default function LatestProductsSection({ data = [] }) {
           </h2>
         </div>
 
-        <div className="relative mt-6 overflow-hidden group">
+        <div className="relative mt-6 overflow-hidden group py-1.5">
           <div className="flex gap-4 animate-products-scroll group-hover:[animation-play-state:paused]">
             {loopItems.map((p, i) => (
               <div

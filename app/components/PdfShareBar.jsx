@@ -150,8 +150,6 @@ function IconCopy({ className = "h-5 w-5" }) {
 
 /* ---------------- Backdrop Modal ---------------- */
 
-
-
 function BackdropModal({ open, onClose, title, children }) {
   const [mounted, setMounted] = useState(false);
 
@@ -214,7 +212,6 @@ function BackdropModal({ open, onClose, title, children }) {
   );
 }
 
-
 /* ---------------- Main Component ---------------- */
 
 export default function PdfShareBar({
@@ -224,9 +221,10 @@ export default function PdfShareBar({
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const pageUrl = useMemo(() => {
-    if (typeof window === "undefined") return "";
-    return window.location.href;
+  const [pageUrl, setPageUrl] = useState("");
+
+  useEffect(() => {
+    setPageUrl(window.location.href);
   }, []);
 
   const handleDownload = () => {

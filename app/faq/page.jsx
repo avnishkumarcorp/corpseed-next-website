@@ -27,7 +27,7 @@ export const FAQ_DATA = {
             "If a customer is having issues with our service delivery process, he has various alternatives available at his disposal to register his grievance with us. He can either email his complaint at complaints@corpseed.com or he can call our 24x7 Customer Care Helpline. Also, any customer is always welcome to visit our office to lodge a complaint with the senior management.",
         },
         {
-          id: "online-payment",
+          id: "payment",
           question: "What is the process for online payment?",
           answer:
             "A customer can buy our services directly from our online platform, for which he need to make online payment. Once he clicks on “Apply Now”, a new window will open, a customer is required to submit the information in the respective fields and click “Make Payment”. A unique ticket number will be auto generated, the customer need to quote this number as reference for any enquiry regarding his service request.",

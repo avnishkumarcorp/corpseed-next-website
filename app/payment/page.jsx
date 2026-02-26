@@ -11,12 +11,12 @@ export async function generateMetadata() {
     description: data?.metaDescription || "Corpseed || Payments",
     keywords: data?.metaKeyword || "",
     alternates: {
-      canonical: "/online-payments",
+      canonical: "/payment",
     },
     openGraph: {
       title: data?.metaTitle || "Corpseed || Payments",
       description: data?.metaDescription || "Corpseed || Payments",
-      url: "/online-payments",
+      url: "/payment",
       type: "website",
     },
     twitter: {

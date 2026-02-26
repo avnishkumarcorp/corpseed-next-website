@@ -15,7 +15,7 @@ const ABOUT_US_COL = {
     { label: "Change Your CA", href: "/change-your-ca" },
     { label: "Life At Corpseed", href: "/life-at-corpseed" },
     { label: "MCA Calculator", href: "/mca-calculator" },
-    { label: "Online Payment", href: "/online-payment" },
+    { label: "Online Payment", href: "/payment" },
   ],
 };
 

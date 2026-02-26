@@ -221,10 +221,10 @@ export default async function ServicePage({ params }) {
         <section className="bg-gray-50 py-6">
           <div className="mx-auto max-w-7xl px-4">
             <h2 className="text-center text-2xl font-semibold mb-8">
-              Fire Safety NOC by City
+              {service?.title} by State/City
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
               {serviceCities?.map((city) => (
                 <Link
                   key={city.id}

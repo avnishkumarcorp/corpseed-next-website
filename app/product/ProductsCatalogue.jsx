@@ -82,11 +82,17 @@ const ProductCard = React.memo(function ProductCard({ p, idx }) {
           </span>
         </div>
 
-        <p className="mt-3 text-sm text-gray-600">{clampText(p?.summary, 160)}</p>
+        <p className="mt-3 text-sm text-gray-600">
+          {clampText(p?.summary, 160)}
+        </p>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-xs text-gray-500">{p?.serviceName || "Corpseed"}</span>
-          <span className="text-sm font-semibold text-blue-600">Explore more →</span>
+          <span className="text-xs text-gray-500">
+            {p?.serviceName || "Corpseed"}
+          </span>
+          <span className="text-sm font-semibold text-blue-600">
+            Explore more →
+          </span>
         </div>
       </div>
     </Link>
@@ -109,7 +115,9 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
   const initialFilter = useMemo(() => (q || filter || "").trim(), [q, filter]);
 
   // ✅ IMPORTANT: backend does NOT text-search. We do client-side filtering for q.
-  const normalizedQ = String(q || "").trim().toLowerCase();
+  const normalizedQ = String(q || "")
+    .trim()
+    .toLowerCase();
 
   const visibleProducts = useMemo(() => {
     if (!normalizedQ) return products;
@@ -329,6 +337,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
         onClose={() => setConsultOpen(false)}
         title="Consult Now"
         bookMeeting={true}
+        location={data?.title}
       />
     </>
   );

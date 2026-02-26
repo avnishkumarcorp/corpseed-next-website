@@ -51,6 +51,9 @@ export async function submitPartnerEnquiry({
   mobile,
   message,
   location = "",
+  page,
+  postDate,
+  modifyDate,
 }) {
   const payload = {
     otp: String(otp || "").trim(),
@@ -59,6 +62,9 @@ export async function submitPartnerEnquiry({
     mobile: String(mobile || "").trim(),
     message: String(message || "").trim(),
     location: String(location || "").trim(),
+    page: String(page || "").trim(),
+    postDate: String(postDate || "").trim(),
+    modifyDate: String(modifyDate || "").trim(),
   };
 
   const res = await fetch("/api/enquiry/partner", {
@@ -86,6 +92,7 @@ export async function submitConsultNowEnquiry({
   location,
   categoryId,
   city,
+  page,
 }) {
   const payload = {
     otp: String(otp || "").trim(),
@@ -95,6 +102,7 @@ export async function submitConsultNowEnquiry({
     city: String(city || "").trim(), // 🔥 ADD THIS
     message: String(message || "").trim(),
     location: String(location || "").trim(),
+    page: String(page || "").trim(),
     categoryId: categoryId || "",
     postDate: "",
     modifyDate: "",
@@ -123,6 +131,7 @@ export async function submitBookMeetingEnquiry({
   message,
   otp,
   location,
+  page,
 }) {
   const payload = {
     name: String(name || "").trim(),
@@ -133,6 +142,7 @@ export async function submitBookMeetingEnquiry({
     message: String(message || "").trim(),
     otp: String(otp || "").trim(),
     location: String(location || "").trim(),
+    page: String(page || "").trim(),
   };
 
   const res = await fetch("/api/enquiry/book-meeting", {
@@ -157,6 +167,7 @@ export async function submitContactUsEnquiry({
   city,
   message,
   location,
+  page,
 }) {
   const payload = {
     otp: String(otp || "").trim(),
@@ -166,6 +177,7 @@ export async function submitContactUsEnquiry({
     city: String(city || "").trim(),
     message: String(message || "").trim(),
     location: String(location || "").trim(),
+    page: String(page || "").trim(),
     postDate: "",
     modifyDate: "",
   };

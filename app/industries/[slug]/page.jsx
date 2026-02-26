@@ -135,7 +135,7 @@ function NewsCard({ title, item, hrefBase }) {
 export default async function IndustryPage({ params }) {
   const { slug } = await params;
   const data = await getIndustryData(slug);
-
+  const location = `${process.env.NEXT_PUBLIC_API_BASE_URL}/industries/${slug}`;
   const featured = data?.industries || [];
 
   if (!data) return null;
@@ -236,6 +236,7 @@ export default async function IndustryPage({ params }) {
         badgeText="INCLUDES FREE SUPPORT"
         ratingText="Rated 4.9 by 74,861+ customers globally"
         videoText="Click to Watch & Know More"
+        location={location}
       />
 
       <section className="mx-auto max-w-full px-4 bg-white min-h-[120px]">

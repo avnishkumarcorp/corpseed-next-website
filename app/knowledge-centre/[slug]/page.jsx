@@ -237,7 +237,7 @@ export async function generateMetadata({ params }) {
 ================================= */
 export default async function KnowledgeCentreSlugPage({ params }) {
   const { slug } = await params;
-
+  let location = `${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge-center/${slug}`;
   const apiData = await getKnowledgeCentreBySlug(slug);
   if (!apiData?.blog) return notFound();
 
@@ -330,7 +330,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                   </div>
 
                   <div className="border border-[#e5e5e5] shadow-[0_0_0_12px_#f8f9fa]">
-                    <EnquiryOtpInline />
+                    <EnquiryOtpInline page={slug} location={location} />
                   </div>
                 </div>
                 {/* </Card> */}

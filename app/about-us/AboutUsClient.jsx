@@ -57,10 +57,10 @@ const AboutUsClient = () => {
                 </p>
 
                 <div className="mt-7 flex flex-wrap gap-3">
-                  <TalkToExpertCard
+                  {/* <TalkToExpertCard
                     isAboutUs={true}
                     onClick={() => setConsultOpen(true)}
-                  />
+                  /> */}
                   <Link
                     href="#begin"
                     className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/15 !text-white font-semibold transition cursor-pointer backdrop-blur inline-flex items-center gap-2"
@@ -429,11 +429,12 @@ const AboutUsClient = () => {
           </div>
         </div>
       </Section>
-      <ConsultNowModal
+      {/* <ConsultNowModal
         open={consultOpen}
         onClose={() => setConsultOpen(false)}
         title="Consult Now"
-      />
+        
+      /> */}
     </main>
   );
 };

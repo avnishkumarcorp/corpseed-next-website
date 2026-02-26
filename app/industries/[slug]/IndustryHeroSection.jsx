@@ -13,6 +13,7 @@ export default function IndustryHeroSection({
   ratingText,
   videoText = "Watch Overview",
   videoUrl = "/videos/corpseed-intro.mp4",
+  location,
 }) {
   const [consultOpen, setConsultOpen] = useState(false);
 
@@ -63,6 +64,7 @@ export default function IndustryHeroSection({
                 triggerText="Get Free Consultation"
                 className="m-0"
                 page={title}
+                location={location}
               />
             </div>
 
@@ -70,6 +72,8 @@ export default function IndustryHeroSection({
               open={consultOpen}
               onClose={() => setConsultOpen(false)}
               title="Consult Now"
+              page={title}
+              location={location || title}
             />
           </div>
         </div>

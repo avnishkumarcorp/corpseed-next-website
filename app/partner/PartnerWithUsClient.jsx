@@ -1,23 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   BadgeCheck,
-  LineChart,
-  Wallet,
-  ClipboardList,
   ArrowRight,
   Handshake,
   ShieldCheck,
-  Rocket,
   CheckCircle2,
 } from "lucide-react";
 import PartnerRegisterModal from "./PartnerRegisterModal";
-import icon1 from '../assets/Group 1006.svg'
-import icon2 from '../assets/Group 1007.svg'
-import icon3 from '../assets/Group 1008.svg'
-import icon4 from '../assets/Group 1009.svg'
+import icon1 from "../assets/Group 1006.svg";
+import icon2 from "../assets/Group 1007.svg";
+import icon3 from "../assets/Group 1008.svg";
+import icon4 from "../assets/Group 1009.svg";
 import Image from "next/image";
 
 const advantages = [
@@ -56,7 +52,8 @@ const steps = [
   },
 ];
 
-export default function PartnerWithUsClient() {
+export default function PartnerWithUsClient({}) {
+  let location = `${process.env.NEXT_PUBLIC_API_BASE_URL}/partner`;
   const [open, setOpen] = useState(false);
 
   const openModal = () => setOpen(true);
@@ -64,7 +61,12 @@ export default function PartnerWithUsClient() {
 
   return (
     <main className="bg-white">
-      <PartnerRegisterModal open={open} onClose={closeModal} />
+      <PartnerRegisterModal
+        open={open}
+        onClose={closeModal}
+        location={location}
+        page={"partner"}
+      />
 
       {/* HERO */}
       <section className="relative border-b border-gray-200 bg-gradient-to-b from-slate-50 to-white">
@@ -78,14 +80,14 @@ export default function PartnerWithUsClient() {
               </div>
 
               <h1 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                PARTNER 
-                WITH US
+                PARTNER WITH US
               </h1>
 
               <p className="mt-4 text-base md:text-lg text-gray-600 leading-relaxed max-w-2xl">
-                Are you an attorney with a zeal to help people with legal services and a strong
-                statistic to prove it? Let's talk. We're looking for attorneys across India to
-                provide our customers/Partners with sound legal advice, consulting,
+                Are you an attorney with a zeal to help people with legal
+                services and a strong statistic to prove it? Let's talk. We're
+                looking for attorneys across India to provide our
+                customers/Partners with sound legal advice, consulting,
                 representation and other related legal services.
               </p>
 
@@ -117,17 +119,35 @@ export default function PartnerWithUsClient() {
             <div className="lg:col-span-5">
               <div className="rounded-2xl border border-gray-200 bg-white shadow-[0_10px_28px_rgba(15,23,42,0.08)] overflow-hidden">
                 <div className="p-6 border-b border-gray-200 bg-slate-50">
-                  <p className="text-sm font-semibold text-gray-900">Partner Snapshot</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    Partner Snapshot
+                  </p>
                   <p className="text-sm text-gray-600 mt-1">
                     Why professionals join Corpseed
                   </p>
                 </div>
 
                 <div className="p-6 space-y-4">
-                  <StatRow icon={CheckCircle2} title="Commission opportunity" value="Upto 20%" />
-                  <StatRow icon={CheckCircle2} title="Onboarding" value="Under 10 minutes" />
-                  <StatRow icon={CheckCircle2} title="Delivery model" value="Hassle-free" />
-                  <StatRow icon={CheckCircle2} title="Reporting" value="Time-saving insights" />
+                  <StatRow
+                    icon={CheckCircle2}
+                    title="Commission opportunity"
+                    value="Upto 20%"
+                  />
+                  <StatRow
+                    icon={CheckCircle2}
+                    title="Onboarding"
+                    value="Under 10 minutes"
+                  />
+                  <StatRow
+                    icon={CheckCircle2}
+                    title="Delivery model"
+                    value="Hassle-free"
+                  />
+                  <StatRow
+                    icon={CheckCircle2}
+                    title="Reporting"
+                    value="Time-saving insights"
+                  />
 
                   <div className="pt-2">
                     <button
@@ -214,7 +234,8 @@ export default function PartnerWithUsClient() {
                 Ready to become a Corpseed Partner?
               </h3>
               <p className="mt-2 text-gray-600 max-w-2xl">
-                Join the network and start delivering compliance and legal services with a smoother, faster workflow.
+                Join the network and start delivering compliance and legal
+                services with a smoother, faster workflow.
               </p>
             </div>
 
@@ -259,30 +280,19 @@ function StatRow({ icon: Icon, title, value }) {
 function AdvCard({ title, desc, icon }) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden transition hover:shadow-md">
-      
       {/* BIG IMAGE */}
       <div className="relative h-48 w-full bg-blue-50">
-        <Image
-          src={icon}
-          alt={title}
-          fill
-          className="object-contain p-6"
-        />
+        <Image src={icon} alt={title} fill className="object-contain p-6" />
       </div>
 
       {/* CONTENT */}
       <div className="p-6 text-center">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {title}
-        </h3>
-        <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-          {desc}
-        </p>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <p className="mt-2 text-sm text-gray-600 leading-relaxed">{desc}</p>
       </div>
     </div>
   );
 }
-
 
 function StepCard({ step, title, desc, icon: Icon }) {
   return (
@@ -294,7 +304,9 @@ function StepCard({ step, title, desc, icon: Icon }) {
           </div>
           <div>
             <p className="text-xs font-semibold text-gray-500">STEP {step}</p>
-            <h3 className="text-lg md:text-xl font-bold text-gray-900">{title}</h3>
+            <h3 className="text-lg md:text-xl font-bold text-gray-900">
+              {title}
+            </h3>
           </div>
         </div>
 

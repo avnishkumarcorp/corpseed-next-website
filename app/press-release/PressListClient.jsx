@@ -11,13 +11,8 @@ import {
   Facebook,
   Linkedin,
   Mail,
-  Share2,
-  Phone,
-  User,
-  MessageSquare,
 } from "lucide-react";
 import SafeHtml from "../components/SafeHtml";
-import EnquiryForm from "../components/enquiry-form/EnquiryForm";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 function Badge({ children }) {
@@ -93,6 +88,7 @@ function buildQS({ page, size }) {
 }
 
 export default function PressListClient({ apiData, page, size }) {
+  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/press-release`;
   const router = useRouter();
 
   const pressList = apiData?.pressList || [];
@@ -414,7 +410,7 @@ export default function PressListClient({ apiData, page, size }) {
               </form>
             </div>
           </CardShell> */}
-          <EnquiryOtpInline page={"press-release"} />
+          <EnquiryOtpInline page={"press-release"} location={pageLocation} />
         </aside>
       </div>
     </section>

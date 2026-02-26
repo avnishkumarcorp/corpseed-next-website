@@ -144,7 +144,7 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function KnowledgeCentrePage({ searchParams }) {
   const sp = await searchParams;
-
+  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge-center`;
   let currentPage = Number(sp?.page || 1);
   const q = (sp?.q || "").toString();
   const filter = (sp?.filter || "").toString();
@@ -442,7 +442,10 @@ export default async function KnowledgeCentrePage({ searchParams }) {
               </Card>
 
               <div className="border border-gray-200 rounded-sm">
-                <EnquiryOtpInline />
+                <EnquiryOtpInline
+                  page={"knowledge-centre"}
+                  location={pageLocation}
+                />
               </div>
             </div>
           </aside>

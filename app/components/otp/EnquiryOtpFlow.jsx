@@ -78,7 +78,7 @@ function OTPInput({ value, onChange, length = 4 }) {
 
 /* ---------------- MAIN COMPONENT ---------------- */
 
-export default function EnquiryOtpInline({ onVerified, page }) {
+export default function EnquiryOtpInline({ onVerified, page, location }) {
   const [name, setName] = React.useState("");
   const [mobile, setMobile] = React.useState("");
   const [whatsapp, setWhatsapp] = React.useState(true);
@@ -138,8 +138,8 @@ export default function EnquiryOtpInline({ onVerified, page }) {
         name: name.trim(),
         email: "NA", // <-- NOT empty
         mobile: cleanMobile.trim(),
-        location: "NA", // <-- NOT empty
-        page: page || "unknown-page",
+        location: location, // <-- NOT empty
+        page: page || location,
         whatsApp: whatsapp ? 1 : 0,
       };
 

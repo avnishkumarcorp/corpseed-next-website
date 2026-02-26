@@ -3,11 +3,11 @@
 import Link from "next/link";
 import React, { useMemo, useRef, useState } from "react";
 import { MapPin, Phone, Mail, HelpCircle, ShieldCheck } from "lucide-react";
-import { sendOtp, submitContactUsEnquiry, verifyOtp } from "@/app/lib/enquiryOtp";
-
-function cn(...s) {
-  return s.filter(Boolean).join(" ");
-}
+import {
+  sendOtp,
+  submitContactUsEnquiry,
+  verifyOtp,
+} from "@/app/lib/enquiryOtp";
 
 /* ---------------- MODAL HELPERS ---------------- */
 
@@ -92,6 +92,7 @@ function Field({ label, required, children }) {
 }
 
 export default function ContactUsClient({ data }) {
+  let location = `${process.env.NEXT_PUBLIC_API_BASE_URL}/contact`;
   const addresses = data?.addresses || [];
 
   // ✅ One form for all: name, mobile mandatory; others optional
@@ -99,7 +100,7 @@ export default function ContactUsClient({ data }) {
     name: "",
     email: "",
     mobile: "",
-    location: "",
+    city: "",
     message: "",
   });
 
@@ -135,7 +136,7 @@ export default function ContactUsClient({ data }) {
       name: form.name,
       mobile: cleanMobile,
       email: form.email,
-      location: form.location,
+      city: form.city,
       message: form.message,
     });
 
@@ -184,15 +185,19 @@ export default function ContactUsClient({ data }) {
       return;
     }
 
+    const today = new Date().toISOString().split("T")[0];
+
     // 2️⃣ CALL CONTACT-US API AFTER VERIFY
     const contactRes = await submitContactUsEnquiry({
       otp,
       name: form.name,
       email: form.email,
       mobile: cleanMobile,
-      city: form.location, // backend expects city
+      city: form.city, // backend expects city
       message: form.message,
-      location: form.location,
+      location,
+      postDate: today,
+      modifyDate: today,
     });
 
     setLoading(false);
@@ -277,10 +282,10 @@ export default function ContactUsClient({ data }) {
                     />
                   </Field>
 
-                  <Field label="Location">
+                  <Field label="City">
                     <input
-                      name="location"
-                      value={form.location}
+                      name="city"
+                      value={form.city}
                       onChange={onChange}
                       placeholder="City / Location"
                       className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none

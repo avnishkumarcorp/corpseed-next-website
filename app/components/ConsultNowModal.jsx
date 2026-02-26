@@ -65,6 +65,9 @@ export default function ConsultNowModal({
   consultNow = false,
   categoryId,
   bookMeeting,
+  location,
+  page,
+  slug,
 }) {
   const [step, setStep] = useState(1); // 1=form, 2=otp, 3=success
   const [loading, setLoading] = useState(false);
@@ -140,8 +143,9 @@ export default function ConsultNowModal({
         name,
         mobile,
         email,
-        location: city,
+        city,
         message,
+        location,
       });
 
       if (!r.ok) {
@@ -189,7 +193,9 @@ export default function ConsultNowModal({
           city,
           message,
           otp,
-          location: city,
+          location,
+          page,
+          slug,
         });
       } else if (consultNow) {
         response = await submitConsultNowEnquiry({
@@ -198,9 +204,12 @@ export default function ConsultNowModal({
           email,
           mobile,
           message,
-          location: city,
+          location,
           categoryId,
-          city, // 🔥 ADD THIS
+          city,
+          page,
+          slug,
+          // 🔥 ADD THIS
         });
       } else {
         response = await submitPartnerEnquiry({
@@ -209,7 +218,9 @@ export default function ConsultNowModal({
           email,
           mobile,
           message,
-          location: city,
+          location,
+          page,
+          slug,
         });
       }
 

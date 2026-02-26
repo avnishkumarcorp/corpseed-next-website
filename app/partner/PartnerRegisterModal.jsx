@@ -15,11 +15,16 @@ const OCCUPATIONS = [
   "Other",
 ];
 
-export default function PartnerRegisterModal({ open, onClose }) {
+export default function PartnerRegisterModal({
+  open,
+  onClose,
+  location,
+  page,
+}) {
   const [loading, setLoading] = useState(false);
   const [otpOpen, setOtpOpen] = useState(false);
   const [verifiedOtp, setVerifiedOtp] = useState("");
-
+  const today = new Date().toISOString().split("T")[0];
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -27,7 +32,6 @@ export default function PartnerRegisterModal({ open, onClose }) {
     occupation: "Chartered Accountant",
     message: "",
     agree: false,
-    location: "",
   });
 
   useEffect(() => {
@@ -78,7 +82,7 @@ export default function PartnerRegisterModal({ open, onClose }) {
         name: form.fullName,
         mobile: form.mobile,
         email: form.email,
-        location: form.location || "",
+        location: location || "",
         message: form.message,
       });
 
@@ -126,7 +130,10 @@ export default function PartnerRegisterModal({ open, onClose }) {
         email: form.email,
         mobile: form.mobile,
         message: form.message,
-        location: form.location || "",
+        location: location || "",
+        postDate: today,
+        modifyDate: today,
+        page: page,
       });
 
       if (!submitRes.ok) {
@@ -151,7 +158,6 @@ export default function PartnerRegisterModal({ open, onClose }) {
         occupation: "Chartered Accountant",
         message: "",
         agree: false,
-        location: "",
       });
       setVerifiedOtp("");
     } catch (e) {
@@ -169,7 +175,7 @@ export default function PartnerRegisterModal({ open, onClose }) {
         name: form.fullName,
         mobile: form.mobile,
         email: form.email,
-        location: form.location || "",
+        location: location || "",
         message: form.message,
       });
 

@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Phone, ShieldCheck } from "lucide-react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
 import { createPortal } from "react-dom";
-import { createServiceEnquiry } from "@/app/lib/serviceEnquiry";
 
 /* ---------------- MODAL HELPERS ---------------- */
 
@@ -105,6 +104,8 @@ export default function EnquiryForm({
   serviceId,
   type,
   industryId,
+  location,
+  slug,
 }) {
   const [form, setForm] = useState({
     name: "",
@@ -257,6 +258,8 @@ export default function EnquiryForm({
         postDate: now,
         modifyDate: now,
         message: form.message?.trim() || `Enquiry for ${serviceName}`,
+        location: location || window.location.href,
+        slug,
       };
 
       /* ---------------- CALL CORRECT API ---------------- */

@@ -100,6 +100,7 @@ const ProductCard = React.memo(function ProductCard({ p, idx }) {
 });
 
 export default function ProductsCatalogue({ data, page, size, filter, q }) {
+  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/product`;
   const [consultOpen, setConsultOpen] = useState(false);
 
   const products = data?.products || [];
@@ -337,7 +338,8 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
         onClose={() => setConsultOpen(false)}
         title="Consult Now"
         bookMeeting={true}
-        location={data?.title}
+        location={pageLocation}
+        page={"product"}
       />
     </>
   );

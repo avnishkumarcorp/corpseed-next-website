@@ -101,6 +101,7 @@ function SideSection({ badge, title, items, type }) {
 
 export default async function ProductSlugPage({ params }) {
   const { slug } = await params;
+  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/${slug}`;
   const data = await getProductBySlug(slug);
 
   if (!data?.product) return null;
@@ -165,7 +166,10 @@ export default async function ProductSlugPage({ params }) {
               </p>
             </div>
 
-            <EnquiryOtpInline page={product?.title || product?.name} />
+            <EnquiryOtpInline
+              page={product?.title || product?.name}
+              location={pageLocation}
+            />
 
             {/* if anything remains after marker */}
             {/* {after?.trim() ? (

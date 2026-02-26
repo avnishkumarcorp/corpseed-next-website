@@ -72,7 +72,7 @@ export default function ConsultNowModal({
   const [step, setStep] = useState(1); // 1=form, 2=otp, 3=success
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-
+  const today = new Date().toISOString().split("T")[0];
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
@@ -196,6 +196,8 @@ export default function ConsultNowModal({
           location,
           page,
           slug,
+          postDate: today,
+          modifyDate: today,
         });
       } else if (consultNow) {
         response = await submitConsultNowEnquiry({
@@ -209,6 +211,8 @@ export default function ConsultNowModal({
           city,
           page,
           slug,
+          postDate: today,
+          modifyDate: today,
           // 🔥 ADD THIS
         });
       } else {
@@ -221,6 +225,8 @@ export default function ConsultNowModal({
           location,
           page,
           slug,
+          postDate: today,
+          modifyDate: today,
         });
       }
 

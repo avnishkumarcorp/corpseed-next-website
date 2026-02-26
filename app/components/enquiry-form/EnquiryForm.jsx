@@ -196,7 +196,7 @@ export default function EnquiryForm({
       name: form.name,
       mobile: cleanMobile,
       email: form.email,
-      location: form.location,
+      location: location,
       message: form.message || `Enquiry for ${serviceName}`,
     });
 

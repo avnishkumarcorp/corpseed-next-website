@@ -138,6 +138,7 @@ export default function ContactUsClient({ data }) {
       email: form.email,
       city: form.city,
       message: form.message,
+      location,
     });
 
     setLoading(false);

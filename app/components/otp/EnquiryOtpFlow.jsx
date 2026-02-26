@@ -99,7 +99,7 @@ export default function EnquiryOtpInline({ onVerified, page, location }) {
 
     setError("");
     setLoading(true);
-    const res = await sendOtp({ name, mobile: cleanMobile });
+    const res = await sendOtp({ name, mobile: cleanMobile, location });
     setLoading(false);
 
     if (!res.ok) {

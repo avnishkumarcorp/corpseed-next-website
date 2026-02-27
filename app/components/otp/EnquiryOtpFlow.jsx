@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
 import { createCallbackEnquiry } from "@/app/lib/callbackEnquiry";
 
@@ -78,7 +78,7 @@ function OTPInput({ value, onChange, length = 4 }) {
 
 /* ---------------- MAIN COMPONENT ---------------- */
 
-export default function EnquiryOtpInline({ onVerified, page, location }) {
+export default function EnquiryOtpInline({ onVerified, page }) {
   const [name, setName] = React.useState("");
   const [mobile, setMobile] = React.useState("");
   const [whatsapp, setWhatsapp] = React.useState(true);
@@ -88,6 +88,14 @@ export default function EnquiryOtpInline({ onVerified, page, location }) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [resData, setResData] = useState();
+
+  const [location, setLocation] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocation(window.location.href);
+    }
+  }, []);
 
   const cleanMobile = mobile.replace(/\D/g, "").slice(0, 10);
 

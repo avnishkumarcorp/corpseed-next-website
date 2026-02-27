@@ -65,7 +65,6 @@ export default function ConsultNowModal({
   consultNow = false,
   categoryId,
   bookMeeting,
-  location,
   page,
   slug,
 }) {
@@ -79,8 +78,14 @@ export default function ConsultNowModal({
   const [city, setCity] = useState("");
   const [message, setMessage] = useState("");
   const [emailError, setEmailError] = useState("");
-
   const [otp, setOtp] = useState("");
+  const [location, setLocation] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocation(window.location.href);
+    }
+  }, []);
 
   const validateEmail = (value) => {
     if (!value.trim()) {

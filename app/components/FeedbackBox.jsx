@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { submitFeedback } from "@/app/lib/feedback";
 import { SmilePlus, Smile, Meh, Frown, Angry, X } from "lucide-react";
 
@@ -45,7 +45,13 @@ function SuccessPopup({ open, onClose }) {
 
           <div className="mt-6 flex justify-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 shadow-lg">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <svg
+                width="44"
+                height="44"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
                 <path
                   d="M20 6L9 17l-5-5"
                   stroke="white"
@@ -87,7 +93,9 @@ function CommentPopup({
         </button>
 
         <div className="p-6">
-          <p className="text-lg font-semibold text-gray-900">Add your feedback</p>
+          <p className="text-lg font-semibold text-gray-900">
+            Add your feedback
+          </p>
           <p className="mt-1 text-sm text-gray-600">
             Rating: <span className="font-semibold">{ratingValue}</span>
           </p>
@@ -117,7 +125,9 @@ function CommentPopup({
               className={[
                 "rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-md cursor-pointer",
                 "hover:bg-blue-700 hover:shadow-lg transition",
-                loading || !comment.trim() ? "opacity-60 cursor-not-allowed" : "",
+                loading || !comment.trim()
+                  ? "opacity-60 cursor-not-allowed"
+                  : "",
               ].join(" ")}
             >
               {loading ? "Submitting..." : "Submit"}
@@ -129,11 +139,7 @@ function CommentPopup({
   );
 }
 
-export default function FeedbackBox({
-  type = "product",
-  location = "Unknown",
-  className = "",
-}) {
+export default function FeedbackBox({ type = "product", className = "" }) {
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
 
@@ -142,6 +148,13 @@ export default function FeedbackBox({
   const [comment, setComment] = useState("");
 
   const [error, setError] = useState("");
+  const [location, setLocation] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocation(window.location.href);
+    }
+  }, []);
 
   const send = async ({ ratingValue, commentText }) => {
     setLoading(true);
@@ -196,8 +209,12 @@ export default function FeedbackBox({
     <>
       <div className={`w-full ${className}`}>
         <div className="text-center">
-          <p className="text-xl font-semibold text-gray-900">Give us your feedback</p>
-          <p className="mt-1 text-sm text-gray-700">What do you think about this article?</p>
+          <p className="text-xl font-semibold text-gray-900">
+            Give us your feedback
+          </p>
+          <p className="mt-1 text-sm text-gray-700">
+            What do you think about this article?
+          </p>
         </div>
 
         <div className="mt-4 flex items-center justify-center gap-4">

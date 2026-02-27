@@ -34,6 +34,8 @@ export async function generateMetadata({ params }) {
   };
 }
 
+const FORM_MARKER = "--------------Blog Contact Form-------------";
+
 function splitByFormMarker(html) {
   const raw = String(html || "");
   if (!raw) return { before: "", after: "" };
@@ -101,7 +103,6 @@ function SideSection({ badge, title, items, type }) {
 
 export default async function ProductSlugPage({ params }) {
   const { slug } = await params;
-  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/${slug}`;
   const data = await getProductBySlug(slug);
 
   if (!data?.product) return null;
@@ -166,10 +167,7 @@ export default async function ProductSlugPage({ params }) {
               </p>
             </div>
 
-            <EnquiryOtpInline
-              page={product?.title || product?.name}
-              location={pageLocation}
-            />
+            <EnquiryOtpInline page={product?.title || product?.name} />
 
             {/* if anything remains after marker */}
             {/* {after?.trim() ? (
@@ -203,7 +201,7 @@ export default async function ProductSlugPage({ params }) {
                 type="blog"
               />
 
-              <FeedbackBox type="product" location={slug} className="mt-10" />
+              <FeedbackBox type="product" slug={slug} className="mt-10" />
             </div>
           </aside>
         </div>

@@ -7,7 +7,7 @@ const VideoPopup = dynamic(() => import("../components/VideoPopup"), {
   ssr: false,
 });
 
-const EnquiryOtpFlow = dynamic(
+const EnquiryOtpInline = dynamic(
   () => import("../components/otp/EnquiryOtpFlow"),
   { ssr: false },
 );
@@ -23,7 +23,6 @@ export default function ServiceHero({
   ratingText,
   videoText = "Watch Overview",
   videoUrl = "/videos/corpseed-intro.mp4",
-  location,
   slug,
 }) {
   const [consultOpen, setConsultOpen] = useState(false);
@@ -103,11 +102,10 @@ export default function ServiceHero({
             </div>
 
             <div className="bg-[#f2f3ff] p-2 mt-2.5">
-              <EnquiryOtpFlow
+              <EnquiryOtpInline
                 triggerText="Get Free Consultation"
                 className="m-0"
                 page={title}
-                location={location}
                 slug={slug}
               />
             </div>
@@ -116,7 +114,6 @@ export default function ServiceHero({
               open={consultOpen}
               onClose={() => setConsultOpen(false)}
               title="Consult Now"
-              location={location}
               page={title}
               slug={slug}
             />

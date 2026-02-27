@@ -15,12 +15,7 @@ const OCCUPATIONS = [
   "Other",
 ];
 
-export default function PartnerRegisterModal({
-  open,
-  onClose,
-  location,
-  page,
-}) {
+export default function PartnerRegisterModal({ open, onClose, page }) {
   const [loading, setLoading] = useState(false);
   const [otpOpen, setOtpOpen] = useState(false);
   const [verifiedOtp, setVerifiedOtp] = useState("");
@@ -33,6 +28,13 @@ export default function PartnerRegisterModal({
     message: "",
     agree: false,
   });
+  const [location, setLocation] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocation(window.location.href);
+    }
+  }, []);
 
   useEffect(() => {
     if (!open) return;

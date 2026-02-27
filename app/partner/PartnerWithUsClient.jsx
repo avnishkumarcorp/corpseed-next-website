@@ -53,7 +53,6 @@ const steps = [
 ];
 
 export default function PartnerWithUsClient({}) {
-  let location = `${process.env.NEXT_PUBLIC_API_BASE_URL}/partner`;
   const [open, setOpen] = useState(false);
 
   const openModal = () => setOpen(true);
@@ -61,12 +60,7 @@ export default function PartnerWithUsClient({}) {
 
   return (
     <main className="bg-white">
-      <PartnerRegisterModal
-        open={open}
-        onClose={closeModal}
-        location={location}
-        page={"partner"}
-      />
+      <PartnerRegisterModal open={open} onClose={closeModal} page={"partner"} />
 
       {/* HERO */}
       <section className="relative border-b border-gray-200 bg-gradient-to-b from-slate-50 to-white">

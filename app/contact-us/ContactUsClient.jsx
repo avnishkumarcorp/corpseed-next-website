@@ -92,7 +92,6 @@ function Field({ label, required, children }) {
 }
 
 export default function ContactUsClient({ data }) {
-  let location = `${process.env.NEXT_PUBLIC_API_BASE_URL}/contact`;
   const addresses = data?.addresses || [];
 
   // ✅ One form for all: name, mobile mandatory; others optional
@@ -109,6 +108,13 @@ export default function ContactUsClient({ data }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [resData, setResData] = useState(null);
+  const [location, setLocation] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocation(window.location.href);
+    }
+  }, []);
 
   const cleanMobile = useMemo(
     () =>

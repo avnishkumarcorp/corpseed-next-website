@@ -88,7 +88,6 @@ function buildQS({ page, size }) {
 }
 
 export default function PressListClient({ apiData, page, size }) {
-  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/press-release`;
   const router = useRouter();
 
   const pressList = apiData?.pressList || [];
@@ -410,7 +409,7 @@ export default function PressListClient({ apiData, page, size }) {
               </form>
             </div>
           </CardShell> */}
-          <EnquiryOtpInline page={"press-release"} location={pageLocation} />
+          <EnquiryOtpInline page={"press-release"} />
         </aside>
       </div>
     </section>

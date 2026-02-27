@@ -75,14 +75,12 @@ export default async function ServicePage({ params }) {
   const { segments } = (await params) ?? [];
   let state = null;
   let slug = null;
-  let location = `${process.env.NEXT_PUBLIC_API_BASE_URL}/service`;
+
   if (segments?.length === 1) {
     slug = segments[0];
-    location = location + `/${segments[0]}`;
   } else if (segments?.length === 2) {
     state = segments[0];
     slug = segments[1];
-    location = location + `/${segments[0]}//${segments[1]}`;
   } else {
     notFound();
   }
@@ -182,7 +180,6 @@ export default async function ServicePage({ params }) {
         badgeText="INCLUDES FREE SUPPORT"
         ratingText="Rated 4.9 by 74,861+ customers globally"
         videoText="Click to Watch & Know More"
-        location={location}
         slug={slug}
       />
 
@@ -214,7 +211,6 @@ export default async function ServicePage({ params }) {
                 serviceId={service?.id}
                 categoryId={service?.categoryId}
                 type={"service"}
-                location={location}
                 slug={slug}
               />
             </div>

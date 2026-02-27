@@ -104,14 +104,13 @@ export default function EnquiryForm({
   serviceId,
   type,
   industryId,
-  location,
   slug,
 }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
     mobile: "",
-    location: "",
+    city: "",
     message: "",
   });
 
@@ -129,6 +128,13 @@ export default function EnquiryForm({
   });
 
   const [resData, setResData] = useState(null);
+  const [location, setLocation] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setLocation(window.location.href);
+    }
+  }, []);
 
   const cleanMobile = useMemo(
     () =>
@@ -253,12 +259,12 @@ export default function EnquiryForm({
         name: form.name.trim(),
         email: form.email.trim(),
         mobile: cleanMobile,
-        city: form.location.trim(),
-        url: window.location.href, // ✅ backend expects pageUrl
+        city: form.city.trim(),
+        url: location, // ✅ backend expects pageUrl
         postDate: now,
         modifyDate: now,
         message: form.message?.trim() || `Enquiry for ${serviceName}`,
-        location: location || window.location.href,
+        location: location,
         slug,
       };
 

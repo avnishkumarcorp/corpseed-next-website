@@ -28,7 +28,6 @@ const RightCard = ({ icon, title, desc, href, onClick = () => {} }) => {
 
 export default function VirtualMeetingSection() {
   const [openStartupGuide, setOpenStartupGuide] = useState(false);
-  let location = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
   return (
     <section className="w-full bg-white">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -157,7 +156,6 @@ export default function VirtualMeetingSection() {
       <StartupGuidePopup
         open={openStartupGuide}
         onClose={() => setOpenStartupGuide(false)}
-        location={location}
       />
     </section>
   );

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import styles from "./SafeHtml.module.css";
+import { forwardRef } from "react";
 
 const LEGACY_BASE =
   process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://www.admin.corpseed.com";
@@ -104,7 +105,7 @@ function fixRelativeAssets(rootEl) {
   });
 }
 
-export default function SafeHtmlShadow({ html }) {
+const SafeHtmlShadow = forwardRef(({ html }, ref) => {
   const hostRef = useRef(null);
 
   useEffect(() => {
@@ -318,5 +319,15 @@ margin: 0 auto;
     return () => clearTimeout(t);
   }, [html]);
 
-  return <div ref={hostRef} className={styles.bsWrapper} />;
-}
+  return (
+    <div
+      ref={(el) => {
+        hostRef.current = el;
+        if (ref) ref.current = el;
+      }}
+      className={styles.bsWrapper}
+    />
+  );
+});
+
+export default SafeHtmlShadow;

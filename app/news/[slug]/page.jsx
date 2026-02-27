@@ -18,8 +18,10 @@ import {
 
 import SafeHtml from "@/app/components/SafeHtml";
 import { getNewsBySlug } from "@/app/lib/newsRoom";
-import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
+import { headers } from "next/headers";
+import BlogContentClient from "@/app/components/BlogContentClient";
+import TocClient from "@/app/components/TocClient";
 
 export const revalidate = 300;
 
@@ -43,26 +45,32 @@ function Card({ children, className = "" }) {
   );
 }
 
-/**
- * Extract TOC from description HTML:
- * 1) <div id="main-toc">...</div> => tocHtml
- * 2) remove it from body
- * 3) remove span.formView marker (if exists)
- */
-function splitTocAndBody(html = "") {
-  const input = String(html || "");
-
+function splitTocAndBody(html = "", slug = "", url) {
+  let input = String(html || "");
+  input = input.replace(/<base[^>]*>/gi, "");
   const tocMatch = input.match(
     /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
   );
+  const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
+  const tocHtml = tocHtmlRaw
+    .replace(/<base[^>]*>/gi, "")
+    .replace(
+      /<a([^>]*?)href=(['"])([^'"]*?)\2([^>]*?)>/gi,
+      (full, pre, q, href, post) => {
+        const hashIndex = href.indexOf("#");
+        if (hashIndex === -1) return full;
 
-  const tocHtml = tocMatch ? tocMatch[0] : "";
-  let bodyHtml = tocHtml ? input.replace(tocHtml, "") : input;
+        const hash = href.slice(hashIndex + 1); // without '#'
+        return `<a${pre}href="${url}#${hash}"${post}>`;
+      },
+    );
 
+  let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
   bodyHtml = bodyHtml.replace(
     /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
     "",
   );
+  bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
 
   return { tocHtml, bodyHtml };
 }
@@ -128,13 +136,9 @@ function TocCard({ tocHtml }) {
   if (!tocHtml) return null;
 
   return (
-    <div>
-      {/* Desktop */}
-      <div className="hidden px-5 lg:block">
-        <SafeHtmlShadow html={tocHtml} />
-      </div>
+    <>
+      <TocClient html={tocHtml} headerOffset={90} />
 
-      {/* Mobile */}
       <div className="block px-5 py-4 lg:hidden">
         <details className="group">
           <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
@@ -143,12 +147,13 @@ function TocCard({ tocHtml }) {
               <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
             </span>
           </summary>
+
           <div className="mt-3 max-h-[320px] overflow-auto pr-1">
-            <SafeHtmlShadow html={tocHtml} />
+            <TocClient html={tocHtml} headerOffset={90} />
           </div>
         </details>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -304,8 +309,18 @@ export default async function NewsRoomSlugPage({ params }) {
   // ✅ Share URL
   const pageUrl = `https://www.corpseed.com/news/${item.slug}`;
 
+  const headersList = await headers();
+  const host = headersList.get("host");
+  const protocol = headersList.get("x-forwarded-proto") || "http";
+
+  const url = `${protocol}://${host}/news/${slug}`;
+
   // ✅ TOC split
-  const { tocHtml, bodyHtml } = splitTocAndBody(item.description || "");
+  const { tocHtml, bodyHtml } = splitTocAndBody(
+    item.description || "",
+    slug,
+    url,
+  );
 
   return (
     <div className="bg-white">
@@ -315,19 +330,21 @@ export default async function NewsRoomSlugPage({ params }) {
           {/* ✅ IMAGE LEFT + TEXT RIGHT (top aligned) */}
           <div className="mt-4 grid gap-8 lg:grid-cols-[1.45fr_1.05fr] lg:items-start">
             {/* LEFT image (no padding, no extra space) */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-              <div className="relative h-[260px] w-full sm:h-[320px]">
+            <div className="relative rounded-2xl border border-slate-200 bg-slate-100 shadow-sm overflow-hidden">
+              <div className="relative w-full">
                 <Image
                   src={item.image}
                   alt={safeText(item.title)}
-                  fill
+                  width={1200}
+                  height={800}
                   priority
-                  className="object-cover" // ✅ remove empty padding space
+                  className="w-full h-auto object-contain rounded-2xl"
                   sizes="(max-width: 1024px) 100vw, 700px"
                 />
               </div>
-              <div className="absolute right-3 -bottom-0 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 text-blue-600 px-2 py-1 shadow-lg">
-                <Phone className="h-3 w-3" />
+
+              <div className="absolute right-3 bottom-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 text-blue-600 font-bold px-2 py-1 shadow-lg">
+                <Phone className="h-4 w-4" />
                 7558640644 - Harshita
               </div>
             </div>
@@ -391,7 +408,8 @@ export default async function NewsRoomSlugPage({ params }) {
                 {/* <Card className="overflow-hidden"> */}
                 <div className="px-2 sm:px-3">
                   <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
-                    <SafeHtmlShadow html={bodyHtml} />
+                    {/* <SafeHtmlShadow html={bodyHtml} /> */}
+                    <BlogContentClient html={bodyHtml} />
                   </div>
 
                   {/* Mobile share */}
@@ -448,11 +466,11 @@ export default async function NewsRoomSlugPage({ params }) {
               {/* Sidebar */}
               <aside className="space-y-6">
                 <div className="lg:sticky lg:top-24 space-y-6">
-                  {/* <TocCard tocHtml={tocHtml} /> */}
-
                   <div className="bg-[#f2f3ff] p-2 mt-2.5">
                     <EnquiryOtpInline page={slug} />
                   </div>
+
+                  <TocCard tocHtml={tocHtml} />
 
                   <ListCard
                     title="Top News"

@@ -18,6 +18,7 @@ import FeedbackBox from "@/app/components/FeedbackBox";
 import SocialRail from "@/app/components/ShareRailClient"; // ✅ keep using external component
 import dynamic from "next/dynamic";
 import TocClient from "@/app/components/TocClient";
+import { headers } from "next/headers";
 
 export const revalidate = 300;
 
@@ -51,8 +52,11 @@ function Card({ children, className = "" }) {
  * 2) Removes that TOC block from main content
  * 3) Removes formView marker
  */
-function splitTocAndBody(html = "") {
-  const input = String(html || "");
+function splitTocAndBody(html = "", slug = "", url) {
+  let input = String(html || "");
+
+  // ✅ remove <base ...> from full html (very important)
+  input = input.replace(/<base[^>]*>/gi, "");
 
   const tocMatch = input.match(
     /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
@@ -60,24 +64,35 @@ function splitTocAndBody(html = "") {
 
   const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
 
-  // ✅ Convert ANY absolute URL with #... to only #...
-  // Example: href="https://www.admin.corpseed.com/#X" -> href="#X"
+  // ✅ rewrite TOC links to current page path (relative)
+  // also remove <base> if it exists inside toc block
   const tocHtml = tocHtmlRaw
-    .replace(/href=(['"])\s*https?:\/\/[^'"]*#([^'"]+)\1/gi, 'href="#$2"')
-    .replace(/href=(['"])\s*\/[^'"]*#([^'"]+)\1/gi, 'href="#$2"')
-    .replace(/href=(['"])\s*[^'"]*#([^'"]+)\1/gi, 'href="#$2"')
-    // optional: remove target so it never opens new tab
-    .replace(/\s+target=(['"]).*?\1/gi, "");
+    .replace(/<base[^>]*>/gi, "")
+    .replace(
+      /<a([^>]*?)href=(['"])([^'"]*?)\2([^>]*?)>/gi,
+      (full, pre, q, href, post) => {
+        const hashIndex = href.indexOf("#");
+        if (hashIndex === -1) return full;
+
+        const hash = href.slice(hashIndex + 1); // without '#'
+        return `<a${pre}href="${url}#${hash}"${post}>`;
+      },
+    );
 
   let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
 
+  // remove form marker
   bodyHtml = bodyHtml.replace(
     /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
     "",
   );
 
+  // ✅ also remove <base> if any remains
+  bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
+
   return { tocHtml, bodyHtml };
 }
+
 function TocCard({ tocHtml }) {
   if (!tocHtml) return null;
 
@@ -275,7 +290,18 @@ export default async function KnowledgeCentreSlugPage({ params }) {
   const author = apiData.author || null;
 
   const pageUrl = `https://www.corpseed.com/knowledge-centre/${blog.slug}`;
-  const { tocHtml, bodyHtml } = splitTocAndBody(blog.description || "");
+
+  const headersList = await headers();
+  const host = headersList.get("host");
+  const protocol = headersList.get("x-forwarded-proto") || "http";
+
+  const url = `${protocol}://${host}/knowledge-centre/${slug}`;
+
+  const { tocHtml, bodyHtml } = splitTocAndBody(
+    blog.description || "",
+    slug,
+    url,
+  );
 
   const { before, after } = splitByConsultationHeading(bodyHtml);
 
@@ -286,22 +312,21 @@ export default async function KnowledgeCentreSlugPage({ params }) {
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
           <div className="mt-4 grid gap-8 lg:grid-cols-[1.45fr_1.05fr] lg:items-start">
             {/* LEFT image */}
-            <div className="relative rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-              {/* Keep overflow here */}
-              <div className="relative h-[260px] w-full sm:h-[320px] overflow-hidden rounded-2xl">
+            <div className="relative rounded-2xl border border-slate-200 bg-slate-100 shadow-sm overflow-hidden">
+              <div className="relative w-full">
                 <Image
                   src={blog.image}
                   alt={safeText(blog.title)}
-                  fill
+                  width={1200}
+                  height={800}
                   priority
-                  className="object-cover"
+                  className="w-full h-auto object-contain rounded-2xl"
                   sizes="(max-width: 1024px) 100vw, 700px"
                 />
               </div>
 
-              {/* Absolute badge */}
-              <div className="absolute right-3 -bottom-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 text-blue-600 px-2 py-1 shadow-lg">
-                <Phone className="h-3 w-3" />
+              <div className="absolute right-3 bottom-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 text-blue-600 font-bold px-2 py-1 shadow-lg">
+                <Phone className="h-4 w-4" />
                 7558640644 - Harshita
               </div>
             </div>
@@ -427,11 +452,11 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               {/* Sidebar */}
               <aside className="space-y-6">
                 <div className="lg:sticky lg:top-24 space-y-6">
-                  {/* <TocCard tocHtml={tocHtml} /> */}
-
                   <div className="bg-[#f2f3ff] p-2 mt-2.5">
                     <EnquiryOtpInline page={slug} />
                   </div>
+
+                  <TocCard tocHtml={tocHtml} />
 
                   <ListCard
                     title="Top Articles"

@@ -144,7 +144,6 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function KnowledgeCentrePage({ searchParams }) {
   const sp = await searchParams;
-  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge-center`;
   let currentPage = Number(sp?.page || 1);
   const q = (sp?.q || "").toString();
   const filter = (sp?.filter || "").toString();
@@ -335,6 +334,10 @@ export default async function KnowledgeCentrePage({ searchParams }) {
               ) : null}
 
               {/* Categories */}
+              <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                <EnquiryOtpInline page={"knowledge-centre"} />
+              </div>
+
               <Card className="overflow-hidden">
                 <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
                   <p className="text-sm font-semibold text-slate-900">
@@ -441,11 +444,8 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 </div>
               </Card>
 
-              <div className="border border-gray-200 rounded-sm">
-                <EnquiryOtpInline
-                  page={"knowledge-centre"}
-                  location={pageLocation}
-                />
+              <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                <EnquiryOtpInline page={"knowledge-centre"} />
               </div>
             </div>
           </aside>

@@ -258,6 +258,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
 
               {/* cards */}
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                <TalkToExpertCard onClick={() => setConsultOpen(true)} />
                 {visibleProducts.map((p, idx) => (
                   <ProductCard key={p?.id || p?.slug || idx} p={p} idx={idx} />
                 ))}
@@ -336,7 +337,7 @@ export default function ProductsCatalogue({ data, page, size, filter, q }) {
         open={consultOpen}
         onClose={() => setConsultOpen(false)}
         title="Consult Now"
-        bookMeeting={true}
+        consultNow={true}
         page={"product"}
       />
     </>

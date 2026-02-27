@@ -320,7 +320,7 @@ export default function ConsultNowModal({
               />
               <Input
                 label="Email Address"
-                required
+                // required
                 value={email}
                 onChange={(val) => {
                   setEmail(val);

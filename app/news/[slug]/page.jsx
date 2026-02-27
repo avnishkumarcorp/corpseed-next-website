@@ -13,11 +13,13 @@ import {
   ChevronRight,
   Newspaper,
   BookOpen,
+  Phone,
 } from "lucide-react";
 
 import SafeHtml from "@/app/components/SafeHtml";
 import { getNewsBySlug } from "@/app/lib/newsRoom";
 import SafeHtmlShadow from "@/app/components/SafeHtmlShadow";
+import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 
 export const revalidate = 300;
 
@@ -324,6 +326,10 @@ export default async function NewsRoomSlugPage({ params }) {
                   sizes="(max-width: 1024px) 100vw, 700px"
                 />
               </div>
+              <div className="absolute right-3 -bottom-0 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 text-blue-600 px-2 py-1 shadow-lg">
+                <Phone className="h-3 w-3" />
+                7558640644 - Harshita
+              </div>
             </div>
 
             {/* RIGHT text */}
@@ -370,7 +376,7 @@ export default async function NewsRoomSlugPage({ params }) {
       </section>
 
       {/* CONTENT (same fix: don't let social rail push content) */}
-      <section className="py-8 md:py-10">
+      <section className="py-2 md:py-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="relative">
             {/* Social rail overlay (shift left) */}
@@ -383,7 +389,7 @@ export default async function NewsRoomSlugPage({ params }) {
               {/* Main */}
               <div className="space-y-6">
                 {/* <Card className="overflow-hidden"> */}
-                <div className="p-5 sm:p-7">
+                <div className="px-2 sm:px-3">
                   <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
                     <SafeHtmlShadow html={bodyHtml} />
                   </div>
@@ -442,7 +448,11 @@ export default async function NewsRoomSlugPage({ params }) {
               {/* Sidebar */}
               <aside className="space-y-6">
                 <div className="lg:sticky lg:top-24 space-y-6">
-                  <TocCard tocHtml={tocHtml} />
+                  {/* <TocCard tocHtml={tocHtml} /> */}
+
+                  <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                    <EnquiryOtpInline page={slug} />
+                  </div>
 
                   <ListCard
                     title="Top News"

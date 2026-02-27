@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MapPin, Phone, Mail, HelpCircle, ShieldCheck } from "lucide-react";
 import {
   sendOtp,

@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Newspaper,
   BookOpen,
+  Phone,
 } from "lucide-react";
 import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
@@ -16,6 +17,7 @@ import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 import FeedbackBox from "@/app/components/FeedbackBox";
 import SocialRail from "@/app/components/ShareRailClient"; // ✅ keep using external component
 import dynamic from "next/dynamic";
+import TocClient from "@/app/components/TocClient";
 
 export const revalidate = 300;
 
@@ -56,8 +58,18 @@ function splitTocAndBody(html = "") {
     /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
   );
 
-  const tocHtml = tocMatch ? tocMatch[0] : "";
-  let bodyHtml = tocHtml ? input.replace(tocHtml, "") : input;
+  const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
+
+  // ✅ Convert ANY absolute URL with #... to only #...
+  // Example: href="https://www.admin.corpseed.com/#X" -> href="#X"
+  const tocHtml = tocHtmlRaw
+    .replace(/href=(['"])\s*https?:\/\/[^'"]*#([^'"]+)\1/gi, 'href="#$2"')
+    .replace(/href=(['"])\s*\/[^'"]*#([^'"]+)\1/gi, 'href="#$2"')
+    .replace(/href=(['"])\s*[^'"]*#([^'"]+)\1/gi, 'href="#$2"')
+    // optional: remove target so it never opens new tab
+    .replace(/\s+target=(['"]).*?\1/gi, "");
+
+  let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
 
   bodyHtml = bodyHtml.replace(
     /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
@@ -66,14 +78,13 @@ function splitTocAndBody(html = "") {
 
   return { tocHtml, bodyHtml };
 }
-
 function TocCard({ tocHtml }) {
   if (!tocHtml) return null;
 
   return (
     <>
-      <BlogContentClient html={tocHtml} />
-      {/* Mobile */}
+      <TocClient html={tocHtml} headerOffset={90} />
+
       <div className="block px-5 py-4 lg:hidden">
         <details className="group">
           <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
@@ -82,8 +93,9 @@ function TocCard({ tocHtml }) {
               <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
             </span>
           </summary>
+
           <div className="mt-3 max-h-[320px] overflow-auto pr-1">
-            <BlogContentClient html={tocHtml} />
+            <TocClient html={tocHtml} headerOffset={90} />
           </div>
         </details>
       </div>
@@ -232,6 +244,25 @@ export async function generateMetadata({ params }) {
   };
 }
 
+function splitByConsultationHeading(html = "") {
+  const input = String(html || "");
+
+  const regex = /<h[1-6][^>]*>\s*BOOK A FREE CONSULTATION\s*<\/h[1-6]>/i;
+
+  const match = input.match(regex);
+
+  if (!match) {
+    return { before: input, after: "" };
+  }
+
+  const index = match.index;
+
+  const before = input.slice(0, index);
+  const after = input.slice(index + match[0].length);
+
+  return { before, after };
+}
+
 /* ===============================
    PAGE
 ================================= */
@@ -246,6 +277,8 @@ export default async function KnowledgeCentreSlugPage({ params }) {
   const pageUrl = `https://www.corpseed.com/knowledge-centre/${blog.slug}`;
   const { tocHtml, bodyHtml } = splitTocAndBody(blog.description || "");
 
+  const { before, after } = splitByConsultationHeading(bodyHtml);
+
   return (
     <div className="bg-slate-50">
       {/* HERO (same as news-room) */}
@@ -253,8 +286,9 @@ export default async function KnowledgeCentreSlugPage({ params }) {
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
           <div className="mt-4 grid gap-8 lg:grid-cols-[1.45fr_1.05fr] lg:items-start">
             {/* LEFT image */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-              <div className="relative h-[260px] w-full sm:h-[320px]">
+            <div className="relative rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+              {/* Keep overflow here */}
+              <div className="relative h-[260px] w-full sm:h-[320px] overflow-hidden rounded-2xl">
                 <Image
                   src={blog.image}
                   alt={safeText(blog.title)}
@@ -263,6 +297,12 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 700px"
                 />
+              </div>
+
+              {/* Absolute badge */}
+              <div className="absolute right-3 -bottom-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 text-blue-600 px-2 py-1 shadow-lg">
+                <Phone className="h-3 w-3" />
+                7558640644 - Harshita
               </div>
             </div>
 
@@ -387,7 +427,11 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               {/* Sidebar */}
               <aside className="space-y-6">
                 <div className="lg:sticky lg:top-24 space-y-6">
-                  <TocCard tocHtml={tocHtml} />
+                  {/* <TocCard tocHtml={tocHtml} /> */}
+
+                  <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                    <EnquiryOtpInline page={slug} />
+                  </div>
 
                   <ListCard
                     title="Top Articles"

@@ -166,8 +166,9 @@ export default async function ProductSlugPage({ params }) {
                 Get help from our experts. It’s absolutely FREE.
               </p>
             </div>
-
-            <EnquiryOtpInline page={product?.title || product?.name} />
+            <div className="bg-[#f2f3ff] p-2 mt-2.5">
+              <EnquiryOtpInline page={product?.title || product?.name} />
+            </div>
 
             {/* if anything remains after marker */}
             {/* {after?.trim() ? (
@@ -180,6 +181,10 @@ export default async function ProductSlugPage({ params }) {
           {/* Right sidebar */}
           <aside className="lg:col-span-4">
             <div className="sticky top-[88px] space-y-6">
+              <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                <EnquiryOtpInline page={product?.title || product?.name} />
+              </div>
+
               <SideSection
                 badge="Top"
                 title="Products"

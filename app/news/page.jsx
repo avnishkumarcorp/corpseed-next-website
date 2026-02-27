@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Eye } from "lucide-react";
 import { getNewsRoomList } from "../lib/newsRoom";
 import NewsSearchBox from "./NewsSearchBox";
+import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
 export const revalidate = 300;
 
@@ -302,6 +303,10 @@ export default async function NewsRoomPage({ searchParams }) {
               ) : null}
 
               {/* Categories */}
+
+              <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                <EnquiryOtpInline page={"news"} />
+              </div>
               <Card className="overflow-hidden">
                 <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
                   <p className="text-sm font-semibold text-slate-900">

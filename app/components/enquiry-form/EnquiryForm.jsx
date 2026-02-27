@@ -165,11 +165,16 @@ export default function EnquiryForm({
   };
 
   const validateFields = () => {
-    const next = { email: "", mobile: "" };
+    const next = { name: "", mobile: "" };
     let ok = true;
 
-    if (!isValidEmail(form.email)) {
-      next.email = "Please enter a valid email address.";
+    // if (!isValidEmail(form.email)) {
+    //   next.email = "Please enter a valid email address.";
+    //   ok = false;
+    // }
+
+    if (!form.name) {
+      next.mobile = "Enter valid 10 digit mobile number.";
       ok = false;
     }
 

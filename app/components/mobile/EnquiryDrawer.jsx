@@ -77,7 +77,7 @@ export default function EnquiryDrawer({ open, onClose }) {
           </div>
 
           <div className="antdDrawerBodyFit">
-            <EnquiryForm />
+            <EnquiryForm page={"www.corpseed.com"} type={"global"} />
           </div>
         </div>
       </div>

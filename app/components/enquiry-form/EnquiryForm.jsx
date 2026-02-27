@@ -297,6 +297,21 @@ export default function EnquiryForm({
             serviceId,
           }),
         });
+      } else if (type === "global") {
+        enquiryRes = await fetch("/api/enquiry/global", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            otp: basePayload.otp,
+            name: basePayload.name,
+            email: basePayload.email,
+            mobile: basePayload.mobile,
+            url: basePayload.url,
+            postDate: basePayload.postDate,
+            modifyDate: basePayload.modifyDate,
+            message: basePayload.message,
+          }),
+        });
       }
 
       if (!enquiryRes.ok) {
@@ -403,18 +418,33 @@ export default function EnquiryForm({
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-600">
-              Location*
-            </label>
+            <label className="text-xs font-semibold text-gray-600">City*</label>
             <input
-              name="location"
-              value={form.location}
+              name="city"
+              value={form.city}
               onChange={onChange}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
               placeholder="Please enter your city"
               required
             />
           </div>
+
+          {type === "global" && (
+            <div>
+              <label className="text-xs font-semibold text-gray-600">
+                Message*
+              </label>
+              <textarea
+                name="message"
+                value={form.message}
+                onChange={onChange}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                placeholder="Enter your message"
+                rows={3}
+                required
+              />
+            </div>
+          )}
 
           {error && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">

@@ -104,7 +104,7 @@ export default async function ServicePage({ params }) {
   const service = data?.service;
   const serviceCities = state
     ? data.serviceCityMapResponseDTOS
-    : data?.cityServiceDetails;
+    : data?.serviceCityMapResponseDTOS;
 
   const productSchema = {
     "@context": "https://schema.org/",
@@ -259,7 +259,7 @@ export default async function ServicePage({ params }) {
                   href={`/service/${city?.cityName
                     ?.toLowerCase()
                     ?.replace(/\s+/g, "-")}/${slug}`}
-                  className="group flex items-center justify-center gap-2 font-medium text-slate-700 transition"
+                  className="group flex items-center justify-start gap-2 font-medium text-slate-700 transition"
                 >
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 transition group-hover:scale-110" />
                   <span className="text-blue-600">{city.title}</span>

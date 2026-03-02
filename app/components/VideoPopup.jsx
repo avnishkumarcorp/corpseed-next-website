@@ -16,12 +16,31 @@ export default function VideoPopup({ videoUrl, videoText = "Watch Video" }) {
   // 🔹 Convert to embed format
   const getYoutubeEmbedUrl = (url) => {
     if (!url) return "";
-    if (url.includes("youtu.be")) {
-      return `https://www.youtube.com/embed/${url.split("/").pop()}`;
+
+    try {
+      const urlObj = new URL(url);
+
+      // Already embed URL
+      if (url.includes("/embed/")) {
+        return url;
+      }
+
+      // Short URL (youtu.be)
+      if (url.includes("youtu.be")) {
+        const id = urlObj.pathname.split("/").pop();
+        return `https://www.youtube.com/embed/${id}`;
+      }
+
+      // Standard watch URL
+      const videoId = urlObj.searchParams.get("v");
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+
+      return url;
+    } catch {
+      return url;
     }
-    const urlObj = new URL(url);
-    const videoId = urlObj.searchParams.get("v");
-    return `https://www.youtube.com/embed/${videoId}`;
   };
 
   const embedUrl = isYoutube ? getYoutubeEmbedUrl(videoUrl) : videoUrl;
@@ -52,9 +71,9 @@ export default function VideoPopup({ videoUrl, videoText = "Watch Video" }) {
             {/* 🔹 YouTube iframe OR MP4 video */}
             {isYoutube ? (
               <iframe
-                src={`${embedUrl}?autoplay=1`}
+                src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
                 title="YouTube Video"
-                allow="autoplay; encrypted-media"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="h-[250px] w-full rounded-lg sm:h-[350px] md:h-[450px]"
               />

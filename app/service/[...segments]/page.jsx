@@ -11,6 +11,7 @@ import StepsTimelineSection from "../StepsTimelineSection";
 import PdfShareBar from "@/app/components/PdfShareBar";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
+import logo from "../../assets/logo.webp";
 
 export const revalidate = 300;
 
@@ -110,7 +111,7 @@ export default async function ServicePage({ params }) {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: service.title || "Corpseed",
-    image: "https://www.corpseed.com/assets/img/logo.webp",
+    image: logo,
     description:
       service.seoDescription ||
       service.metaDescription ||

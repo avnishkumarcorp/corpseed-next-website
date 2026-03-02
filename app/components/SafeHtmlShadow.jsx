@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import styles from "./SafeHtml.module.css";
 import { forwardRef } from "react";
+import logo from "../assets/logo.png";
 
 const LEGACY_BASE =
   process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://www.admin.corpseed.com";
@@ -277,7 +278,13 @@ margin: 0 auto;
     display: block !important;
 }
 
+.text-center{
+display:flex;
+justify-content: center;
+}
+
     `;
+
     shadowRoot.appendChild(base);
 
     // ✅ Append CSS links WITHOUT crossorigin (prevents CORS failures)
@@ -313,6 +320,34 @@ margin: 0 auto;
         loaded += 1;
         if (loaded === links.length) show();
       };
+    });
+
+    wrapper.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (src?.includes("/assets/img/logo.png")) {
+        img.setAttribute("src", logo.src);
+      }
+    });
+
+    // 🔥 Replace legacy video block with working YouTube iframe
+    wrapper.querySelectorAll(".vediosec").forEach((block) => {
+      const parent = block.closest("[data-oembed-url]");
+      const youtubeUrl = parent?.getAttribute("data-oembed-url");
+
+      if (!youtubeUrl) return;
+
+      block.addEventListener("click", () => {
+        block.innerHTML = `
+      <iframe
+        width="100%"
+        height="360"
+        src="${youtubeUrl}?autoplay=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>
+    `;
+      });
     });
 
     const t = setTimeout(show, 1200);

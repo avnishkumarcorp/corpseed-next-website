@@ -5845,13 +5845,23 @@ h6 {
   width: 100%;
 }
 
-p,h1,h2,h3,h4,h5,h6{
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: #212529;
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-10%); } /* fixed pixel shift */
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-10%);
+  } /* fixed pixel shift */
 }
 
 .animate-marquee {
@@ -5860,7 +5870,6 @@ p,h1,h2,h3,h4,h5,h6{
   animation-iteration-count: infinite;
 }
 
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -5868,7 +5877,6 @@ p,h1,h2,h3,h4,h5,h6{
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 
 @keyframes productsScroll {
   from {
@@ -5882,4 +5890,20 @@ p,h1,h2,h3,h4,h5,h6{
 .animate-products-scroll {
   animation: productsScroll 10s linear infinite;
   will-change: transform;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.vediosec {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.playbtn {
+  text-align: center !important;
 }

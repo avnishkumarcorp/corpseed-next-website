@@ -64,13 +64,9 @@ export async function generateMetadata({ params }) {
 
   const descriptionBase = data?.metaDescription || "";
 
-  const title = state
-    ? `${titleBase} in ${stateLabel} - Corpseed`
-    : `${titleBase} - Corpseed`;
+  const title = `${titleBase}`;
 
-  const description = state
-    ? `${descriptionBase} in ${stateLabel}. Get expert assistance from Corpseed.`
-    : `${descriptionBase} Get expert assistance from Corpseed.`;
+  const description = `${descriptionBase}`;
 
   return {
     title,

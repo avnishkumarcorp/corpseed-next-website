@@ -60,14 +60,9 @@ export async function generateMetadata({ params }) {
 
   const stateLabel = state?.replace(/-/g, " ");
 
-  const titleBase =
-    data?.serviceCityMap?.title || data?.service?.title || "Service";
+  const titleBase = data?.title || "Service";
 
-  const descriptionBase =
-    data?.serviceCityMap?.metaDescription ||
-    data?.service?.metaDescription ||
-    data?.service?.shortDescription ||
-    "";
+  const descriptionBase = data?.metaDescription || "";
 
   const title = state
     ? `${titleBase} in ${stateLabel} - Corpseed`

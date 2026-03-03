@@ -334,6 +334,33 @@ justify-content: center;
       const parent = block.closest("[data-oembed-url]");
       const youtubeUrl = parent?.getAttribute("data-oembed-url");
 
+      const playContainer = block.querySelector(".playbtn");
+
+      if (playContainer && !playContainer.querySelector("svg")) {
+        playContainer.insertAdjacentHTML(
+          "beforeend",
+          `<div style="width:100%; display:flex;
+    align-items:center;
+    justify-content:center;">
+           <div style="
+    height:60px;
+    width:60px;
+    background:#ffffff;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+  ">
+    <svg viewBox="0 0 24 24" fill="none" style="height:40px; width:40px;">
+      <path d="M9 7L17 12L9 17V7Z" fill="#000"/>
+    </svg>
+  </div>
+ </div>
+  `,
+        );
+      }
+
       if (!youtubeUrl) return;
 
       block.addEventListener("click", () => {

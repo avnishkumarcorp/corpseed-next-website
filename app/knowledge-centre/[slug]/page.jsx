@@ -338,7 +338,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm text-slate-600">
-                {apiData?.metaDescription || blog.summary}
+                {blog.summary}
               </p>
 
               <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">

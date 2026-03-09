@@ -231,6 +231,17 @@ const SafeHtmlShadow = forwardRef(({ html }, ref) => {
     color: #212529;
 }
 
+#main-toc ul,
+#main-toc ol {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+#main-toc ol li::marker {
+  content: "";
+}
+
 #main-toc ul li, #main-toc ol li{
     padding: 3px;
    }

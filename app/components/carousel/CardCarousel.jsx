@@ -154,7 +154,7 @@ function Tabs({ tabs = [], activeKey, onChange }) {
 
   return (
     <div className="w-full max-w-5xl">
-      <div className="no-scrollbar flex items-center justify-center gap-10 overflow-x-auto px-2 py-2.5">
+      <div className="no-scrollbar flex items-center gap-6 overflow-x-auto px-2 py-2.5 md:justify-center">
         {safeTabs.map((t) => {
           const key = t?.key ?? t?.label;
           const label = t?.label ?? String(key ?? "");

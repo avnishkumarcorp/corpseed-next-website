@@ -4,6 +4,7 @@ import "./globals.css";
 import HeaderWrapper from "./components/header/HeaderWrapper";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import MobileStickyFooter from "./components/mobile/MobileStickyFooter";
+import SecurityLayer from "./components/security/SecurityLayer";
 
 export const metadata = {
   title: "Corpseed",
@@ -125,6 +126,7 @@ export default function RootLayout({ children }) {
       </head>
 
       <body className="min-h-screen bg-white text-gray-900">
+        <SecurityLayer />
         <div className="flex min-h-screen flex-col">
           <HeaderWrapper />
           <main className="flex-1">{children}</main>

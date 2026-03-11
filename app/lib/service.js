@@ -15,7 +15,7 @@ export async function getServiceBySlug(slug) {
       headers: { "Content-Type": "application/json" },
 
       // ✅ caches on server and revalidates
-      next: { revalidate: 300, tags: [`service:${slug}`] },
+      next: { revalidate: 60, tags: [`service:${slug}`] },
 
       signal: controller.signal,
     });
@@ -59,7 +59,7 @@ export async function getServiceByCityAndSlug(city, slug) {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       next: {
-        revalidate: 300,
+        revalidate: 60,
         tags: [`service:${city}:${slug}`],
       },
       signal: controller.signal,

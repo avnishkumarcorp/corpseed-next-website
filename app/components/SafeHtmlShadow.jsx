@@ -177,17 +177,51 @@ const SafeHtmlShadow = forwardRef(({ html }, ref) => {
       .content-scope ul { list-style: none; padding-left: 0; margin-left: 0;color: #212529; }
   .content-scope li { position: relative; padding-left: 24px;color: #212529; }
 
-  .content-scope li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.45em;
-    width: 15px;
-    height: 15px;
-    background: url("${iconUrl}") no-repeat center;
-    background-size: cover;
-    color: #212529;
-  }
+  // .content-scope li::before {
+  //   content: "";
+  //   position: absolute;
+  //   left: 0;
+  //   top: 0.45em;
+  //   width: 15px;
+  //   height: 15px;
+  //   background: url("${iconUrl}") no-repeat center;
+  //   background-size: cover;
+  //   color: #212529;
+  // }
+
+
+  .content-scope ul {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+.content-scope ul li {
+  position: relative;
+  padding-left: 24px;
+}
+
+.content-scope ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 15px;
+  height: 15px;
+  background: url("${iconUrl}") no-repeat center;
+  background-size: cover;
+}
+
+.content-scope ol li::before {
+  content: none;
+}
+
+.content-scope ol {
+  list-style: decimal;
+  padding-left: 20px;
+}
+
+
       .page-header h2 {
         font-weight: 400;
         color: #303134;
@@ -231,16 +265,6 @@ const SafeHtmlShadow = forwardRef(({ html }, ref) => {
     color: #212529;
 }
 
-#main-toc ul,
-#main-toc ol {
-  list-style: none;
-  padding-left: 0;
-  margin-left: 0;
-}
-
-#main-toc ol li::marker {
-  content: "";
-}
 
 #main-toc ul li, #main-toc ol li{
     padding: 3px;

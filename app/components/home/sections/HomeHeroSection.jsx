@@ -49,16 +49,16 @@ export default function HomeHeroSection({
 
       <div className="relative z-10 mx-auto max-w-[92%] px-4 pt-6 pb-6 sm:px-6 lg:px-8 lg:pt-6 lg:pb-6">
         <div className="grid items-start gap-10 lg:grid-cols-12 overflow-hidden">
-          <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center text-center lg:text-left min-w-0">
+          <div className="lg:col-span-6 lg:self-center lg:flex lg:flex-col lg:justify-center items-center lg:items-start text-center lg:text-left max-w-xl min-w-0">
             <a
               href="tel:+917558640644" // 👈 your real number
-              className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm hover:bg-blue-700 cursor-pointer"
+              className="inline-flex w-fit items-center gap-2 mx-auto lg:mx-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm hover:bg-blue-700 cursor-pointer"
             >
               <span>{ctaText}</span>
               <PhoneCall className="h-4 w-4" />
             </a>
 
-            <h1 className="mt-5 text-[3rem] font-semibold not-italic leading-[1.05] tracking-[0.03em] text-[#272d30]">
+            <h1 className="mt-5 text-[2rem] sm:text-[2.5rem] lg:text-[3rem] font-semibold leading-[1.1] tracking-[0.02em] text-[#272d30]">
               {title.split("\n").map((line, i) => (
                 <span key={i} className="block">
                   {line}
@@ -66,8 +66,8 @@ export default function HomeHeroSection({
               ))}
             </h1>
 
-            <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
-              <p className="text-[16px] text-[#212529] tracking-[0.05rem] font-medium">
+            <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-x-2 gap-y-2 text-sm w-full">
+              <p className="text-[16px] text-[#212529] tracking-[0.05rem] font-medium text-center lg:!text-left w-full">
                 <span className="!text-blue-500">
                   Regulatory, Sustainability, Environmental, Legal{" "}
                 </span>
@@ -81,7 +81,7 @@ export default function HomeHeroSection({
               <span className="font-medium">{ratingText}</span>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 w-full">
               <HeroSearch
                 baseUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
                 placeholders={[

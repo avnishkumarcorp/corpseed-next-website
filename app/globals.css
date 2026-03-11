@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -39,22 +43,6 @@ body {
 
 .container {
   @apply max-w-7xl mx-auto px-6;
-}
-
-.h1 {
-  @apply text-4xl md:text-6xl font-bold tracking-tight;
-}
-
-.h2 {
-  @apply text-3xl md:text-5xl font-semibold;
-}
-
-.h3 {
-  @apply text-2xl md:text-3xl font-semibold;
-}
-
-.text-body {
-  @apply text-gray-600 text-base md:text-lg leading-relaxed;
 }
 
 .iti {

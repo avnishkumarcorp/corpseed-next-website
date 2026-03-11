@@ -15,7 +15,7 @@ export async function getServiceBySlug(slug) {
       headers: { "Content-Type": "application/json" },
 
       // ✅ caches on server and revalidates
-      next: { revalidate: 3600, tags: [`service:${slug}`] },
+      next: { revalidate: 300, tags: [`service:${slug}`] },
 
       signal: controller.signal,
     });
@@ -32,30 +32,23 @@ export async function getServiceBySlug(slug) {
   }
 }
 
-
-
-
 export async function getAllCategories() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customer/category/all`,
     {
-      next: { revalidate: 3600 },
-    }
+      next: { revalidate: 300 },
+    },
   );
   if (!res.ok) return null;
   return res.json();
 }
-
-
-
-
 
 export async function getServiceByCityAndSlug(city, slug) {
   if (!city || !slug) return null;
 
   const base = process.env.NEXT_PUBLIC_API_BASE_URL;
   const url = `${base}/api/customer/service/${encodeURIComponent(
-    city
+    city,
   )}/${encodeURIComponent(slug)}`;
 
   const controller = new AbortController();
@@ -66,7 +59,7 @@ export async function getServiceByCityAndSlug(city, slug) {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       next: {
-        revalidate: 3600,
+        revalidate: 300,
         tags: [`service:${city}:${slug}`],
       },
       signal: controller.signal,

@@ -221,12 +221,60 @@ const SafeHtmlShadow = forwardRef(({ html }, ref) => {
   padding-left: 20px;
 }
 
+.content-scope h2 {
+  font-weight: 400 !important;
+  color: #303134;
+  font-size: 24px;
+}
 
-      .page-header h2 {
-        font-weight: 400;
-        color: #303134;
-        font-size: 24px;
-      }
+.content-scope h2 strong,
+.content-scope h2 b {
+  font-weight: 400 !important;
+}
+
+      // .page-header h2 {
+      //   font-weight: 400;
+      //   color: #303134;
+      //   font-size: 24px;
+      // }
+
+
+.content-scope h1,
+.content-scope h2,
+.content-scope h3,
+.content-scope h4,
+.content-scope h5,
+.content-scope h6 {
+  font-weight: 400 !important;
+  color: #303134;
+}
+
+/* remove bold coming from CMS strong tags */
+.content-scope h1 strong,
+.content-scope h2 strong,
+.content-scope h3 strong,
+.content-scope h4 strong,
+.content-scope h5 strong,
+.content-scope h6 strong,
+.content-scope h1 b,
+.content-scope h2 b,
+.content-scope h3 b,
+.content-scope h4 b,
+.content-scope h5 b,
+.content-scope h6 b {
+  font-weight: 400 !important;
+}
+
+.content-scope a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.content-scope a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
 
       .blog-desc h1 {
         letter-spacing: 0.2px !important;

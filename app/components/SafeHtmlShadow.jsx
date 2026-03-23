@@ -276,6 +276,27 @@ const SafeHtmlShadow = forwardRef(({ html }, ref) => {
   text-decoration: underline;
 }
 
+.content-scope table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 1rem 0;
+  background: #fff;
+}
+
+.content-scope table th,
+.content-scope table td {
+  border: 1px solid #000 !important;
+  padding: 8px !important;
+  text-align: center;
+  color: #000 !important;
+  background: #fff !important;
+}
+
+.content-scope table th {
+  font-weight: 600;
+  background: #f5f5f5;
+}
+
       .blog-desc h1 {
         letter-spacing: 0.2px !important;
         margin-bottom: 0.5rem !important;

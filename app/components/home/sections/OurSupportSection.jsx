@@ -71,13 +71,13 @@ const DATA = {
         description:
           "Our ecosystem includes trusted industry bodies that support growth, compliance readiness, and strong governance practices.",
       },
-      {
-        name: "CII",
-        role: "Industry Partner",
-        image: mem3,
-        description:
-          "Through partnerships and alliances, we enable businesses to stay aligned with evolving regulatory and industry expectations.",
-      },
+      // {
+      //   name: "CII",
+      //   role: "Industry Partner",
+      //   image: mem3,
+      //   description:
+      //     "Through partnerships and alliances, we enable businesses to stay aligned with evolving regulatory and industry expectations.",
+      // },
     ],
   },
 };
@@ -127,7 +127,9 @@ function Dots({ count, activeIndex, onDot }) {
           onClick={() => onDot(i)}
           className={[
             "h-2 rounded-full transition cursor-pointer",
-            i === activeIndex ? "w-7 bg-blue-600" : "w-2 bg-slate-300 hover:bg-slate-400",
+            i === activeIndex
+              ? "w-7 bg-blue-600"
+              : "w-2 bg-slate-300 hover:bg-slate-400",
           ].join(" ")}
           aria-label={`Go to slide ${i + 1}`}
         />
@@ -166,7 +168,13 @@ function StaticInvestor({ logo, text }) {
     <div className="grid items-center gap-6 md:grid-cols-[220px_1fr]">
       <div className="flex justify-center md:justify-start">
         <div className="relative h-[52px] w-[190px]">
-          <Image src={logo} alt="Corpseed" fill className="object-contain" priority />
+          <Image
+            src={logo}
+            alt="Corpseed"
+            fill
+            className="object-contain"
+            priority
+          />
         </div>
       </div>
       <p className="text-sm leading-7 text-slate-600">{text}</p>
@@ -223,8 +231,14 @@ function AutoCarousel({ slides, autoplayMs = 4200, resetKey, variant }) {
 
       <style jsx>{`
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </div>

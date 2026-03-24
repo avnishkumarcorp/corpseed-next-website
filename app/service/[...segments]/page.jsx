@@ -240,11 +240,11 @@ export default async function ServicePage({ params }) {
       {serviceCities?.length > 0 && (
         <section className="bg-gray-50 py-6">
           <div className="mx-auto max-w-7xl px-4">
-            <h2 className="text-center text-2xl font-semibold mb-8">
+            <h2 className="text-center text-2xl font-semibold mb-10">
               {service?.title} by State/City
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1 text-center">
               {serviceCities?.map((city) => (
                 <Link
                   key={city?.id}
@@ -253,8 +253,8 @@ export default async function ServicePage({ params }) {
                     ?.replace(/\s+/g, "-")}/${slug}`}
                   className="group flex items-center justify-start gap-2 font-medium text-slate-700 transition"
                 >
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500 transition group-hover:scale-110" />
-                  <span className="text-blue-600">{city.title}</span>
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 transition group-hover:scale-110" />
+                  <span className="text-blue-600 text-sm">{city.title}</span>
                 </Link>
               ))}
             </div>

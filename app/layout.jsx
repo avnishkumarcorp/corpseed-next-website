@@ -58,10 +58,11 @@ export default function RootLayout({ children }) {
               },
               address: {
                 "@type": "PostalAddress",
-                streetAddress: "2nd Floor, A-154A, A Block, Sector 63",
+                streetAddress:
+                  "3rd Floor, A-5, Grovy Optiva, Block A, Sector 68, Noida, Basi Bahuddin Nagar, Uttar Pradesh",
                 addressLocality: "Noida",
                 addressRegion: "Uttar Pradesh",
-                postalCode: "201301",
+                postalCode: "201316",
                 addressCountry: "India",
               },
               geo: {

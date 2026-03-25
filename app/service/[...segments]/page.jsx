@@ -58,9 +58,7 @@ export async function generateMetadata({ params }) {
   const data = await getServiceData(slug, state);
   if (!data?.service) return {};
 
-  const stateLabel = state?.replace(/-/g, " ");
-
-  const titleBase = data?.title || "Service";
+  const titleBase = data?.title || data?.metaTitle;
 
   const descriptionBase = data?.metaDescription || "";
 

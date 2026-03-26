@@ -15,7 +15,7 @@ export async function GET(req) {
       )}`,
       {
         headers: { accept: "*/*" },
-        next: { revalidate: 300 },
+        next: { revalidate: 30 },
       },
     );
 

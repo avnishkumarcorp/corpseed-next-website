@@ -7,7 +7,7 @@ export async function submitFeedback({ type, ratingValue, comment, location }) {
 
   const res = await fetch(`/api/feedback/${encodeURIComponent(type)}`, {
     method: "POST",
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });

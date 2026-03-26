@@ -15,7 +15,7 @@ export async function getServiceBySlug(slug) {
       headers: { "Content-Type": "application/json" },
 
       // ✅ caches on server and revalidates
-      next: { revalidate: 60, tags: [`service:${slug}`] },
+      next: { cache: "no-store", tags: [`service:${slug}`] },
 
       signal: controller.signal,
     });
@@ -36,7 +36,7 @@ export async function getAllCategories() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/customer/category/all`,
     {
-      next: { revalidate: 300 },
+      cache: "no-store",
     },
   );
   if (!res.ok) return null;
@@ -59,7 +59,7 @@ export async function getServiceByCityAndSlug(city, slug) {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       next: {
-        revalidate: 60,
+        cache: "no-store",
         tags: [`service:${city}:${slug}`],
       },
       signal: controller.signal,

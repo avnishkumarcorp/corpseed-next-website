@@ -2,7 +2,7 @@
 import ProductsCatalogue from "./ProductsCatalogue";
 import { getProductsPageCached } from "../lib/products.cached";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 export async function generateMetadata({ searchParams }) {
   const sp = await searchParams;

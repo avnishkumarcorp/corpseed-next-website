@@ -6,7 +6,7 @@ import { getKnowledgeCentreList } from "../lib/knowledgeCentre";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 import KnowledgeSearchInput from "../components/KnowledgeSearchInput";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 function Card({ children, className = "" }) {
   return (

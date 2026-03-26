@@ -15,7 +15,7 @@ export async function sendOtp({
 
   const res = await fetch("/api/enquiry/send-otp", {
     method: "POST",
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -34,7 +34,7 @@ export async function verifyOtp({ mobile, otp, name }) {
 
   const res = await fetch(
     `/api/enquiry/verify-otp/${encodeURIComponent(cleanMobile)}/${encodeURIComponent(cleanOtp)}?name=${encodeURIComponent(cleanName)}`,
-    { method: "GET", next: { revalidate: 300 } },
+    { method: "GET", next: { revalidate: 30 } },
   );
 
   return {
@@ -69,7 +69,7 @@ export async function submitPartnerEnquiry({
 
   const res = await fetch("/api/enquiry/partner", {
     method: "POST",
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -153,7 +153,7 @@ export async function submitBookMeetingEnquiry({
 
   const res = await fetch("/api/enquiry/book-meeting", {
     method: "POST",
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -226,7 +226,7 @@ export async function submitStartupGuideEnquiry({
   const res = await fetch("/api/enquiry/startup-guide", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
     body: JSON.stringify(payload),
   });
 

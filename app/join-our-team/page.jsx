@@ -8,7 +8,7 @@ function splitKeywords(metaKeyword) {
     .filter(Boolean);
 }
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 export async function generateMetadata() {
   const data = await getJoinOurTeamData();

@@ -13,7 +13,9 @@ export async function getHeaderMenu() {
 
     // ✅ if env missing, don't silently fail
     if (!base) {
-      console.error("getHeaderMenu: Missing API_BASE_URL / NEXT_PUBLIC_API_BASE_URL");
+      console.error(
+        "getHeaderMenu: Missing API_BASE_URL / NEXT_PUBLIC_API_BASE_URL",
+      );
       return [];
     }
 
@@ -24,17 +26,23 @@ export async function getHeaderMenu() {
       headers: { Accept: "application/json" },
 
       // ✅ ISR cache for menu (change 300 -> 60 if you want faster updates)
-      next: { revalidate: 300 },
+      next: { revalidate: 30 },
     });
 
     if (!res.ok) {
       const t = await res.text().catch(() => "");
-      console.error("getHeaderMenu failed:", upstream, res.status, res.statusText, t);
+      console.error(
+        "getHeaderMenu failed:",
+        upstream,
+        res.status,
+        res.statusText,
+        t,
+      );
       return [];
     }
 
     const data = await res.json();
-    return Array.isArray(data) ? data : data?.data ?? [];
+    return Array.isArray(data) ? data : (data?.data ?? []);
   } catch (e) {
     console.error("getHeaderMenu error:", e);
     return [];

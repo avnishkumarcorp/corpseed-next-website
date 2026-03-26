@@ -20,7 +20,7 @@ import dynamic from "next/dynamic";
 import TocClient from "@/app/components/TocClient";
 import { headers } from "next/headers";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 const BlogContentClient = dynamic(
   () => import("@/app/components/BlogContentClient"),

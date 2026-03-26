@@ -6,7 +6,7 @@ import { getNewsRoomList } from "../lib/newsRoom";
 import NewsSearchBox from "./NewsSearchBox";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 function Card({ children, className = "" }) {
   return (

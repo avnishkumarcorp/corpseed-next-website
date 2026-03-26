@@ -25,7 +25,7 @@ export async function GET(req) {
       `${base}/api/updated-news?${backendParams.toString()}`,
       {
         headers: { Accept: "application/json" },
-        next: { revalidate: 300 },
+        next: { revalidate: 30 },
       },
     );
 

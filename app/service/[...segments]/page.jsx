@@ -13,7 +13,7 @@ import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import logo from "../../assets/logo.webp";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 const ClientsMarquee = nextDynamic(
   () => import("@/app/components/clients/ClientsMarquee"),

@@ -13,7 +13,7 @@ export async function apiGet(path) {
       headers: {
         Accept: "application/json",
       },
-      next: { revalidate: 300 },
+      next: { revalidate: 30 },
     });
 
     if (!res.ok) {

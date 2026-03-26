@@ -25,7 +25,7 @@ export async function getLawUpdatesList({ page, size, from, to, dept }) {
   const qs = buildQs({ page, size, from, to, dept });
   const url = `${API_BASE}/api/updated-law-update?${qs}`;
 
-  const res = await fetch(url, { next: { revalidate: 300 } });
+  const res = await fetch(url, { next: { revalidate: 30 } });
   if (!res.ok) throw new Error(`Law updates list fetch failed: ${res.status}`);
 
   return res.json();
@@ -33,7 +33,7 @@ export async function getLawUpdatesList({ page, size, from, to, dept }) {
 
 export async function getLawUpdateBySlug(slug) {
   const url = `${API_BASE}/api/updated-law-update/${slug}`;
-  const res = await fetch(url, { next: { revalidate: 300 } });
+  const res = await fetch(url, { next: { revalidate: 30 } });
   if (!res.ok) return null;
   return res.json();
 }

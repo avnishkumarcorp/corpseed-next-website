@@ -16,7 +16,7 @@ export async function apiGet(path, { revalidate = 600 } = {}) {
   const res = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
-    next: { revalidate },
+    cache: "no-store",
   });
 
   // ✅ treat not-found as null (no crash)
@@ -28,8 +28,8 @@ export async function apiGet(path, { revalidate = 600 } = {}) {
     throw new Error(
       `API failed ${res.status} ${path} (${url}) content-type=${ct} :: ${t.slice(
         0,
-        250
-      )}`
+        250,
+      )}`,
     );
   }
 

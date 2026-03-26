@@ -23,7 +23,7 @@ import { headers } from "next/headers";
 import BlogContentClient from "@/app/components/BlogContentClient";
 import TocClient from "@/app/components/TocClient";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;

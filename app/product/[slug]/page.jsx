@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { getProductBySlug } from "@/app/lib/products";
 import FeedbackBox from "@/app/components/FeedbackBox";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
-export const revalidate = 300;
+export const revalidate = 30;
 
 const SafeHtmlShadow = dynamic(() => import("@/app/components/SafeHtmlShadow"));
 

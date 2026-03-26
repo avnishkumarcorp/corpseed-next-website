@@ -7,12 +7,9 @@ export async function getClients() {
   }
 
   try {
-    const res = await fetch(
-      `${base}/api/customer/clients`,
-      {
-        next: { revalidate: 3600, tags: ["clients"] },
-      }
-    );
+    const res = await fetch(`${base}/api/customer/clients`, {
+      next: { revalidate: 30, tags: ["clients"] },
+    });
 
     if (!res.ok) {
       console.error("Clients API failed:", res.status);
@@ -24,8 +21,8 @@ export async function getClients() {
     return Array.isArray(json?.data)
       ? json.data
       : Array.isArray(json)
-      ? json
-      : [];
+        ? json
+        : [];
   } catch (err) {
     console.error("Clients fetch error:", err);
     return [];

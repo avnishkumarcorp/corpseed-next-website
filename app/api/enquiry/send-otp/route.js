@@ -31,7 +31,7 @@ export async function POST(req) {
 
   const res = await fetch(backendUrl, {
     method: "POST",
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
     headers: {
       "Content-Type": "application/json",
     },

@@ -23,7 +23,7 @@ export async function subscribeEmail(email) {
       headers: {
         Accept: "application/json", // ✅ FIXED
       },
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
 
     const text = await res.text();
@@ -48,7 +48,7 @@ export async function subscribeEmail(email) {
 export async function getSubscribeThankYouMeta() {
   try {
     return await apiGet("/api/customer/subscribe/thanks", {
-      revalidate: 3600, // cache 1 hour
+      revalidate: 30, // cache 1 hour
     });
   } catch (err) {
     console.error("getSubscribeThankYouMeta error:", err);

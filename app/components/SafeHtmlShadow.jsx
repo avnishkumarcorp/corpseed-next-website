@@ -7,17 +7,17 @@ import { forwardRef } from "react";
 import logo from "../assets/logo.png";
 
 const LEGACY_BASE =
-  process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://www.admin.corpseed.com";
+  process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://admin.corpseed.com";
 
 // ✅ Only CSS here (remove JS from this list)
 const CSS_URLS = [
-  "https://www.admin.corpseed.com/assets/css/bootstrap.min.css",
-  "https://www.admin.corpseed.com/assets/css/main.css",
-  "https://www.admin.corpseed.com/chat_boat/css/main.css",
-  "https://www.admin.corpseed.com/assets/css/owl.carousel.min.css",
-  "https://www.admin.corpseed.com/assets/css/intlTelInput.css",
-  "https://www.admin.corpseed.com/chat_boat/css/chatBot.css",
-  "https://www.admin.corpseed.com/assets/css/temp.css",
+  "https://admin.corpseed.com/assets/css/bootstrap.min.css",
+  "https://admin.corpseed.com/assets/css/main.css",
+  "https://admin.corpseed.com/chat_boat/css/main.css",
+  "https://admin.corpseed.com/assets/css/owl.carousel.min.css",
+  "https://admin.corpseed.com/assets/css/intlTelInput.css",
+  "https://admin.corpseed.com/chat_boat/css/chatBot.css",
+  "https://admin.corpseed.com/assets/css/temp.css",
 ];
 
 // Turn any relative/partial URL into absolute corpseed URL

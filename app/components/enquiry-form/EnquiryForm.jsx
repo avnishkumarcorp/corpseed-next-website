@@ -398,7 +398,7 @@ export default function EnquiryForm({
                   : "border-gray-300",
               ].join(" ")}
             >
-              <Phone className="h-4 w-4 text-gray-500" />
+              {/* <Phone className="h-4 w-4 text-gray-500" /> */}
               <input
                 name="mobile"
                 value={form.mobile}

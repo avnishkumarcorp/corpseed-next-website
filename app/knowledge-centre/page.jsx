@@ -5,6 +5,7 @@ import { Eye, Search } from "lucide-react";
 import { getKnowledgeCentreList } from "../lib/knowledgeCentre";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 import KnowledgeSearchInput from "../components/KnowledgeSearchInput";
+import KnowledgeCategoryCard from "../components/KnowledgeCategoryCard";
 
 export const revalidate = 30;
 
@@ -338,44 +339,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 <EnquiryOtpInline page={"knowledge-centre"} />
               </div>
 
-              <Card className="overflow-hidden">
-                <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Categories
-                  </p>
-                </div>
-
-                <div className="divide-y divide-slate-200">
-                  {categories.map((c) => {
-                    const href = `/knowledge-centre${buildQueryString({
-                      page: 1,
-                      q,
-                      filter: c.slug,
-                      tag,
-                    })}`;
-
-                    return (
-                      <Link
-                        key={c.id ?? c.slug}
-                        href={href}
-                        className="flex items-center justify-between px-5 py-4 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-                      >
-                        <span className="min-w-0 truncate">
-                          {c.subCategoryName || c.categoryName}
-                        </span>
-                        <span className="text-xs text-slate-400">View</span>
-                      </Link>
-                    );
-                  })}
-
-                  <Link
-                    href="/knowledge-centre"
-                    className="block px-5 py-4 text-sm text-blue-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    View All
-                  </Link>
-                </div>
-              </Card>
+              <KnowledgeCategoryCard categories={categories} q={q} tag={tag} />
 
               {/* Tags */}
               <Card className="p-5">

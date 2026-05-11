@@ -1,5 +1,6 @@
 "use client";
 
+import { sendOtp } from "@/app/lib/enquiryOtp";
 import { useMemo, useState } from "react";
 
 function cn(...classes) {
@@ -35,6 +36,12 @@ export default function JobClient({ job }) {
   const [applyOpen, setApplyOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState("");
+  const [otpOpen, setOtpOpen] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [pendingPayload, setPendingPayload] = useState(null);
+  const [pendingFormEl, setPendingFormEl] = useState(null);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [otpError, setOtpError] = useState("");
 
   const bullets = useMemo(() => toBulletsFromText(""), []);
 
@@ -42,30 +49,227 @@ export default function JobClient({ job }) {
     e.preventDefault();
     setToast("");
 
-    const form = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const form = new FormData(formEl);
 
-    // you can replace this with your real API later
-    // currently using a fake endpoint
-    const payload = Object.fromEntries(form.entries());
-    payload.jobSlug = job?.slug;
-    payload.jobId = job?.id;
+    const cvFile = form.get("cv");
+
+    // ✅ These are actual form fields
+    const name = String(form.get("name") || "").trim();
+    const email = String(form.get("email") || "").trim();
+    const mobile = String(form.get("mobile") || "")
+      .replace(/\D/g, "")
+      .slice(0, 10);
+    const currentCTC = String(form.get("currentCTC") || "").trim();
+    const location = String(form.get("location") || "").trim();
+    const experience = String(form.get("experience") || "").trim();
+    const goal = String(form.get("goal") || "").trim();
+    const motivation = String(form.get("motivation") || "").trim();
+    const address = String(form.get("address") || "").trim();
+
+    const hasCvFile = cvFile instanceof File && cvFile.name;
+
+    // ✅ Checks only on fields present in form
+    if (!name) return setToast("❌ Name is required.");
+
+    if (!email) return setToast("❌ Email is required.");
+
+    if (mobile.length !== 10) {
+      return setToast("❌ Enter valid 10 digit mobile number.");
+    }
+
+    if (!currentCTC) return setToast("❌ Current CTC is required.");
+
+    if (!location) return setToast("❌ Current location is required.");
+
+    if (!experience) return setToast("❌ Experience is required.");
+
+    if (!goal) return setToast("❌ Goal is required.");
+
+    if (!hasCvFile) return setToast("❌ CV is required.");
+
+    if (!motivation) return setToast("❌ Motivation is required.");
+
+    if (!address) return setToast("❌ Address is required.");
+
+    // ✅ Backend payload mapping
+    const payload = {
+      name,
+      email,
+      mobile,
+      address,
+      currentCTC,
+      experience,
+
+      // ✅ No qualification field in form, so send job qualification or NA
+      qualification: job?.qualification || "NA",
+
+      location,
+
+      // ✅ form field goal mapped to backend field bestGoal
+      bestGoal: goal,
+
+      motivation,
+
+      // ✅ form field cv mapped to backend field fileUrl
+      // If backend needs real uploaded URL, replace this with upload API response URL
+      fileUrl: cvFile.name,
+    };
 
     try {
       setSubmitting(true);
 
-      const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const currentPageUrl =
+        typeof window !== "undefined" ? window.location.href : "career-page";
+
+      const otpRes = await sendOtp({
+        name: payload.name,
+        mobile: payload.mobile,
+        location: currentPageUrl,
       });
 
-      if (!res.ok) throw new Error("Failed");
+      if (!otpRes.ok) {
+        setToast(
+          otpRes?.data?.message || "❌ Failed to send OTP. Please try again.",
+        );
+        return;
+      }
 
-      setToast("✅ Application submitted successfully (demo).");
-      e.currentTarget.reset();
-      setApplyOpen(false);
+      setPendingPayload(payload);
+      setPendingFormEl(formEl);
+      setOtp("");
+      setOtpError("");
+      setOtpOpen(true);
+      setToast("✅ OTP sent successfully. Please verify OTP.");
     } catch (err) {
-      setToast("❌ Something went wrong. Please try again.");
+      setToast("❌ Failed to send OTP. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleFinalSubmitAfterOtp = async () => {
+    if (otp.length !== 4) {
+      setToast("❌ Enter valid 4 digit OTP.");
+      return;
+    }
+
+    if (!pendingPayload) {
+      setToast("❌ Application data missing. Please fill the form again.");
+      setOtpOpen(false);
+      return;
+    }
+
+    const slug = job?.slug;
+
+    if (!slug) {
+      setToast("❌ Job slug is missing.");
+      return;
+    }
+
+    if (!pendingPayload.name) return setToast("❌ Name is required.");
+
+    if (!pendingPayload.email) return setToast("❌ Email is required.");
+
+    if (!pendingPayload.mobile || pendingPayload.mobile.length !== 10) {
+      return setToast("❌ Enter valid 10 digit mobile number.");
+    }
+
+    if (!pendingPayload.currentCTC) {
+      return setToast("❌ Current CTC is required.");
+    }
+
+    if (!pendingPayload.location) {
+      return setToast("❌ Current location is required.");
+    }
+
+    if (!pendingPayload.experience) {
+      return setToast("❌ Experience is required.");
+    }
+
+    if (!pendingPayload.bestGoal) {
+      return setToast("❌ Goal is required.");
+    }
+
+    if (!pendingPayload.fileUrl) {
+      return setToast("❌ CV is required.");
+    }
+
+    if (!pendingPayload.motivation) {
+      return setToast("❌ Motivation is required.");
+    }
+
+    if (!pendingPayload.address) {
+      return setToast("❌ Address is required.");
+    }
+    // if (!pendingPayload.fileUrl) return setToast("❌ CV file URL is required.");
+
+    try {
+      setSubmitting(true);
+      setToast("");
+      setOtpError("");
+
+      const submitUrl = `/api/customer/career/join-our-team/${encodeURIComponent(
+        slug,
+      )}/submit?otp=${encodeURIComponent(otp)}`;
+
+      console.log("CAREER FRONTEND SUBMIT URL:", submitUrl);
+      console.log("CAREER FRONTEND PAYLOAD:", pendingPayload);
+
+      const res = await fetch(submitUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(pendingPayload),
+      });
+
+      const text = await res.text();
+
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { message: text };
+      }
+
+      console.log("CAREER FRONTEND STATUS:", res.status);
+      console.log("CAREER FRONTEND RESPONSE:", data);
+
+      const backendFailed =
+        data?.success === false ||
+        String(data?.status || "").toLowerCase() === "fail";
+
+      if (!res.ok || backendFailed) {
+        const message =
+          data?.message ||
+          data?.error ||
+          "Application submission failed. Please try again.";
+
+        setOtpError(`❌ ${message}`);
+        return;
+      }
+
+      pendingFormEl?.reset();
+
+      setOtp("");
+      setPendingPayload(null);
+      setPendingFormEl(null);
+      setOtpOpen(false);
+      setApplyOpen(false);
+
+      setToast("");
+      setSuccessOpen(true);
+      setTimeout(() => {
+        setSuccessOpen(false);
+      }, 3000);
+    } catch (err) {
+      setToast(
+        err?.message
+          ? `❌ ${err.message}`
+          : "❌ Application submission failed.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -171,21 +375,23 @@ export default function JobClient({ job }) {
 
         {/* Job Details */}
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">Job Details :</h3>
+          <h3 className="text-lg font-semibold text-slate-900">
+            Job Details :
+          </h3>
 
           <p className="mt-4 text-sm md:text-base text-slate-700 leading-relaxed">
             Corpseed ITES Pvt. Ltd. is a technology platform, make things easier
             for Entrepreneurs and businesses. Just like a seed is required to
             grow a tree similarly, there are few prerequisites like "Business
             Planning, finalizing the legal structure of the business, Govt
-            Licenses/Permits, Legal compliance, financial structure & Integration
-            of right technology to operate the business". These prerequisites act
-            as a seed for an organization to grow successfully. These are the
-            basic mandatory requirements a business must follow, in order to
-            sustain in the current competitive environment. Our goal is to help
-            entrepreneurs in managing these most important business requirements,
-            at an affordable price for better growth, compliance, and
-            sustainability.
+            Licenses/Permits, Legal compliance, financial structure &
+            Integration of right technology to operate the business". These
+            prerequisites act as a seed for an organization to grow
+            successfully. These are the basic mandatory requirements a business
+            must follow, in order to sustain in the current competitive
+            environment. Our goal is to help entrepreneurs in managing these
+            most important business requirements, at an affordable price for
+            better growth, compliance, and sustainability.
           </p>
 
           <p className="mt-6 text-sm font-semibold text-slate-900">
@@ -219,7 +425,8 @@ export default function JobClient({ job }) {
                     Please Fill In all Details
                   </p>
                   <p className="text-xs text-slate-500">
-                    Applying for: <span className="font-semibold">{job?.title}</span>
+                    Applying for:{" "}
+                    <span className="font-semibold">{job?.title}</span>
                   </p>
                 </div>
 
@@ -278,7 +485,8 @@ export default function JobClient({ job }) {
 
                   <div>
                     <label className="text-sm font-semibold text-slate-700">
-                      What is your current CTC ? <span className="text-red-500">*</span>
+                      What is your current CTC ?{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <div className="mt-2 flex overflow-hidden rounded-lg border border-slate-200">
                       <span className="px-3 py-2.5 text-sm text-slate-600 bg-slate-50 border-r border-slate-200">
@@ -327,7 +535,8 @@ export default function JobClient({ job }) {
 
                   <div>
                     <label className="text-sm font-semibold text-slate-700">
-                      Goal motivates you to be the best? <span className="text-red-500">*</span>
+                      Goal motivates you to be the best?{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <input
                       name="goal"
@@ -400,7 +609,7 @@ export default function JobClient({ job }) {
                     className={cn(
                       "rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white",
                       "hover:bg-blue-700 transition shadow-sm cursor-pointer",
-                      submitting && "opacity-70 cursor-not-allowed"
+                      submitting && "opacity-70 cursor-not-allowed",
                     )}
                     disabled={submitting}
                   >
@@ -408,6 +617,106 @@ export default function JobClient({ job }) {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {otpOpen ? (
+        <div className="fixed inset-0 z-[10000]">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => (!submitting ? setOtpOpen(false) : null)}
+          />
+
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                <div>
+                  <p className="text-base font-semibold text-slate-900">
+                    Verify OTP
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    OTP sent to {pendingPayload?.mobile}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setOtpOpen(false)}
+                  disabled={submitting}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="px-6 py-6">
+                <input
+                  value={otp}
+                  onChange={(e) =>
+                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))
+                  }
+                  inputMode="numeric"
+                  maxLength={4}
+                  placeholder="Enter 4 digit OTP"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-center text-lg font-semibold tracking-[0.4em] text-slate-900 placeholder:tracking-normal placeholder:text-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                />
+
+                {otpError ? (
+                  <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                    {otpError}
+                  </div>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={handleFinalSubmitAfterOtp}
+                  disabled={submitting}
+                  className={cn(
+                    "mt-6 w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700",
+                    submitting && "cursor-not-allowed opacity-70",
+                  )}
+                >
+                  {submitting ? "Submitting..." : "Verify & Submit"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {successOpen ? (
+        <div className="fixed inset-0 z-[10001]">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setSuccessOpen(false)}
+          />
+
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl">
+              <div className="px-6 py-8 text-center">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+                  <span className="text-3xl font-bold text-green-600">✓</span>
+                </div>
+
+                <h3 className="mt-5 text-lg font-semibold text-slate-900">
+                  Application Submitted Successfully
+                </h3>
+
+                <p className="mt-2 text-sm text-slate-600">
+                  Thank you for applying. Our HR team will review your
+                  application and contact you shortly.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => setSuccessOpen(false)}
+                  className="mt-6 w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                >
+                  Okay
+                </button>
+              </div>
             </div>
           </div>
         </div>

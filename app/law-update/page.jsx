@@ -4,6 +4,11 @@ import { getLawUpdatesList, stripHtml } from "../lib/lawUpdates";
 
 export const revalidate = 30;
 
+function getParamValue(value, fallback = "") {
+  if (Array.isArray(value)) return value[0] || fallback;
+  return value ?? fallback;
+}
+
 function normalizeSearchParams(searchParams) {
   const params = new URLSearchParams();
 
@@ -40,10 +45,10 @@ function buildHref(searchParams, nextParams = {}) {
 function FilterBar({ searchParams, deptOptions = [] }) {
   // Server component version (no client JS): simple & fast
 
-  const from = searchParams?.from || "";
-  const to = searchParams?.to || "";
-  const dept = searchParams?.dept || "";
-  const size = searchParams?.size || "6";
+  const from = getParamValue(searchParams?.from, "");
+  const to = getParamValue(searchParams?.to, "");
+  const dept = getParamValue(searchParams?.dept, "");
+  const size = getParamValue(searchParams?.size, "6");
 
   return (
     <form className="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -199,13 +204,13 @@ function Pagination({ pageData, searchParams }) {
 }
 
 export default async function LawUpdatesPage({ searchParams }) {
-  const resolvedParams = await searchParams;
+  const resolvedParams = (await searchParams) || {};
 
-  const page = await Number(resolvedParams?.page || 1);
-  const size = await Number(resolvedParams?.size || 6);
-  const from = (await resolvedParams?.from) || "";
-  const to = (await resolvedParams?.to) || "";
-  const dept = (await resolvedParams?.dept) || "";
+  const page = Number(getParamValue(resolvedParams?.page, "1")) || 1;
+  const size = Number(getParamValue(resolvedParams?.size, "6")) || 6;
+  const from = getParamValue(resolvedParams?.from, "");
+  const to = getParamValue(resolvedParams?.to, "");
+  const dept = getParamValue(resolvedParams?.dept, "");
 
   const data = await getLawUpdatesList({ page, size, from, to, dept });
 
@@ -230,7 +235,10 @@ export default async function LawUpdatesPage({ searchParams }) {
           </p>
 
           <div className="mt-8">
-            <FilterBar searchParams={searchParams} deptOptions={deptOptions} />
+            <FilterBar
+              searchParams={resolvedParams}
+              deptOptions={deptOptions}
+            />
           </div>
         </div>
       </div>
@@ -308,7 +316,7 @@ export default async function LawUpdatesPage({ searchParams }) {
 
         {pageData?.totalPages > 1 ? (
           <div className="mt-10">
-            <Pagination pageData={pageData} searchParams={searchParams} />
+            <Pagination pageData={pageData} searchParams={resolvedParams} />
           </div>
         ) : null}
 

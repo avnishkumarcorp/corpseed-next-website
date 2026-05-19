@@ -15,7 +15,7 @@ import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 import FeedbackBox from "@/app/components/FeedbackBox";
-import SocialRail from "@/app/components/ShareRailClient"; // ✅ keep using external component
+import SocialRail from "@/app/components/ShareRailClient";
 import dynamic from "next/dynamic";
 import TocClient from "@/app/components/TocClient";
 import { headers } from "next/headers";
@@ -52,10 +52,10 @@ function Card({ children, className = "" }) {
  * 2) Removes that TOC block from main content
  * 3) Removes formView marker
  */
-function splitTocAndBody(html = "", slug = "", url) {
+function splitTocAndBody(html = "", url = "") {
   let input = String(html || "");
 
-  // ✅ remove <base ...> from full html (very important)
+  // remove <base ...> from full html
   input = input.replace(/<base[^>]*>/gi, "");
 
   const tocMatch = input.match(
@@ -64,8 +64,7 @@ function splitTocAndBody(html = "", slug = "", url) {
 
   const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
 
-  // ✅ rewrite TOC links to current page path (relative)
-  // also remove <base> if it exists inside toc block
+  // rewrite TOC links to current page path
   const tocHtml = tocHtmlRaw
     .replace(/<base[^>]*>/gi, "")
     .replace(
@@ -74,7 +73,7 @@ function splitTocAndBody(html = "", slug = "", url) {
         const hashIndex = href.indexOf("#");
         if (hashIndex === -1) return full;
 
-        const hash = href.slice(hashIndex + 1); // without '#'
+        const hash = href.slice(hashIndex + 1);
         return `<a${pre}href="${url}#${hash}"${post}>`;
       },
     );
@@ -87,7 +86,7 @@ function splitTocAndBody(html = "", slug = "", url) {
     "",
   );
 
-  // ✅ also remove <base> if any remains
+  // remove <base> if any remains
   bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
 
   return { tocHtml, bodyHtml };
@@ -97,9 +96,22 @@ function TocCard({ tocHtml }) {
   if (!tocHtml) return null;
 
   return (
-    <>
-      <TocClient html={tocHtml} headerOffset={90} />
+    <Card className="overflow-hidden">
+      <div className="border-b border-slate-200 px-5 py-4">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-5 w-5 text-blue-600" />
+          <p className="text-sm font-semibold text-slate-900">
+            Table of Contents
+          </p>
+        </div>
+      </div>
 
+      {/* Desktop ToC */}
+      <div className="hidden max-h-[calc(100vh-220px)] overflow-auto px-4 py-4 lg:block">
+        <TocClient html={tocHtml} headerOffset={90} />
+      </div>
+
+      {/* Mobile ToC */}
       <div className="block px-5 py-4 lg:hidden">
         <details className="group">
           <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
@@ -114,7 +126,7 @@ function TocCard({ tocHtml }) {
           </div>
         </details>
       </div>
-    </>
+    </Card>
   );
 }
 
@@ -130,6 +142,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <Icon className="h-5 w-5" />
             </span>
           ) : null}
+
           <div>
             <p className="text-sm font-semibold text-slate-900">{title}</p>
             {badge ? <p className="text-xs text-slate-500">{badge}</p> : null}
@@ -142,7 +155,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
           <Link
             key={x.slug}
             href={`${basePath}/${x.slug}`}
-            className="group flex gap-3 px-5 py-4 hover:bg-slate-50 cursor-pointer"
+            className="group flex cursor-pointer gap-3 px-5 py-4 hover:bg-slate-50"
           >
             <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
               {x.image ? (
@@ -160,6 +173,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <p className="line-clamp-2 text-sm font-medium text-slate-900 group-hover:underline">
                 {safeText(x.title)}
               </p>
+
               <p className="mt-1 text-xs text-slate-500">
                 {x.postDate ? formatDate(x.postDate) : "Read"}
                 {typeof x.visited === "number" ? ` • ${x.visited} views` : ""}
@@ -177,20 +191,16 @@ function AuthorCard({ author }) {
 
   return (
     <Card className="overflow-hidden">
-      {/* Thin accent line */}
       <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-slate-900 to-blue-600 opacity-80" />
 
       <div className="px-6 py-5">
-        {/* Header */}
         <div className="mb-4">
           <p className="text-sm font-semibold text-slate-900">
             About the Author
           </p>
         </div>
 
-        {/* Main Layout */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          {/* Avatar */}
           <div className="relative h-[95px] w-[95px] flex-none overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
             <Image
               src={author.profilePicture}
@@ -201,30 +211,27 @@ function AuthorCard({ author }) {
             />
           </div>
 
-          {/* Content */}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h3 className="text-base font-semibold text-slate-900">
                 {author.firstName} {author.lastName}
               </h3>
 
-              {author.jobTitle && (
+              {author.jobTitle ? (
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                   {author.jobTitle}
                 </span>
-              )}
+              ) : null}
             </div>
 
-            {/* Compact Bio */}
-            <div className="mt-2 text-sm leading-6 text-slate-600 line-clamp-4">
+            <div className="mt-2 line-clamp-4 text-sm leading-6 text-slate-600">
               <SafeHtml html={author.aboutMe} />
             </div>
 
-            {/* Button */}
             <div className="mt-3">
               <Link
                 href={`/profile/${author.slug}`}
-                className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+                className="inline-flex cursor-pointer items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800"
               >
                 View profile →
               </Link>
@@ -259,31 +266,13 @@ export async function generateMetadata({ params }) {
   };
 }
 
-function splitByConsultationHeading(html = "") {
-  const input = String(html || "");
-
-  const regex = /<h[1-6][^>]*>\s*BOOK A FREE CONSULTATION\s*<\/h[1-6]>/i;
-
-  const match = input.match(regex);
-
-  if (!match) {
-    return { before: input, after: "" };
-  }
-
-  const index = match.index;
-
-  const before = input.slice(0, index);
-  const after = input.slice(index + match[0].length);
-
-  return { before, after };
-}
-
 /* ===============================
    PAGE
 ================================= */
 export default async function KnowledgeCentreSlugPage({ params }) {
   const { slug } = await params;
   const apiData = await getKnowledgeCentreBySlug(slug);
+
   if (!apiData?.blog) return notFound();
 
   const blog = apiData.blog;
@@ -297,113 +286,123 @@ export default async function KnowledgeCentreSlugPage({ params }) {
 
   const url = `${protocol}://${host}/knowledge-centre/${slug}`;
 
-  const { tocHtml, bodyHtml } = splitTocAndBody(
-    blog.description || "",
-    slug,
-    url,
-  );
-
-  const { before, after } = splitByConsultationHeading(bodyHtml);
+  const { tocHtml, bodyHtml } = splitTocAndBody(blog.description || "", url);
 
   return (
-    <div className="bg-slate-50">
-      {/* HERO (same as news-room) */}
-      <section className="border-b border-slate-200 bg-white">
+    <div className="bg-white">
+      {/* ===============================
+    TOP SECTION
+    ROW 1: HEADING + ENQUIRY SAME HEIGHT
+    ROW 2: IMAGE + TOC SIDE BY SIDE
+================================= */}
+      <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          <div className="mt-4 grid gap-8 lg:grid-cols-[1.45fr_1.05fr] lg:items-start">
-            {/* LEFT image */}
-            <div className="relative rounded-2xl border border-slate-200 bg-slate-100 shadow-sm overflow-hidden">
-              <div className="relative w-full">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+            {/* LEFT: HEADING CARD */}
+            <Card className="flex min-w-0 flex-col overflow-hidden lg:h-full">
+              <div className="flex h-full flex-col justify-center p-5 sm:p-6">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                  {blog.title}
+                </h1>
+
+                {blog.summary ? (
+                  <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
+                    {blog.summary}
+                  </p>
+                ) : null}
+
+                <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
+                  {blog.modifyDate ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      {formatDate(blog.modifyDate)}
+                    </span>
+                  ) : null}
+
+                  {typeof blog.visited === "number" ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      {blog.visited}
+                    </span>
+                  ) : null}
+
+                  {author ? (
+                    <span className="inline-flex items-center gap-2">
+                      <User2 className="h-4 w-4" />
+                      {author?.firstName || "Corpseed"}{" "}
+                      {author?.lastName || "Corpseed"}
+                    </span>
+                  ) : null}
+
+                  {blog?.categoryTitle ? (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                      {blog.categoryTitle}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </Card>
+
+            {/* RIGHT: ENQUIRY FORM CARD */}
+            <aside className="min-w-0 lg:flex">
+              <Card className="flex w-full overflow-hidden border-blue-100 bg-[#f2f3ff] p-3 lg:h-full">
+                <div className="w-full">
+                  <EnquiryOtpInline page={slug} />
+                </div>
+              </Card>
+            </aside>
+
+            {/* LEFT BELOW: IMAGE */}
+            {blog.image ? (
+              <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
                 <Image
                   src={blog.image}
                   alt={safeText(blog.title)}
                   width={1200}
                   height={800}
                   priority
-                  className="w-full h-auto object-contain rounded-2xl"
-                  sizes="(max-width: 1024px) 100vw, 700px"
+                  className="h-auto w-full object-contain"
+                  sizes="(max-width: 1024px) 100vw, 760px"
                 />
+
+                <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 px-2 py-1 font-bold text-blue-600 shadow-lg">
+                  <Phone className="h-4 w-4" />
+                  7558640644 - Harshita
+                </div>
               </div>
+            ) : null}
 
-              <div className="absolute right-3 bottom-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 text-blue-600 font-bold px-2 py-1 shadow-lg">
-                <Phone className="h-4 w-4" />
-                7558640644 - Harshita
-              </div>
-            </div>
-
-            {/* RIGHT text */}
-            <div className="min-w-0 lg:flex lg:h-full lg:flex-col lg:justify-center">
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                {blog.title}
-              </h1>
-
-              <p className="mt-3 max-w-3xl text-sm text-slate-600">
-                {blog.summary}
-              </p>
-
-              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
-                {blog.modifyDate ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    {formatDate(blog.modifyDate)}
-                  </span>
-                ) : null}
-
-                {typeof blog.visited === "number" ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    {blog.visited}
-                  </span>
-                ) : null}
-
-                {author ? (
-                  <span className="inline-flex items-center gap-2">
-                    <User2 className="h-4 w-4" />
-                    {author?.firstName || "Corpseed"}{" "}
-                    {author?.lastName || "Corpseed"}
-                  </span>
-                ) : null}
-
-                {blog?.categoryTitle ? (
-                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                    {blog.categoryTitle}
-                  </span>
-                ) : null}
-              </div>
-            </div>
+            {/* RIGHT BELOW: TOC NEXT TO IMAGE */}
+            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+              <TocCard tocHtml={tocHtml} />
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* CONTENT (same as news-room: rail overlay + 2-col grid) */}
-      <section className="py-6 md:py-8 bg-white">
+      {/* ===============================
+          ARTICLE CONTENT
+          TOC IS NOW OUTSIDE TOP SECTION
+          AND BESIDE THE ARTICLE TEXT
+      ================================= */}
+      <section className="bg-white py-6 md:py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="relative">
-            {/* Social rail overlay (doesn't consume grid column) */}
-            <div className="hidden lg:block absolute left-0 top-0 -translate-x-16">
+            {/* Social rail overlay */}
+            <div className="absolute left-0 top-0 hidden -translate-x-16 lg:block">
               <SocialRail pageUrl={pageUrl} title={blog.title} />
             </div>
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
-              {/* Main */}
-              <div className="space-y-6 bg-white">
-                {/* <Card className="overflow-hidden"> */}
-                <div className="bg-white flex flex-col gap-6">
-                  <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+              {/* Main Content */}
+              <main className="min-w-0 space-y-8">
+                <Card className="overflow-hidden p-5 sm:p-6">
+                  <div className="prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed">
                     <BlogContentClient html={bodyHtml} />
                   </div>
+                </Card>
 
-                  <div className="border border-[#e5e5e5] shadow-[0_0_0_12px_#f8f9fa]">
-                    <EnquiryOtpInline page={slug} />
-                  </div>
-                </div>
-                {/* </Card> */}
-
-                {author ? (
-                  <div className="mt-10">
-                    <AuthorCard author={author} />
-                  </div>
-                ) : null}
+                {author ? <AuthorCard author={author} /> : null}
 
                 {apiData?.feedback ? <FeedbackBox /> : null}
 
@@ -420,7 +419,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                         <Link
                           key={x.slug}
                           href={`/knowledge-centre/${x.slug}`}
-                          className="group flex gap-3 rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50 cursor-pointer"
+                          className="group flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50"
                         >
                           <div className="relative h-16 w-20 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                             {x.image ? (
@@ -438,6 +437,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                             <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:underline">
                               {safeText(x.title)}
                             </p>
+
                             <p className="mt-1 text-xs text-slate-500">
                               {x.postDate ? formatDate(x.postDate) : "Read"}
                             </p>
@@ -447,15 +447,11 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                     </div>
                   </Card>
                 ) : null}
-              </div>
+              </main>
 
-              {/* Sidebar */}
-              <aside className="space-y-6">
-                <div className="lg:sticky lg:top-24 space-y-6">
-                  <div className="bg-[#f2f3ff] p-2 mt-2.5">
-                    <EnquiryOtpInline page={slug} />
-                  </div>
-
+              {/* Right Sidebar: ToC + article/news cards */}
+              <aside className="min-w-0">
+                <div className="space-y-6 lg:sticky lg:top-24">
                   <TocCard tocHtml={tocHtml} />
 
                   <ListCard
@@ -474,7 +470,6 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                     basePath="/knowledge-centre"
                   />
 
-                  {/* ✅ if these are really news, keep basePath as per your API; change if needed */}
                   <ListCard
                     title="Top News"
                     badge="Trending"
@@ -497,12 +492,12 @@ export default async function KnowledgeCentreSlugPage({ params }) {
         </div>
       </section>
 
-      {/* Footer back (optional but matches style) */}
-      <div className="pb-10">
+      {/* Footer back */}
+      <div className="bg-white pb-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Link
             href="/knowledge-centre"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
+            className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
           >
             ← Back to Knowledge Centre
           </Link>

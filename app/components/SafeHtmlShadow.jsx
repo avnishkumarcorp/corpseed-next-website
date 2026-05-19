@@ -164,6 +164,8 @@ const SafeHtmlShadow = forwardRef(({ html }, ref) => {
         text-align: left;
       }
 
+      
+
       .page-header article .checklist li,
       .page-header article ul li {
         position: relative;

@@ -10,7 +10,6 @@ import {
   Facebook,
   Linkedin,
   Mail,
-  ChevronRight,
   Newspaper,
   BookOpen,
   Phone,
@@ -21,7 +20,8 @@ import { getNewsBySlug } from "@/app/lib/newsRoom";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 import { headers } from "next/headers";
 import BlogContentClient from "@/app/components/BlogContentClient";
-import TocClient from "@/app/components/TocClient";
+import NewTocClient from "@/app/components/NewTocClient";
+import { splitTocAndBody } from "@/app/lib/tocUtils";
 
 export const revalidate = 30;
 
@@ -45,42 +45,6 @@ function Card({ children, className = "" }) {
   );
 }
 
-function splitTocAndBody(html = "", slug = "", url) {
-  let input = String(html || "");
-
-  input = input.replace(/<base[^>]*>/gi, "");
-
-  const tocMatch = input.match(
-    /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
-  );
-
-  const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
-
-  const tocHtml = tocHtmlRaw
-    .replace(/<base[^>]*>/gi, "")
-    .replace(
-      /<a([^>]*?)href=(['"])([^'"]*?)\2([^>]*?)>/gi,
-      (full, pre, q, href, post) => {
-        const hashIndex = href.indexOf("#");
-        if (hashIndex === -1) return full;
-
-        const hash = href.slice(hashIndex + 1);
-        return `<a${pre}href="${url}#${hash}"${post}>`;
-      },
-    );
-
-  let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
-
-  bodyHtml = bodyHtml.replace(
-    /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
-    "",
-  );
-
-  bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
-
-  return { tocHtml, bodyHtml };
-}
-
 function SocialRail({ pageUrl, title }) {
   return (
     <div className="hidden lg:block">
@@ -102,7 +66,7 @@ function SocialRail({ pageUrl, title }) {
             )}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
             title="Facebook"
             aria-label="Facebook"
           >
@@ -115,7 +79,7 @@ function SocialRail({ pageUrl, title }) {
             )}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
             title="LinkedIn"
             aria-label="LinkedIn"
           >
@@ -126,7 +90,7 @@ function SocialRail({ pageUrl, title }) {
             href={`mailto:?subject=${encodeURIComponent(
               title,
             )}&body=${encodeURIComponent(pageUrl)}`}
-            className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
             title="Email"
             aria-label="Email"
           >
@@ -135,44 +99,6 @@ function SocialRail({ pageUrl, title }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function TocCard({ tocHtml }) {
-  if (!tocHtml) return null;
-
-  return (
-    <Card className="overflow-hidden">
-      <div className="border-b border-slate-200 px-5 py-4">
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-blue-600" />
-          <p className="text-sm font-semibold text-slate-900">
-            Table of Contents
-          </p>
-        </div>
-      </div>
-
-      {/* Desktop ToC */}
-      <div className="hidden max-h-[calc(100vh-220px)] overflow-auto px-4 py-4 lg:block">
-        <TocClient html={tocHtml} headerOffset={90} />
-      </div>
-
-      {/* Mobile ToC */}
-      <div className="block px-5 py-4 lg:hidden">
-        <details className="group">
-          <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
-            <span className="inline-flex items-center gap-2">
-              Open contents
-              <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
-            </span>
-          </summary>
-
-          <div className="mt-3 max-h-[320px] overflow-auto pr-1">
-            <TocClient html={tocHtml} headerOffset={90} />
-          </div>
-        </details>
-      </div>
-    </Card>
   );
 }
 
@@ -188,7 +114,6 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <Icon className="h-5 w-5" />
             </span>
           ) : null}
-
           <div>
             <p className="text-sm font-semibold text-slate-900">{title}</p>
             {badge ? <p className="text-xs text-slate-500">{badge}</p> : null}
@@ -201,7 +126,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
           <Link
             key={x.slug}
             href={`${basePath}/${x.slug}`}
-            className="group flex cursor-pointer gap-3 px-5 py-4 hover:bg-slate-50"
+            className="group flex gap-3 px-5 py-4 hover:bg-slate-50 cursor-pointer"
           >
             <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
               {x.image ? (
@@ -209,7 +134,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
                   src={x.image}
                   alt={safeText(x.title)}
                   fill
-                  className="object-cover"
+                  className="object-cover" // ✅ remove padding + fill nicely
                   sizes="80px"
                 />
               ) : null}
@@ -219,7 +144,6 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <p className="line-clamp-2 text-sm font-medium text-slate-900 group-hover:underline">
                 {safeText(x.title)}
               </p>
-
               <p className="mt-1 text-xs text-slate-500">
                 {x.postDate ? formatDate(x.postDate) : "Read"}
                 {typeof x.visited === "number" ? ` • ${x.visited} views` : ""}
@@ -237,16 +161,20 @@ function AuthorCard({ author }) {
 
   return (
     <Card className="overflow-hidden">
+      {/* Thin accent line */}
       <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-slate-900 to-blue-600 opacity-80" />
 
       <div className="px-6 py-5">
+        {/* Header */}
         <div className="mb-4">
           <p className="text-sm font-semibold text-slate-900">
             About the Author
           </p>
         </div>
 
+        {/* Main Layout */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {/* Avatar */}
           <div className="relative h-[95px] w-[95px] flex-none overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
             <Image
               src={author.profilePicture}
@@ -257,27 +185,30 @@ function AuthorCard({ author }) {
             />
           </div>
 
+          {/* Content */}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h3 className="text-base font-semibold text-slate-900">
                 {author.name}
               </h3>
 
-              {author.jobTitle ? (
+              {author.jobTitle && (
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                   {author.jobTitle}
                 </span>
-              ) : null}
+              )}
             </div>
 
-            <div className="mt-2 line-clamp-4 text-sm leading-6 text-slate-600">
+            {/* Compact Bio */}
+            <div className="mt-2 text-sm leading-6 text-slate-600 line-clamp-4">
               <SafeHtml html={author.aboutMe} />
             </div>
 
+            {/* Button */}
             <div className="mt-3">
               <Link
                 href={`/profile/${author.slug}`}
-                className="inline-flex cursor-pointer items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
               >
                 View profile →
               </Link>
@@ -289,9 +220,7 @@ function AuthorCard({ author }) {
   );
 }
 
-/* ===============================
-   SEO
-================================= */
+/** ✅ SEO from API (news slug) */
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getNewsBySlug(slug);
@@ -313,9 +242,6 @@ export async function generateMetadata({ params }) {
   };
 }
 
-/* ===============================
-   PAGE
-================================= */
 export default async function NewsRoomSlugPage({ params }) {
   const { slug } = await params;
 
@@ -325,6 +251,7 @@ export default async function NewsRoomSlugPage({ params }) {
   const item = apiData.news;
   const author = apiData.author || null;
 
+  // ✅ Share URL
   const pageUrl = `https://www.corpseed.com/news/${item.slug}`;
 
   const headersList = await headers();
@@ -333,34 +260,30 @@ export default async function NewsRoomSlugPage({ params }) {
 
   const url = `${protocol}://${host}/news/${slug}`;
 
-  const { tocHtml, bodyHtml } = splitTocAndBody(
-    item.description || "",
-    slug,
-    url,
-  );
+  // ✅ TOC split
+  const { tocItems, bodyHtml } = splitTocAndBody(item.description || "", url);
 
   return (
     <div className="bg-white">
       {/* ===============================
-          HERO SECTION
-          ROW 1: HEADING + ENQUIRY SAME HEIGHT
-          ROW 2: IMAGE + TOC SIDE BY SIDE
-      ================================= */}
+    TOP SECTION
+    SECTION 1: HEADING + ENQUIRY SAME HEIGHT
+    SECTION 2: IMAGE + TOC, IMAGE KEEPS ITS OWN HEIGHT
+================================= */}
       <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
-            {/* LEFT: HEADING CARD */}
-            <Card className="flex min-w-0 flex-col overflow-hidden lg:h-full">
-              <div className="flex h-full flex-col justify-center p-5 sm:p-6">
+          {/* ROW 1: HEADING + ENQUIRY IN ONE COMMON SECTION */}
+          <Card className="overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+              {/* LEFT: HEADING CONTENT */}
+              <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
                 <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
                   {item.title}
                 </h1>
 
-                {apiData?.metaDescription || item.summary ? (
-                  <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
-                    {apiData?.metaDescription || item.summary}
-                  </p>
-                ) : null}
+                <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
+                  {apiData?.metaDescription || item.summary}
+                </p>
 
                 <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
                   {item.postDate ? (
@@ -391,27 +314,28 @@ export default async function NewsRoomSlugPage({ params }) {
                   ) : null}
                 </div>
               </div>
-            </Card>
 
-            {/* RIGHT: ENQUIRY FORM CARD */}
-            <aside className="min-w-0 lg:flex">
-              <Card className="flex w-full overflow-hidden border-blue-100 bg-[#f2f3ff] p-3 lg:h-full">
-                <div className="w-full">
+              {/* RIGHT: ENQUIRY FORM INSIDE SAME CARD */}
+              <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
+                <div className="h-full w-full">
                   <EnquiryOtpInline page={slug} />
                 </div>
-              </Card>
-            </aside>
+              </div>
+            </div>
+          </Card>
 
-            {/* LEFT BELOW: IMAGE */}
+          {/* ROW 2: IMAGE + TOC */}
+          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+            {/* LEFT BELOW: IMAGE - HEIGHT WILL FOLLOW IMAGE ONLY */}
             {item.image ? (
-              <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+              <div className="relative self-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
                 <Image
                   src={item.image}
                   alt={safeText(item.title)}
                   width={1200}
                   height={800}
                   priority
-                  className="h-auto w-full object-contain"
+                  className="block h-auto w-full object-contain"
                   sizes="(max-width: 1024px) 100vw, 760px"
                 />
 
@@ -420,42 +344,43 @@ export default async function NewsRoomSlugPage({ params }) {
                   7558640644 - Harshita
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div />
+            )}
 
             {/* RIGHT BELOW: TOC NEXT TO IMAGE */}
-            <aside className="min-w-0 lg:col-start-2 lg:sticky lg:top-24 lg:self-start">
-              <TocCard tocHtml={tocHtml} />
+            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+              <NewTocClient items={tocItems} headerOffset={90} />
             </aside>
           </div>
         </div>
       </section>
 
-      {/* ===============================
-          ARTICLE CONTENT
-          SIDEBAR ONLY HAS NEWS/ARTICLE LISTS
-      ================================= */}
+      {/* CONTENT (same fix: don't let social rail push content) */}
       <section className="py-2 md:py-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="relative">
-            {/* Social rail overlay */}
-            <div className="absolute left-0 top-0 hidden -translate-x-16 lg:block">
+            {/* Social rail overlay (shift left) */}
+            <div className="hidden lg:block absolute left-0 top-0 -translate-x-16">
               <SocialRail pageUrl={pageUrl} title={item.title} />
             </div>
 
+            {/* Main + Sidebar */}
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_420px]">
-              {/* Main Content */}
-              <main className="space-y-6">
+              {/* Main */}
+              <div className="space-y-6">
+                {/* <Card className="overflow-hidden"> */}
                 <div className="px-2 sm:px-3">
-                  <div className="prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed">
+                  <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
+                    {/* <SafeHtmlShadow html={bodyHtml} /> */}
                     <BlogContentClient html={bodyHtml} />
                   </div>
 
-                  {/* Mobile Share */}
+                  {/* Mobile share */}
                   <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
                     <p className="text-sm font-semibold text-slate-900">
                       Share
                     </p>
-
                     <div className="flex items-center gap-2">
                       <a
                         className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
@@ -469,7 +394,6 @@ export default async function NewsRoomSlugPage({ params }) {
                       >
                         <Facebook className="h-5 w-5" />
                       </a>
-
                       <a
                         className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
                         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
@@ -482,7 +406,6 @@ export default async function NewsRoomSlugPage({ params }) {
                       >
                         <Linkedin className="h-5 w-5" />
                       </a>
-
                       <a
                         className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
                         href={`mailto:?subject=${encodeURIComponent(
@@ -496,17 +419,17 @@ export default async function NewsRoomSlugPage({ params }) {
                     </div>
                   </div>
                 </div>
-
+                {/* </Card> */}
                 {author ? (
                   <div className="mt-10">
                     <AuthorCard author={author} />
                   </div>
                 ) : null}
-              </main>
+              </div>
 
-              {/* Right Sidebar */}
+              {/* Sidebar */}
               <aside className="space-y-6">
-                <div className="space-y-6 lg:sticky lg:top-24">
+                <div className="lg:sticky lg:top-24 space-y-6">
                   <ListCard
                     title="Top News"
                     badge="Trending"
@@ -550,7 +473,7 @@ export default async function NewsRoomSlugPage({ params }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Link
             href="/news"
-            className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
           >
             ← Back to News Room
           </Link>

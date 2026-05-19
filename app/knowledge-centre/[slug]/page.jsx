@@ -17,7 +17,8 @@ import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 import FeedbackBox from "@/app/components/FeedbackBox";
 import SocialRail from "@/app/components/ShareRailClient";
 import dynamic from "next/dynamic";
-import TocClient from "@/app/components/TocClient";
+import NewTocClient from "@/app/components/NewTocClient";
+import { splitTocAndBody } from "@/app/lib/tocUtils";
 import { headers } from "next/headers";
 
 export const revalidate = 30;
@@ -52,83 +53,83 @@ function Card({ children, className = "" }) {
  * 2) Removes that TOC block from main content
  * 3) Removes formView marker
  */
-function splitTocAndBody(html = "", url = "") {
-  let input = String(html || "");
+// function splitTocAndBody(html = "", url = "") {
+//   let input = String(html || "");
 
-  // remove <base ...> from full html
-  input = input.replace(/<base[^>]*>/gi, "");
+//   // remove <base ...> from full html
+//   input = input.replace(/<base[^>]*>/gi, "");
 
-  const tocMatch = input.match(
-    /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
-  );
+//   const tocMatch = input.match(
+//     /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
+//   );
 
-  const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
+//   const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
 
-  // rewrite TOC links to current page path
-  const tocHtml = tocHtmlRaw
-    .replace(/<base[^>]*>/gi, "")
-    .replace(
-      /<a([^>]*?)href=(['"])([^'"]*?)\2([^>]*?)>/gi,
-      (full, pre, q, href, post) => {
-        const hashIndex = href.indexOf("#");
-        if (hashIndex === -1) return full;
+//   // rewrite TOC links to current page path
+//   const tocHtml = tocHtmlRaw
+//     .replace(/<base[^>]*>/gi, "")
+//     .replace(
+//       /<a([^>]*?)href=(['"])([^'"]*?)\2([^>]*?)>/gi,
+//       (full, pre, q, href, post) => {
+//         const hashIndex = href.indexOf("#");
+//         if (hashIndex === -1) return full;
 
-        const hash = href.slice(hashIndex + 1);
-        return `<a${pre}href="${url}#${hash}"${post}>`;
-      },
-    );
+//         const hash = href.slice(hashIndex + 1);
+//         return `<a${pre}href="${url}#${hash}"${post}>`;
+//       },
+//     );
 
-  let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
+//   let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
 
-  // remove form marker
-  bodyHtml = bodyHtml.replace(
-    /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
-    "",
-  );
+//   // remove form marker
+//   bodyHtml = bodyHtml.replace(
+//     /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
+//     "",
+//   );
 
-  // remove <base> if any remains
-  bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
+//   // remove <base> if any remains
+//   bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
 
-  return { tocHtml, bodyHtml };
-}
+//   return { tocHtml, bodyHtml };
+// }
 
-function TocCard({ tocHtml }) {
-  if (!tocHtml) return null;
+// function TocCard({ tocHtml }) {
+//   if (!tocHtml) return null;
+//   console.log("Table of Content:", tocHtml);
+//   return (
+//     <Card className="overflow-hidden">
+//       <div className="border-b border-slate-200 px-5 py-4">
+//         <div className="flex items-center gap-2">
+//           <BookOpen className="h-5 w-5 text-blue-600" />
+//           <p className="text-sm font-semibold text-slate-900">
+//             Table of Contents
+//           </p>
+//         </div>
+//       </div>
 
-  return (
-    <Card className="overflow-hidden">
-      <div className="border-b border-slate-200 px-5 py-4">
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-blue-600" />
-          <p className="text-sm font-semibold text-slate-900">
-            Table of Contents
-          </p>
-        </div>
-      </div>
+//       {/* Desktop ToC */}
+//       <div className="hidden max-h-[calc(100vh-220px)] overflow-auto px-4 py-4 lg:block">
+//         <NewTocClient html={tocHtml} headerOffset={90} />
+//       </div>
 
-      {/* Desktop ToC */}
-      <div className="hidden max-h-[calc(100vh-220px)] overflow-auto px-4 py-4 lg:block">
-        <TocClient html={tocHtml} headerOffset={90} />
-      </div>
+//       {/* Mobile ToC */}
+//       <div className="block px-5 py-4 lg:hidden">
+//         <details className="group">
+//           <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
+//             <span className="inline-flex items-center gap-2">
+//               Open contents
+//               <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
+//             </span>
+//           </summary>
 
-      {/* Mobile ToC */}
-      <div className="block px-5 py-4 lg:hidden">
-        <details className="group">
-          <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
-            <span className="inline-flex items-center gap-2">
-              Open contents
-              <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
-            </span>
-          </summary>
-
-          <div className="mt-3 max-h-[320px] overflow-auto pr-1">
-            <TocClient html={tocHtml} headerOffset={90} />
-          </div>
-        </details>
-      </div>
-    </Card>
-  );
-}
+//           <div className="mt-3 max-h-[320px] overflow-auto pr-1">
+//             <TocClient html={tocHtml} headerOffset={90} />
+//           </div>
+//         </details>
+//       </div>
+//     </Card>
+//   );
+// }
 
 function ListCard({ title, icon: Icon, items, basePath, badge }) {
   if (!items?.length) return null;
@@ -286,21 +287,22 @@ export default async function KnowledgeCentreSlugPage({ params }) {
 
   const url = `${protocol}://${host}/knowledge-centre/${slug}`;
 
-  const { tocHtml, bodyHtml } = splitTocAndBody(blog.description || "", url);
-
+  const { tocItems, bodyHtml } = splitTocAndBody(blog.description || "", url);
+  // console.log("ToC Content:", tocItems);
   return (
     <div className="bg-white">
       {/* ===============================
     TOP SECTION
-    ROW 1: HEADING + ENQUIRY SAME HEIGHT
-    ROW 2: IMAGE + TOC SIDE BY SIDE
+    SECTION 1: HEADING + ENQUIRY SAME HEIGHT
+    SECTION 2: IMAGE + TOC, IMAGE KEEPS ITS OWN HEIGHT
 ================================= */}
       <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
-            {/* LEFT: HEADING CARD */}
-            <Card className="flex min-w-0 flex-col overflow-hidden lg:h-full">
-              <div className="flex h-full flex-col justify-center p-5 sm:p-6">
+          {/* ROW 1: HEADING + ENQUIRY IN ONE COMMON SECTION */}
+          <Card className="overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+              {/* LEFT: HEADING CONTENT */}
+              <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
                 <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
                   {blog.title}
                 </h1>
@@ -341,27 +343,28 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                   ) : null}
                 </div>
               </div>
-            </Card>
 
-            {/* RIGHT: ENQUIRY FORM CARD */}
-            <aside className="min-w-0 lg:flex">
-              <Card className="flex w-full overflow-hidden border-blue-100 bg-[#f2f3ff] p-3 lg:h-full">
-                <div className="w-full">
+              {/* RIGHT: ENQUIRY FORM INSIDE SAME CARD */}
+              <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
+                <div className="h-full w-full">
                   <EnquiryOtpInline page={slug} />
                 </div>
-              </Card>
-            </aside>
+              </div>
+            </div>
+          </Card>
 
-            {/* LEFT BELOW: IMAGE */}
+          {/* ROW 2: IMAGE + TOC */}
+          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+            {/* LEFT BELOW: IMAGE - HEIGHT WILL FOLLOW IMAGE ONLY */}
             {blog.image ? (
-              <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+              <div className="relative self-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
                 <Image
                   src={blog.image}
                   alt={safeText(blog.title)}
                   width={1200}
                   height={800}
                   priority
-                  className="h-auto w-full object-contain"
+                  className="block h-auto w-full object-contain"
                   sizes="(max-width: 1024px) 100vw, 760px"
                 />
 
@@ -370,11 +373,13 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                   7558640644 - Harshita
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div />
+            )}
 
             {/* RIGHT BELOW: TOC NEXT TO IMAGE */}
             <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-              <TocCard tocHtml={tocHtml} />
+              <NewTocClient items={tocItems} headerOffset={90} />
             </aside>
           </div>
         </div>
@@ -397,7 +402,10 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               {/* Main Content */}
               <main className="min-w-0 space-y-8">
                 <Card className="overflow-hidden p-5 sm:p-6">
-                  <div className="prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed">
+                  <div
+                    data-article-content
+                    className="prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed"
+                  >
                     <BlogContentClient html={bodyHtml} />
                   </div>
                 </Card>
@@ -452,8 +460,6 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               {/* Right Sidebar: ToC + article/news cards */}
               <aside className="min-w-0">
                 <div className="space-y-6 lg:sticky lg:top-24">
-                  <TocCard tocHtml={tocHtml} />
-
                   <ListCard
                     title="Top Articles"
                     badge="Most visited"

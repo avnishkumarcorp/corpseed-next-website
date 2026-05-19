@@ -23,7 +23,7 @@ function buildQs({ page = 1, size = 6, from = "", to = "", dept = "" }) {
 
 export async function getLawUpdatesList({ page, size, from, to, dept }) {
   const qs = buildQs({ page, size, from, to, dept });
-  const url = `${API_BASE}/api/updated-law-update?${qs}`;
+  const url = `${API_BASE}/api/updated-law-update?${qs}`; 
 
   const res = await fetch(url, { next: { revalidate: 30 } });
   if (!res.ok) throw new Error(`Law updates list fetch failed: ${res.status}`);

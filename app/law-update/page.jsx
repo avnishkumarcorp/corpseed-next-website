@@ -39,6 +39,7 @@ function buildHref(searchParams, nextParams = {}) {
 
 function FilterBar({ searchParams, deptOptions = [] }) {
   // Server component version (no client JS): simple & fast
+
   const from = searchParams?.from || "";
   const to = searchParams?.to || "";
   const dept = searchParams?.dept || "";
@@ -198,11 +199,13 @@ function Pagination({ pageData, searchParams }) {
 }
 
 export default async function LawUpdatesPage({ searchParams }) {
-  const page = Number(searchParams?.page || 1);
-  const size = Number(searchParams?.size || 6);
-  const from = searchParams?.from || "";
-  const to = searchParams?.to || "";
-  const dept = searchParams?.dept || "";
+  const resolvedParams = await searchParams;
+
+  const page = await Number(resolvedParams?.page || 1);
+  const size = await Number(resolvedParams?.size || 6);
+  const from = (await resolvedParams?.from) || "";
+  const to = (await resolvedParams?.to) || "";
+  const dept = (await resolvedParams?.dept) || "";
 
   const data = await getLawUpdatesList({ page, size, from, to, dept });
 

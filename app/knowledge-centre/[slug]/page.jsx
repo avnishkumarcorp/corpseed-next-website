@@ -296,10 +296,10 @@ export default async function KnowledgeCentreSlugPage({ params }) {
     SECTION 1: HEADING + ENQUIRY SAME HEIGHT
     SECTION 2: IMAGE + TOC, IMAGE KEEPS ITS OWN HEIGHT
 ================================= */}
-      <section className="border-b border-slate-200 bg-slate-50">
+      <section className=" bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
           {/* ROW 1: HEADING + ENQUIRY IN ONE COMMON SECTION */}
-          <Card className="overflow-hidden">
+          <div className="overflow-hidden border-none outline-none">
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
               {/* LEFT: HEADING CONTENT */}
               <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
@@ -351,20 +351,20 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
 
           {/* ROW 2: IMAGE + TOC */}
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
-            {/* LEFT BELOW: IMAGE - HEIGHT WILL FOLLOW IMAGE ONLY */}
+          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+            {/* LEFT BELOW: IMAGE */}
             {blog.image ? (
-              <div className="relative self-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+              <div className="relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
                 <Image
                   src={blog.image}
                   alt={safeText(blog.title)}
                   width={1200}
                   height={800}
                   priority
-                  className="block h-auto w-full object-contain"
+                  className="block h-full w-full object-cover"
                   sizes="(max-width: 1024px) 100vw, 760px"
                 />
 
@@ -374,12 +374,14 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                 </div>
               </div>
             ) : (
-              <div />
+              <div className="h-full" />
             )}
 
             {/* RIGHT BELOW: TOC NEXT TO IMAGE */}
-            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-              <NewTocClient items={tocItems} headerOffset={90} />
+            <aside className="min-w-0 h-full">
+              <div className="h-full lg:sticky lg:top-24">
+                <NewTocClient items={tocItems} headerOffset={90} />
+              </div>
             </aside>
           </div>
         </div>

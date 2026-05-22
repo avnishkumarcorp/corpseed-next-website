@@ -66,7 +66,7 @@ function SocialRail({ pageUrl, title }) {
             )}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
+            className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
             title="Facebook"
             aria-label="Facebook"
           >
@@ -79,7 +79,7 @@ function SocialRail({ pageUrl, title }) {
             )}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
+            className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
             title="LinkedIn"
             aria-label="LinkedIn"
           >
@@ -90,7 +90,7 @@ function SocialRail({ pageUrl, title }) {
             href={`mailto:?subject=${encodeURIComponent(
               title,
             )}&body=${encodeURIComponent(pageUrl)}`}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
+            className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
             title="Email"
             aria-label="Email"
           >
@@ -114,6 +114,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <Icon className="h-5 w-5" />
             </span>
           ) : null}
+
           <div>
             <p className="text-sm font-semibold text-slate-900">{title}</p>
             {badge ? <p className="text-xs text-slate-500">{badge}</p> : null}
@@ -126,7 +127,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
           <Link
             key={x.slug}
             href={`${basePath}/${x.slug}`}
-            className="group flex gap-3 px-5 py-4 hover:bg-slate-50 cursor-pointer"
+            className="group flex cursor-pointer gap-3 px-5 py-4 hover:bg-slate-50"
           >
             <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
               {x.image ? (
@@ -134,7 +135,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
                   src={x.image}
                   alt={safeText(x.title)}
                   fill
-                  className="object-cover" // ✅ remove padding + fill nicely
+                  className="object-cover"
                   sizes="80px"
                 />
               ) : null}
@@ -144,6 +145,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <p className="line-clamp-2 text-sm font-medium text-slate-900 group-hover:underline">
                 {safeText(x.title)}
               </p>
+
               <p className="mt-1 text-xs text-slate-500">
                 {x.postDate ? formatDate(x.postDate) : "Read"}
                 {typeof x.visited === "number" ? ` • ${x.visited} views` : ""}
@@ -161,20 +163,16 @@ function AuthorCard({ author }) {
 
   return (
     <Card className="overflow-hidden">
-      {/* Thin accent line */}
       <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-slate-900 to-blue-600 opacity-80" />
 
       <div className="px-6 py-5">
-        {/* Header */}
         <div className="mb-4">
           <p className="text-sm font-semibold text-slate-900">
             About the Author
           </p>
         </div>
 
-        {/* Main Layout */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          {/* Avatar */}
           <div className="relative h-[95px] w-[95px] flex-none overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
             <Image
               src={author.profilePicture}
@@ -185,30 +183,27 @@ function AuthorCard({ author }) {
             />
           </div>
 
-          {/* Content */}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h3 className="text-base font-semibold text-slate-900">
                 {author.name}
               </h3>
 
-              {author.jobTitle && (
+              {author.jobTitle ? (
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                   {author.jobTitle}
                 </span>
-              )}
+              ) : null}
             </div>
 
-            {/* Compact Bio */}
-            <div className="mt-2 text-sm leading-6 text-slate-600 line-clamp-4">
+            <div className="mt-2 line-clamp-4 text-sm leading-6 text-slate-600">
               <SafeHtml html={author.aboutMe} />
             </div>
 
-            {/* Button */}
             <div className="mt-3">
               <Link
                 href={`/profile/${author.slug}`}
-                className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+                className="inline-flex cursor-pointer items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800"
               >
                 View profile →
               </Link>
@@ -220,7 +215,9 @@ function AuthorCard({ author }) {
   );
 }
 
-/** ✅ SEO from API (news slug) */
+/* ===============================
+   SEO
+================================= */
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getNewsBySlug(slug);
@@ -242,6 +239,9 @@ export async function generateMetadata({ params }) {
   };
 }
 
+/* ===============================
+   PAGE
+================================= */
 export default async function NewsRoomSlugPage({ params }) {
   const { slug } = await params;
 
@@ -251,7 +251,6 @@ export default async function NewsRoomSlugPage({ params }) {
   const item = apiData.news;
   const author = apiData.author || null;
 
-  // ✅ Share URL
   const pageUrl = `https://www.corpseed.com/news/${item.slug}`;
 
   const headersList = await headers();
@@ -260,129 +259,113 @@ export default async function NewsRoomSlugPage({ params }) {
 
   const url = `${protocol}://${host}/news/${slug}`;
 
-  // ✅ TOC split
   const { tocItems, bodyHtml } = splitTocAndBody(item.description || "", url);
 
   return (
     <div className="bg-white">
-      {/* ===============================
-    TOP SECTION
-    SECTION 1: HEADING + ENQUIRY SAME HEIGHT
-    SECTION 2: IMAGE + TOC, IMAGE KEEPS ITS OWN HEIGHT
-================================= */}
-      <section className="border-b border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          {/* ROW 1: HEADING + ENQUIRY IN ONE COMMON SECTION */}
-          <div className="overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
-              {/* LEFT: HEADING CONTENT */}
-              <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-                  {item.title}
-                </h1>
+      <section className="bg-slate-50">
+        {/* ROW 1: FULL-WIDTH BORDER WRAPPER */}
+        <div className="border-b border-slate-300">
+          <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+            <div className="overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+                {/* LEFT: HEADING CONTENT */}
+                <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
+                  <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                    {item.title}
+                  </h1>
 
-                <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
-                  {apiData?.metaDescription || item.summary}
-                </p>
+                  <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
+                    {apiData?.metaDescription || item.summary}
+                  </p>
 
-                <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
-                  {item.postDate ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(item.postDate)}
-                    </span>
-                  ) : null}
+                  <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
+                    {item.postDate ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(item.postDate)}
+                      </span>
+                    ) : null}
 
-                  {typeof item.visited === "number" ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      {item.visited}
-                    </span>
-                  ) : null}
+                    {typeof item.visited === "number" ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        {item.visited}
+                      </span>
+                    ) : null}
 
-                  {author ? (
-                    <span className="inline-flex items-center gap-2">
-                      <User2 className="h-4 w-4" />
-                      {author?.name || "Corpseed"}
-                    </span>
-                  ) : null}
+                    {author ? (
+                      <span className="inline-flex items-center gap-2">
+                        <User2 className="h-4 w-4" />
+                        {author?.name || "Corpseed"}
+                      </span>
+                    ) : null}
 
-                  {item?.categoryTitle ? (
-                    <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                      {item.categoryTitle}
-                    </span>
-                  ) : null}
+                    {item?.categoryTitle ? (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        {item.categoryTitle}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
 
-              {/* RIGHT: ENQUIRY FORM INSIDE SAME CARD */}
-              <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
-                <div className="h-full w-full">
-                  <EnquiryOtpInline page={slug} />
+                {/* RIGHT: ENQUIRY FORM */}
+                <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
+                  <div className="h-full w-full">
+                    <EnquiryOtpInline page={slug} />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* ROW 2: IMAGE + TOC */}
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
-            {/* LEFT BELOW: IMAGE - HEIGHT WILL FOLLOW IMAGE ONLY */}
-            {item.image ? (
-              <div className="relative  overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-                <Image
-                  src={item.image}
-                  alt={safeText(item.title)}
-                  width={1200}
-                  height={800}
-                  priority
-                  className="block h-full w-full object-contain"
-                  sizes="(max-width: 1024px) 100vw, 760px"
-                />
-
-                <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 px-2 py-1 font-bold text-blue-600 shadow-lg">
-                  <Phone className="h-4 w-4" />
-                  7558640644 - Harshita
-                </div>
-              </div>
-            ) : (
-              <div />
-            )}
-
-            {/* RIGHT BELOW: TOC NEXT TO IMAGE */}
-            <aside className="min-w-0 h-full">
-              <div className="h-full lg:sticky lg:top-24">
-                <NewTocClient items={tocItems} headerOffset={90} />
-              </div>
-            </aside>
           </div>
         </div>
-      </section>
 
-      {/* CONTENT (same fix: don't let social rail push content) */}
-      <section className="py-2 md:py-4">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="relative">
-            {/* Social rail overlay (shift left) */}
-            <div className="hidden lg:block absolute left-0 top-0 -translate-x-16">
-              <SocialRail pageUrl={pageUrl} title={item.title} />
-            </div>
+        {/* ROW 2 + CONTENT
+            LEFT COLUMN  = Image + News Content + Author
+            RIGHT COLUMN = TOC + Top News + Latest News + Top Articles + Latest Articles
+        */}
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+            {/* LEFT COLUMN */}
+            <main className="min-w-0 space-y-8">
+              {/* IMAGE */}
+              {item.image ? (
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+                  <Image
+                    src={item.image}
+                    alt={safeText(item.title)}
+                    width={1200}
+                    height={800}
+                    priority
+                    className="block h-auto w-full object-cover"
+                    sizes="(max-width: 1024px) 100vw, 760px"
+                  />
 
-            {/* Main + Sidebar */}
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_420px]">
-              {/* Main */}
-              <div className="space-y-6">
-                {/* <Card className="overflow-hidden"> */}
-                <div className="px-2 sm:px-3">
-                  <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
-                    {/* <SafeHtmlShadow html={bodyHtml} /> */}
+                  <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 px-2 py-1 font-bold text-blue-600 shadow-lg">
+                    <Phone className="h-4 w-4" />
+                    7558640644 - Harshita
+                  </div>
+                </div>
+              ) : null}
+
+              {/* NEWS CONTENT */}
+              <div className="relative">
+                {/* Social rail overlay */}
+                <div className="absolute left-0 top-0 hidden -translate-x-16 lg:block">
+                  <SocialRail pageUrl={pageUrl} title={item.title} />
+                </div>
+
+                <div className="overflow-hidden p-5 sm:p-6">
+                  <div className="prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed">
                     <BlogContentClient html={bodyHtml} />
                   </div>
 
-                  {/* Mobile share */}
+                  {/* Mobile Share */}
                   <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 lg:hidden">
                     <p className="text-sm font-semibold text-slate-900">
                       Share
                     </p>
+
                     <div className="flex items-center gap-2">
                       <a
                         className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
@@ -396,6 +379,7 @@ export default async function NewsRoomSlugPage({ params }) {
                       >
                         <Facebook className="h-5 w-5" />
                       </a>
+
                       <a
                         className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
                         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
@@ -408,6 +392,7 @@ export default async function NewsRoomSlugPage({ params }) {
                       >
                         <Linkedin className="h-5 w-5" />
                       </a>
+
                       <a
                         className="cursor-pointer rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
                         href={`mailto:?subject=${encodeURIComponent(
@@ -421,61 +406,64 @@ export default async function NewsRoomSlugPage({ params }) {
                     </div>
                   </div>
                 </div>
-                {/* </Card> */}
-                {author ? (
-                  <div className="mt-10">
-                    <AuthorCard author={author} />
-                  </div>
-                ) : null}
               </div>
 
-              {/* Sidebar */}
-              <aside className="space-y-6">
-                <div className="lg:sticky lg:top-24 space-y-6">
-                  <ListCard
-                    title="Top News"
-                    badge="Trending"
-                    icon={Newspaper}
-                    items={apiData?.topNews || []}
-                    basePath="/news"
-                  />
+              {author ? <AuthorCard author={author} /> : null}
+            </main>
 
-                  <ListCard
-                    title="Latest News"
-                    badge="Fresh updates"
-                    icon={Newspaper}
-                    items={apiData?.latestNews || []}
-                    basePath="/news"
-                  />
+            {/* RIGHT COLUMN: TOC + SIDEBAR CARDS */}
+            <aside className="min-w-0">
+              <div className="space-y-6 lg:sticky lg:top-24">
+                {/* TOC stays side-by-side with image */}
+                {tocItems?.length ? (
+                  <Card className="overflow-hidden">
+                    <NewTocClient items={tocItems} headerOffset={90} />
+                  </Card>
+                ) : null}
 
-                  <ListCard
-                    title="Top Articles"
-                    badge="Most visited"
-                    icon={BookOpen}
-                    items={apiData?.topBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
+                <ListCard
+                  title="Top News"
+                  badge="Trending"
+                  icon={Newspaper}
+                  items={apiData?.topNews || []}
+                  basePath="/news"
+                />
 
-                  <ListCard
-                    title="Latest Articles"
-                    badge="Recently published"
-                    icon={BookOpen}
-                    items={apiData?.latestBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
-                </div>
-              </aside>
-            </div>
+                <ListCard
+                  title="Latest News"
+                  badge="Fresh updates"
+                  icon={Newspaper}
+                  items={apiData?.latestNews || []}
+                  basePath="/news"
+                />
+
+                <ListCard
+                  title="Top Articles"
+                  badge="Most visited"
+                  icon={BookOpen}
+                  items={apiData?.topBlogs || []}
+                  basePath="/knowledge-centre"
+                />
+
+                <ListCard
+                  title="Latest Articles"
+                  badge="Recently published"
+                  icon={BookOpen}
+                  items={apiData?.latestBlogs || []}
+                  basePath="/knowledge-centre"
+                />
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
       {/* Footer back */}
-      <div className="pb-10">
+      <div className="bg-white pb-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Link
             href="/news"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
+            className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
           >
             ← Back to News Room
           </Link>

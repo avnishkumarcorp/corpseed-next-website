@@ -2,15 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  Calendar,
-  Eye,
-  User2,
-  ChevronRight,
-  Newspaper,
-  BookOpen,
-  Phone,
-} from "lucide-react";
+import { Calendar, Eye, User2, Newspaper, BookOpen, Phone } from "lucide-react";
 import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
@@ -39,9 +31,7 @@ function formatDate(dateStr) {
 
 function Card({ children, className = "" }) {
   return (
-    <div
-      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
-    >
+    <div className={`rounded-2xl  bg-white shadow-sm ${className}`}>
       {children}
     </div>
   );
@@ -296,206 +286,203 @@ export default async function KnowledgeCentreSlugPage({ params }) {
     SECTION 1: HEADING + ENQUIRY SAME HEIGHT
     SECTION 2: IMAGE + TOC, IMAGE KEEPS ITS OWN HEIGHT
 ================================= */}
-      <section className=" bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          {/* ROW 1: HEADING + ENQUIRY IN ONE COMMON SECTION */}
-          <div className="overflow-hidden border-none outline-none">
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
-              {/* LEFT: HEADING CONTENT */}
-              <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-                  {blog.title}
-                </h1>
+      <section className="bg-slate-50">
+        {/* ROW 1: FULL-WIDTH BORDER WRAPPER */}
+        <div className="border-b border-slate-300">
+          <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+            {/* ROW 1: HEADING + ENQUIRY IN ONE COMMON SECTION */}
+            <div className="overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+                {/* LEFT: HEADING CONTENT */}
+                <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
+                  <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                    {blog.title}
+                  </h1>
 
-                {blog.summary ? (
-                  <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
-                    {blog.summary}
-                  </p>
-                ) : null}
-
-                <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
-                  {blog.modifyDate ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(blog.modifyDate)}
-                    </span>
+                  {blog.summary ? (
+                    <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
+                      {blog.summary}
+                    </p>
                   ) : null}
 
-                  {typeof blog.visited === "number" ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      {blog.visited}
-                    </span>
-                  ) : null}
+                  <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
+                    {blog.modifyDate ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(blog.modifyDate)}
+                      </span>
+                    ) : null}
 
-                  {author ? (
-                    <span className="inline-flex items-center gap-2">
-                      <User2 className="h-4 w-4" />
-                      {author?.firstName || "Corpseed"}{" "}
-                      {author?.lastName || "Corpseed"}
-                    </span>
-                  ) : null}
+                    {typeof blog.visited === "number" ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        {blog.visited}
+                      </span>
+                    ) : null}
 
-                  {blog?.categoryTitle ? (
-                    <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                      {blog.categoryTitle}
-                    </span>
-                  ) : null}
+                    {author ? (
+                      <span className="inline-flex items-center gap-2">
+                        <User2 className="h-4 w-4" />
+                        {author?.firstName || "Corpseed"}{" "}
+                        {author?.lastName || "Corpseed"}
+                      </span>
+                    ) : null}
+
+                    {blog?.categoryTitle ? (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        {blog.categoryTitle}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
 
-              {/* RIGHT: ENQUIRY FORM INSIDE SAME CARD */}
-              <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
-                <div className="h-full w-full">
-                  <EnquiryOtpInline page={slug} />
+                {/* RIGHT: ENQUIRY FORM INSIDE SAME CARD */}
+                <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
+                  <div className="h-full w-full">
+                    <EnquiryOtpInline page={slug} />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* ROW 2: IMAGE + TOC */}
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
-            {/* LEFT BELOW: IMAGE */}
-            {blog.image ? (
-              <div className="relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-                <Image
-                  src={blog.image}
-                  alt={safeText(blog.title)}
-                  width={1200}
-                  height={800}
-                  priority
-                  className="block h-full w-full object-cover"
-                  sizes="(max-width: 1024px) 100vw, 760px"
-                />
-
-                <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 px-2 py-1 font-bold text-blue-600 shadow-lg">
-                  <Phone className="h-4 w-4" />
-                  7558640644 - Harshita
-                </div>
-              </div>
-            ) : (
-              <div className="h-full" />
-            )}
-
-            {/* RIGHT BELOW: TOC NEXT TO IMAGE */}
-            <aside className="min-w-0 h-full">
-              <div className="h-full lg:sticky lg:top-24">
-                <NewTocClient items={tocItems} headerOffset={90} />
-              </div>
-            </aside>
           </div>
         </div>
-      </section>
 
-      {/* ===============================
-          ARTICLE CONTENT
-          TOC IS NOW OUTSIDE TOP SECTION
-          AND BESIDE THE ARTICLE TEXT
-      ================================= */}
-      <section className="bg-white py-6 md:py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="relative">
-            {/* Social rail overlay */}
-            <div className="absolute left-0 top-0 hidden -translate-x-16 lg:block">
-              <SocialRail pageUrl={pageUrl} title={blog.title} />
-            </div>
+        {/* ROW 2 + ARTICLE CONTENT
+      LEFT COLUMN  = Image + Article Content
+      RIGHT COLUMN = TOC + Top Articles + Latest Articles + News
+  */}
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+            {/* LEFT COLUMN */}
+            <main className="min-w-0 space-y-8">
+              {/* IMAGE */}
+              {blog.image ? (
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+                  <Image
+                    src={blog.image}
+                    alt={safeText(blog.title)}
+                    width={1200}
+                    height={800}
+                    priority
+                    className="block h-auto w-full object-cover"
+                    sizes="(max-width: 1024px) 100vw, 760px"
+                  />
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
-              {/* Main Content */}
-              <main className="min-w-0 space-y-8">
-                <Card className="overflow-hidden p-5 sm:p-6">
+                  <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 px-2 py-1 font-bold text-blue-600 shadow-lg">
+                    <Phone className="h-4 w-4" />
+                    7558640644 - Harshita
+                  </div>
+                </div>
+              ) : null}
+
+              {/* ARTICLE CONTENT */}
+              <div className="relative">
+                {/* Social rail overlay */}
+                <div className="absolute left-0 top-0 hidden -translate-x-16 lg:block">
+                  <SocialRail pageUrl={pageUrl} title={blog.title} />
+                </div>
+
+                <div className="overflow-hidden p-5 sm:p-6">
                   <div
                     data-article-content
                     className="prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed"
                   >
                     <BlogContentClient html={bodyHtml} />
                   </div>
+                </div>
+              </div>
+
+              {author ? <AuthorCard author={author} /> : null}
+
+              {apiData?.feedback ? <FeedbackBox /> : null}
+
+              {apiData?.relatedBlogs?.length ? (
+                <Card>
+                  <div className="border-b border-slate-200 px-5 py-4">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Related articles
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 p-5 sm:grid-cols-2">
+                    {apiData.relatedBlogs.slice(0, 6).map((x) => (
+                      <Link
+                        key={x.slug}
+                        href={`/knowledge-centre/${x.slug}`}
+                        className="group flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50"
+                      >
+                        <div className="relative h-16 w-20 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                          {x.image ? (
+                            <Image
+                              src={x.image}
+                              alt={safeText(x.title)}
+                              fill
+                              className="object-cover"
+                              sizes="120px"
+                            />
+                          ) : null}
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:underline">
+                            {safeText(x.title)}
+                          </p>
+
+                          <p className="mt-1 text-xs text-slate-500">
+                            {x.postDate ? formatDate(x.postDate) : "Read"}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 </Card>
+              ) : null}
+            </main>
 
-                {author ? <AuthorCard author={author} /> : null}
-
-                {apiData?.feedback ? <FeedbackBox /> : null}
-
-                {apiData?.relatedBlogs?.length ? (
-                  <Card>
-                    <div className="border-b border-slate-200 px-5 py-4">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Related articles
-                      </p>
-                    </div>
-
-                    <div className="grid gap-4 p-5 sm:grid-cols-2">
-                      {apiData.relatedBlogs.slice(0, 6).map((x) => (
-                        <Link
-                          key={x.slug}
-                          href={`/knowledge-centre/${x.slug}`}
-                          className="group flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50"
-                        >
-                          <div className="relative h-16 w-20 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
-                            {x.image ? (
-                              <Image
-                                src={x.image}
-                                alt={safeText(x.title)}
-                                fill
-                                className="object-cover"
-                                sizes="120px"
-                              />
-                            ) : null}
-                          </div>
-
-                          <div className="min-w-0">
-                            <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:underline">
-                              {safeText(x.title)}
-                            </p>
-
-                            <p className="mt-1 text-xs text-slate-500">
-                              {x.postDate ? formatDate(x.postDate) : "Read"}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
+            {/* RIGHT COLUMN: TOC + SIDEBAR CARDS */}
+            <aside className="min-w-0">
+              <div className="space-y-6 lg:sticky lg:top-24">
+                {/* TOC stays side-by-side with image */}
+                {tocItems?.length ? (
+                  <Card className="overflow-hidden">
+                    <NewTocClient items={tocItems} headerOffset={90} />
                   </Card>
                 ) : null}
-              </main>
 
-              {/* Right Sidebar: ToC + article/news cards */}
-              <aside className="min-w-0">
-                <div className="space-y-6 lg:sticky lg:top-24">
-                  <ListCard
-                    title="Top Articles"
-                    badge="Most visited"
-                    icon={BookOpen}
-                    items={apiData?.topBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
+                {/* These move down automatically based on TOC height */}
+                <ListCard
+                  title="Top Articles"
+                  badge="Most visited"
+                  icon={BookOpen}
+                  items={apiData?.topBlogs || []}
+                  basePath="/knowledge-centre"
+                />
 
-                  <ListCard
-                    title="Latest Articles"
-                    badge="Recently published"
-                    icon={BookOpen}
-                    items={apiData?.latestBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
+                <ListCard
+                  title="Latest Articles"
+                  badge="Recently published"
+                  icon={BookOpen}
+                  items={apiData?.latestBlogs || []}
+                  basePath="/knowledge-centre"
+                />
 
-                  <ListCard
-                    title="Top News"
-                    badge="Trending"
-                    icon={Newspaper}
-                    items={apiData?.topNews || []}
-                    basePath="/news"
-                  />
+                <ListCard
+                  title="Top News"
+                  badge="Trending"
+                  icon={Newspaper}
+                  items={apiData?.topNews || []}
+                  basePath="/news"
+                />
 
-                  <ListCard
-                    title="Latest News"
-                    badge="Fresh updates"
-                    icon={Newspaper}
-                    items={apiData?.latestNews || []}
-                    basePath="/news"
-                  />
-                </div>
-              </aside>
-            </div>
+                <ListCard
+                  title="Latest News"
+                  badge="Fresh updates"
+                  icon={Newspaper}
+                  items={apiData?.latestNews || []}
+                  basePath="/news"
+                />
+              </div>
+            </aside>
           </div>
         </div>
       </section>

@@ -9,6 +9,7 @@ import corpseedLogo from "../../../assets/CORPSEED.webp";
 import mgmt1 from "../../../../public/home/sakshi.png";
 import mgmt2 from "../../../../public/home/vipan.png";
 import mgmt3 from "../../../../public/home/vinay.png";
+import viresh from "../../../../public/home/viresh.png";
 
 import mem1 from "../../../../public/home/iso.png";
 import mem2 from "../../../../public/home/cii.png";
@@ -50,6 +51,12 @@ const DATA = {
         image: mgmt2,
         description:
           "Mr. Vipan Singh is the visionary founder and CEO of Corpseed ITES Pvt Ltd. With his unbeatable passion, he advocates automation in compliance management for businesses. Under his astute guidance, Corpseed has become synonymous with excellence and efficiency. His unwavering focus on delivering cutting-edge solutions has empowered countless businesses to stay ahead of the curve.",
+      },
+      {
+        name: "Viresh Oberoi",
+        role: "Director",
+        image: viresh,
+        description: `Mr. Viresh Oberoi is an exceptional entrepreneur and the driving force behind mjunction services limited. As the Founder and CEO, he has revolutionized India's largest eCommerce company and left an indelible mark on Tata Steel's market-facing processes. He helps Corpseed in its overall business growth with his unwavering determination and innovative approach.`,
       },
     ],
   },

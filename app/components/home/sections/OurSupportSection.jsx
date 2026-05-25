@@ -7,9 +7,9 @@ import Image from "next/image";
 // ✅ KEEP YOUR IMPORTS EXACTLY (NO PATH CHANGES)
 import corpseedLogo from "../../../assets/CORPSEED.webp";
 import mgmt1 from "../../../../public/home/sakshi.png";
-import mgmt2 from "../../../../public/home/vipan.png";
-import mgmt3 from "../../../../public/home/vinay.png";
-import viresh from "../../../../public/home/viresh.png";
+import mgmt2 from "../../../../public/home/VipanThakur.jpg";
+import mgmt3 from "../../../../public/home/VinayThakur.jpg";
+import viresh from "../../../../public/home/VireshOberoi.jpg";
 
 import mem1 from "../../../../public/home/iso.png";
 import mem2 from "../../../../public/home/cii.png";

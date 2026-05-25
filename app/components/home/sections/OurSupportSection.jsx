@@ -54,7 +54,7 @@ const DATA = {
       },
       {
         name: "Viresh Oberoi",
-        role: "Director",
+        role: "Co-founder and director",
         image: viresh,
         description: `Mr. Viresh Oberoi is an exceptional entrepreneur and the driving force behind mjunction services limited. As the Founder and CEO, he has revolutionized India's largest eCommerce company and left an indelible mark on Tata Steel's market-facing processes. He helps Corpseed in its overall business growth with his unwavering determination and innovative approach.`,
       },

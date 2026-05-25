@@ -280,13 +280,13 @@ export default async function KnowledgeCentreSlugPage({ params }) {
   const { tocItems, bodyHtml } = splitTocAndBody(blog.description || "", url);
   // console.log("ToC Content:", tocItems);
   return (
-    <div className="bg-white">
+    <div className="">
       {/* ===============================
     TOP SECTION
     SECTION 1: HEADING + ENQUIRY SAME HEIGHT
     SECTION 2: IMAGE + TOC, IMAGE KEEPS ITS OWN HEIGHT
 ================================= */}
-      <section className="bg-slate-50">
+      <section className="bg-white">
         {/* ROW 1: FULL-WIDTH BORDER WRAPPER */}
         <div className="border-b border-slate-300">
           <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
@@ -351,8 +351,8 @@ export default async function KnowledgeCentreSlugPage({ params }) {
       LEFT COLUMN  = Image + Article Content
       RIGHT COLUMN = TOC + Top Articles + Latest Articles + News
   */}
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 ">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
             {/* LEFT COLUMN */}
             <main className="min-w-0 space-y-8">
               {/* IMAGE */}
@@ -376,7 +376,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
               ) : null}
 
               {/* ARTICLE CONTENT */}
-              <div className="relative">
+              <div className="relative ">
                 {/* Social rail overlay */}
                 <div className="absolute left-0 top-0 hidden -translate-x-16 lg:block">
                   <SocialRail pageUrl={pageUrl} title={blog.title} />
@@ -385,7 +385,7 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                 <div className="overflow-hidden p-5 sm:p-6">
                   <div
                     data-article-content
-                    className="prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed"
+                    className=" prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed"
                   >
                     <BlogContentClient html={bodyHtml} />
                   </div>
@@ -438,18 +438,16 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                 </Card>
               ) : null}
             </main>
-
             {/* RIGHT COLUMN: TOC + SIDEBAR CARDS */}
-            <aside className="min-w-0">
-              <div className="space-y-6 lg:sticky lg:top-24">
-                {/* TOC stays side-by-side with image */}
+            <aside className="min-w-0 lg:self-stretch">
+              {/* NORMAL SIDEBAR CONTENT */}
+              <div className="space-y-6">
                 {tocItems?.length ? (
                   <Card className="overflow-hidden">
                     <NewTocClient items={tocItems} headerOffset={90} />
                   </Card>
                 ) : null}
 
-                {/* These move down automatically based on TOC height */}
                 <ListCard
                   title="Top Articles"
                   badge="Most visited"
@@ -473,7 +471,10 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                   items={apiData?.topNews || []}
                   basePath="/news"
                 />
+              </div>
 
+              {/* ONLY LATEST NEWS STICKY */}
+              <div className="mt-6 lg:sticky lg:top-24">
                 <ListCard
                   title="Latest News"
                   badge="Fresh updates"

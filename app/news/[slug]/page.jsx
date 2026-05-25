@@ -263,9 +263,9 @@ export default async function NewsRoomSlugPage({ params }) {
 
   return (
     <div className="bg-white">
-      <section className="bg-slate-50">
+      <section className="bg-white">
         {/* ROW 1: FULL-WIDTH BORDER WRAPPER */}
-        <div className="border-b border-slate-300">
+        <div className="border-b ">
           <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
             <div className="overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
@@ -325,7 +325,7 @@ export default async function NewsRoomSlugPage({ params }) {
             RIGHT COLUMN = TOC + Top News + Latest News + Top Articles + Latest Articles
         */}
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
             {/* LEFT COLUMN */}
             <main className="min-w-0 space-y-8">
               {/* IMAGE */}
@@ -412,9 +412,9 @@ export default async function NewsRoomSlugPage({ params }) {
             </main>
 
             {/* RIGHT COLUMN: TOC + SIDEBAR CARDS */}
-            <aside className="min-w-0">
-              <div className="space-y-6 lg:sticky lg:top-24">
-                {/* TOC stays side-by-side with image */}
+            <aside className="min-w-0 lg:self-stretch">
+              {/* NORMAL SIDEBAR CONTENT */}
+              <div className="space-y-6">
                 {tocItems?.length ? (
                   <Card className="overflow-hidden">
                     <NewTocClient items={tocItems} headerOffset={90} />
@@ -426,14 +426,6 @@ export default async function NewsRoomSlugPage({ params }) {
                   badge="Trending"
                   icon={Newspaper}
                   items={apiData?.topNews || []}
-                  basePath="/news"
-                />
-
-                <ListCard
-                  title="Latest News"
-                  badge="Fresh updates"
-                  icon={Newspaper}
-                  items={apiData?.latestNews || []}
                   basePath="/news"
                 />
 
@@ -451,6 +443,17 @@ export default async function NewsRoomSlugPage({ params }) {
                   icon={BookOpen}
                   items={apiData?.latestBlogs || []}
                   basePath="/knowledge-centre"
+                />
+              </div>
+
+              {/* ONLY LATEST NEWS STICKY */}
+              <div className="mt-6 lg:sticky lg:top-24">
+                <ListCard
+                  title="Latest News"
+                  badge="Fresh updates"
+                  icon={Newspaper}
+                  items={apiData?.latestNews || []}
+                  basePath="/news"
                 />
               </div>
             </aside>

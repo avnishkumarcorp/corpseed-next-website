@@ -64,7 +64,7 @@ export default function CardCarousel({
             id: s?.id || s?.uuid,
             title: s?.title || s?.serviceName || "Untitled Service",
             desc: s?.summary || "Description will be available soon.",
-            href: s?.slug ? `/service/${s.slug}` : "#", // ✅ change if your route is /service/[slug]
+            href: s?.slug ? `/service/${s.slug}` : "#",
           }))
         : [];
 
@@ -186,80 +186,106 @@ function Tabs({ tabs = [], activeKey, onChange }) {
 
 /* ---------------- Carousel ---------------- */
 function ServicesCarousel({ items = [], showDots = true }) {
-  const scrollerRef = useRef(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const trackRef = useRef(null);
+  const groupRef = useRef(null);
+  const jumpRafRef = useRef(null);
 
   const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
 
-  // Track active index while scrolling (drag/trackpad/touch)
   useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-
-    let rafId = null;
-
-    const update = () => {
-      const cards = el.querySelectorAll("[data-card]");
-      if (!cards.length) {
-        setActiveIndex(0);
-        return;
-      }
-
-      const containerLeft = el.getBoundingClientRect().left;
-
-      let bestIdx = 0;
-      let bestDist = Infinity;
-
-      cards.forEach((card, idx) => {
-        const dist = Math.abs(
-          card.getBoundingClientRect().left - containerLeft,
-        );
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestIdx = idx;
-        }
-      });
-
-      setActiveIndex(bestIdx);
-    };
-
-    const onScroll = () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(update);
-    };
-
-    el.addEventListener("scroll", onScroll, { passive: true });
-    update();
-
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      el.removeEventListener("scroll", onScroll);
+      if (jumpRafRef.current) {
+        cancelAnimationFrame(jumpRafRef.current);
+      }
     };
-  }, [safeItems.length]);
+  }, []);
 
-  // Clamp activeIndex if items length changes
-  useEffect(() => {
-    if (activeIndex > safeItems.length - 1) setActiveIndex(0);
-  }, [safeItems.length, activeIndex]);
+  const getAnimationDurationMs = (track) => {
+    const computedStyle = window.getComputedStyle(track);
+    const durationValue = computedStyle.animationDuration || "35s";
 
-  const scrollToIndex = (idx) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll("[data-card]");
-    if (!cards.length) return;
+    if (durationValue.includes("ms")) {
+      return parseFloat(durationValue) || 35000;
+    }
 
-    const next = Math.max(0, Math.min(idx, cards.length - 1));
-    cards[next].scrollIntoView({
-      behavior: "smooth",
-      inline: "start",
-      block: "nearest",
-    });
+    if (durationValue.includes("s")) {
+      return (parseFloat(durationValue) || 35) * 1000;
+    }
+
+    return 35000;
   };
 
-  const handlePrev = () => scrollToIndex(activeIndex - 1);
-  const handleNext = () => scrollToIndex(activeIndex + 1);
+  const easeInOutCubic = (t) => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
 
-  // Empty state
+  const moveCards = (direction) => {
+    const track = trackRef.current;
+    const group = groupRef.current;
+
+    if (!track || !group) return;
+
+    const animations = track.getAnimations?.() || [];
+    const animation = animations[0];
+
+    if (!animation) return;
+
+    if (jumpRafRef.current) {
+      cancelAnimationFrame(jumpRafRef.current);
+    }
+
+    const durationMs = getAnimationDurationMs(track);
+
+    const firstCard = group.querySelector("[data-service-card]");
+    const groupStyle = window.getComputedStyle(group);
+
+    const gap =
+      parseFloat(groupStyle.columnGap || groupStyle.gap || "24") || 24;
+
+    const cardWidth = firstCard?.getBoundingClientRect?.().width || 280;
+    const stepPx = cardWidth + gap;
+
+    const groupWidth = group.scrollWidth || 1;
+
+    const jumpMs = (stepPx / groupWidth) * durationMs;
+
+    const startAnimationTime =
+      typeof animation.currentTime === "number" ? animation.currentTime : 0;
+
+    const distance = direction === "next" ? jumpMs : -jumpMs;
+    const jumpDuration = 550;
+    const startTime = performance.now();
+
+    animation.play();
+
+    const animateJump = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / jumpDuration, 1);
+      const eased = easeInOutCubic(progress);
+
+      /*
+        naturalElapsed keeps the normal infinite animation running.
+        distance * eased adds the arrow movement smoothly.
+      */
+      const naturalElapsed = elapsed;
+
+      let nextTime = startAnimationTime + naturalElapsed + distance * eased;
+
+      nextTime = ((nextTime % durationMs) + durationMs) % durationMs;
+
+      animation.currentTime = nextTime;
+
+      if (progress < 1) {
+        jumpRafRef.current = requestAnimationFrame(animateJump);
+      } else {
+        jumpRafRef.current = null;
+        animation.play();
+      }
+    };
+
+    jumpRafRef.current = requestAnimationFrame(animateJump);
+  };
+
   if (safeItems.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-10 text-center text-sm text-gray-600">
@@ -269,75 +295,71 @@ function ServicesCarousel({ items = [], showDots = true }) {
   }
 
   return (
-    <div className="relative">
-      {/* Left arrow */}
-      <button
-        type="button"
-        onClick={handlePrev}
-        disabled={activeIndex === 0}
-        className={[
-          "absolute -left-10 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-black/5 md:flex cursor-pointer",
-          activeIndex === 0 ? "opacity-40 cursor-pointer" : "hover:shadow-lg",
-        ].join(" ")}
-        aria-label="Previous"
-      >
-        <ChevronLeft className="h-5 w-5 text-gray-700" />
-      </button>
+    <div className="relative w-full overflow-hidden px-2 py-2">
+      {safeItems.length > 1 && (
+        <button
+          type="button"
+          onClick={() => moveCards("prev")}
+          className="
+            absolute left-2 top-1/2 z-20 flex h-11 w-11
+            -translate-y-1/2 items-center justify-center rounded-full
+            bg-white/95 shadow-md ring-1 ring-black/5 cursor-pointer
+            hover:shadow-lg
+          "
+          aria-label="Previous"
+        >
+          <ChevronLeft className="h-5 w-5 text-gray-700" />
+        </button>
+      )}
 
-      {/* Right arrow */}
-      <button
-        type="button"
-        onClick={handleNext}
-        disabled={activeIndex === safeItems.length - 1}
-        className={[
-          "absolute -right-10 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-black/5 md:flex cursor-pointer",
-          activeIndex === safeItems.length - 1
-            ? "opacity-40 cursor-pointer"
-            : "hover:shadow-lg",
-        ].join(" ")}
-        aria-label="Next"
-      >
-        <ChevronRight className="h-5 w-5 text-gray-700" />
-      </button>
+      {safeItems.length > 1 && (
+        <button
+          type="button"
+          onClick={() => moveCards("next")}
+          className="
+            absolute right-2 top-1/2 z-20 flex h-11 w-11
+            -translate-y-1/2 items-center justify-center rounded-full
+            bg-white/95 shadow-md ring-1 ring-black/5 cursor-pointer
+            hover:shadow-lg
+          "
+          aria-label="Next"
+        >
+          <ChevronRight className="h-5 w-5 text-gray-700" />
+        </button>
+      )}
 
-      {/* Scroll container */}
       <div
-        ref={scrollerRef}
-        className={[
-          "no-scrollbar flex gap-6 overflow-x-auto px-2 py-2",
-          "scroll-smooth snap-x snap-mandatory",
-          "touch-pan-x",
-        ].join(" ")}
+        ref={trackRef}
+        className="flex w-max flex-row items-stretch hover:[animation-play-state:paused]"
+        style={{
+          animation: "servicesInfiniteScroll 35s linear infinite",
+          willChange: "transform",
+        }}
       >
-        {safeItems.map((it, idx) => (
-          <ServiceTile
-            key={it?.id ? `serviceTile-${it.id}` : `tile-${idx}`} // ✅ fixed
-            item={it}
-          />
-        ))}
-      </div>
-
-      {/* Dots */}
-      {showDots && safeItems.length > 1 && (
-        <div className="mt-5 flex justify-center gap-2">
-          {safeItems.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => scrollToIndex(i)}
-              className={[
-                "h-2.5 w-2.5 rounded-full cursor-pointer",
-                i === activeIndex ? "bg-blue-600" : "bg-blue-200",
-              ].join(" ")}
-              aria-label={`Go to slide ${i + 1}`}
+        <div
+          ref={groupRef}
+          className="flex flex-row items-stretch gap-6 shrink-0 pr-6"
+        >
+          {safeItems.map((it, idx) => (
+            <ServiceTile
+              key={it?.id ? `serviceTile-${it.id}` : `tile-${idx}`}
+              item={it}
             />
           ))}
         </div>
-      )}
+
+        <div className="flex flex-row items-stretch gap-6 shrink-0 pr-6">
+          {safeItems.map((it, idx) => (
+            <ServiceTile
+              key={it?.id ? `serviceTile-dup-${it.id}` : `tile-dup-${idx}`}
+              item={it}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
-
 /* ---------------- Card ---------------- */
 function ServiceTile({ item }) {
   const title = item?.title || "Untitled Service";
@@ -346,27 +368,25 @@ function ServiceTile({ item }) {
 
   return (
     <div
-      data-card
+      data-service-card
       className={[
-        "snap-start",
-        "min-w-[85%] max-w-[85%] sm:min-w-[280px] sm:max-w-[280px]",
+        "w-[85vw] min-w-[85vw] max-w-[85vw]",
+        "sm:w-[280px] sm:min-w-[280px] sm:max-w-[280px]",
+        "shrink-0",
         "rounded-2xl bg-white p-6",
         "shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
         "flex flex-col",
         "min-h-[260px]",
       ].join(" ")}
     >
-      {/* Title */}
       <h5 className="font-medium text-lg leading-snug text-[#212529] line-clamp-2">
         {title}
       </h5>
 
-      {/* Description area (fixed space) */}
       <p className="mt-2 text-sm leading-6 text-[#212529] line-clamp-6">
         {desc}
       </p>
 
-      {/* ✅ Always bottom */}
       <div className="mt-auto pt-6 flex justify-end">
         <Link
           href={href}

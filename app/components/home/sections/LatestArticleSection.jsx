@@ -128,7 +128,9 @@ export default function LatestArticlesSection({
           <span className="rounded-md bg-blue-600 px-3 py-1.5 text-[14px] font-semibold text-white">
             Latest
           </span>
-          <h2 className="text-[26px] font-semibold text-slate-900 !m-0">Articles</h2>
+          <h2 className="text-[26px] font-semibold text-slate-900 !m-0">
+            Articles
+          </h2>
         </div>
 
         {/* Carousel */}
@@ -193,11 +195,9 @@ export default function LatestArticlesSection({
             {/* ✅ Measured viewport (NO padding, correct width) */}
             <div ref={wrapRef} className="overflow-hidden">
               <div
-                className="flex"
+                className="flex w-max flex-row items-stretch hover:[animation-play-state:paused]"
                 style={{
-                  gap: `${GAP}px`,
-                  transform: `translateX(-${translateX}px)`,
-                  transition: "transform 700ms ease-in-out",
+                  animation: "servicesInfiniteScroll 15s linear infinite",
                   willChange: "transform",
                 }}
               >
@@ -205,8 +205,27 @@ export default function LatestArticlesSection({
                   (a, i) => (
                     <div
                       key={a?.slug || i}
-                      style={{ width: cardW || "100%" }}
-                      className="shrink-0"
+                      className="flex flex-row items-stretch gap-6 shrink-0 pr-6"
+                      style={{
+                        width: cardW || "100%",
+                      }}
+                    >
+                      {loading ? (
+                        <ArticleSkeleton imgH={IMG_H} />
+                      ) : (
+                        <ArticleCard article={a} />
+                      )}
+                    </div>
+                  ),
+                )}
+                {(loading ? Array.from({ length: perView * 2 }) : items).map(
+                  (a, i) => (
+                    <div
+                      key={a?.slug || i}
+                      className="flex flex-row items-stretch gap-6 shrink-0 pr-6"
+                      style={{
+                        width: cardW || "100%",
+                      }}
                     >
                       {loading ? (
                         <ArticleSkeleton imgH={IMG_H} />

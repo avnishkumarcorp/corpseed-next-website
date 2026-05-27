@@ -243,7 +243,7 @@ export default function LatestArticlesSection({
                 ref={trackRef}
                 className="flex w-max flex-row items-stretch"
                 style={{
-                  animation: "servicesInfiniteScroll 15s linear infinite",
+                  animation: "latestArticleInfiniteScroll 15s linear infinite",
                   animationPlayState: isHovered ? "paused" : "running",
                   willChange: "transform",
                 }}

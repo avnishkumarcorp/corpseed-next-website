@@ -116,8 +116,8 @@ export default function CardCarousel({
   }, [activeTab, itemsByTab]);
 
   return (
-    <section className="relative bg-[#EEF6FF] py-8">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-x-hidden bg-[#EEF6FF] py-8">
+      <div className="mx-auto w-[calc(100%-32px)]">
         <h2 className="text-center text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
           {title}
         </h2>
@@ -138,7 +138,7 @@ export default function CardCarousel({
         <div className="mt-10 flex justify-center">
           <Link
             href={ctaHref}
-            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 cursor-pointer"
+            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
           >
             {ctaLabel}
           </Link>
@@ -166,7 +166,7 @@ function Tabs({ tabs = [], activeKey, onChange }) {
               type="button"
               onClick={() => onChange?.(key)}
               className={[
-                "relative whitespace-nowrap text-lg font-medium cursor-pointer",
+                "relative cursor-pointer whitespace-nowrap text-lg font-medium",
                 isActive
                   ? "text-blue-600"
                   : "text-gray-800 hover:text-blue-600",
@@ -189,8 +189,8 @@ function ServicesCarousel({ items = [], showDots = true }) {
   const trackRef = useRef(null);
   const groupRef = useRef(null);
   const jumpRafRef = useRef(null);
-
-  const [isHovered, setIsHovered] = useState(false);
+  const hoverPausedRef = useRef(false);
+  const isJumpingRef = useRef(false);
 
   const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
 
@@ -202,23 +202,50 @@ function ServicesCarousel({ items = [], showDots = true }) {
     };
   }, []);
 
+  const getTrackAnimation = () => {
+    const track = trackRef.current;
+    if (!track) return null;
+
+    const animations = track.getAnimations?.() || [];
+    return animations[0] || null;
+  };
+
+  const pauseTrack = () => {
+    hoverPausedRef.current = true;
+
+    const animation = getTrackAnimation();
+    if (!animation) return;
+
+    animation.pause();
+  };
+
+  const resumeTrack = () => {
+    hoverPausedRef.current = false;
+
+    const animation = getTrackAnimation();
+    if (!animation || isJumpingRef.current) return;
+
+    animation.play();
+  };
+
   const getAnimationDurationMs = (track) => {
     const computedStyle = window.getComputedStyle(track);
-    const durationValue = computedStyle.animationDuration || "35s";
+    const durationValue = computedStyle.animationDuration || "30s";
 
     if (durationValue.includes("ms")) {
-      return parseFloat(durationValue) || 35000;
+      return parseFloat(durationValue) || 30000;
     }
 
     if (durationValue.includes("s")) {
-      return (parseFloat(durationValue) || 35) * 1000;
+      return (parseFloat(durationValue) || 30) * 1000;
     }
 
-    return 35000;
+    return 30000;
   };
 
-  const easeInOutCubic = (t) => {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const smootherStep = (t) => {
+    // Very smooth acceleration/deceleration
+    return t * t * t * (t * (t * 6 - 15) + 10);
   };
 
   const moveCards = (direction) => {
@@ -227,14 +254,17 @@ function ServicesCarousel({ items = [], showDots = true }) {
 
     if (!track || !group) return;
 
-    const animations = track.getAnimations?.() || [];
-    const animation = animations[0];
-
+    const animation = getTrackAnimation();
     if (!animation) return;
 
     if (jumpRafRef.current) {
       cancelAnimationFrame(jumpRafRef.current);
     }
+
+    isJumpingRef.current = true;
+
+    // Freeze base animation while we manually move its timeline
+    animation.pause();
 
     const durationMs = getAnimationDurationMs(track);
 
@@ -247,31 +277,24 @@ function ServicesCarousel({ items = [], showDots = true }) {
     const cardWidth = firstCard?.getBoundingClientRect?.().width || 280;
     const stepPx = cardWidth + gap;
 
-    const groupWidth = group.scrollWidth || 1;
-
-    const jumpMs = (stepPx / groupWidth) * durationMs;
+    const cycleWidth = group.scrollWidth || track.scrollWidth / 2 || 1;
+    const jumpMs = (stepPx / cycleWidth) * durationMs;
 
     const startAnimationTime =
       typeof animation.currentTime === "number" ? animation.currentTime : 0;
 
     const distance = direction === "next" ? jumpMs : -jumpMs;
-    const jumpDuration = 550;
-    const startTime = performance.now();
 
-    animation.play();
+    // Higher value = smoother / slower button slide
+    const jumpDuration = 950;
+    const startTime = performance.now();
 
     const animateJump = (now) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / jumpDuration, 1);
-      const eased = easeInOutCubic(progress);
+      const eased = smootherStep(progress);
 
-      /*
-        naturalElapsed keeps the normal infinite animation running.
-        distance * eased adds the arrow movement smoothly.
-      */
-      const naturalElapsed = elapsed;
-
-      let nextTime = startAnimationTime + naturalElapsed + distance * eased;
+      let nextTime = startAnimationTime + distance * eased;
 
       nextTime = ((nextTime % durationMs) + durationMs) % durationMs;
 
@@ -281,7 +304,13 @@ function ServicesCarousel({ items = [], showDots = true }) {
         jumpRafRef.current = requestAnimationFrame(animateJump);
       } else {
         jumpRafRef.current = null;
-        animation.play();
+        isJumpingRef.current = false;
+
+        if (hoverPausedRef.current) {
+          animation.pause();
+        } else {
+          animation.play();
+        }
       }
     };
 
@@ -299,8 +328,17 @@ function ServicesCarousel({ items = [], showDots = true }) {
   return (
     <div
       className="relative w-full overflow-hidden px-0 py-2"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onPointerEnter={pauseTrack}
+      onPointerMove={() => {
+        if (!hoverPausedRef.current) pauseTrack();
+      }}
+      onPointerLeave={resumeTrack}
+      onFocusCapture={pauseTrack}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          resumeTrack();
+        }
+      }}
     >
       {safeItems.length > 1 && (
         <button
@@ -308,8 +346,8 @@ function ServicesCarousel({ items = [], showDots = true }) {
           onClick={() => moveCards("prev")}
           className="
             absolute left-2 top-1/2 z-20 flex h-11 w-11
-            -translate-y-1/2 items-center justify-center rounded-full
-            bg-white/95 shadow-md ring-1 ring-black/5 cursor-pointer
+            -translate-y-1/2 cursor-pointer items-center justify-center rounded-full
+            bg-white/95 shadow-md ring-1 ring-black/5
             hover:shadow-lg
           "
           aria-label="Previous"
@@ -324,8 +362,8 @@ function ServicesCarousel({ items = [], showDots = true }) {
           onClick={() => moveCards("next")}
           className="
             absolute right-2 top-1/2 z-20 flex h-11 w-11
-            -translate-y-1/2 items-center justify-center rounded-full
-            bg-white/95 shadow-md ring-1 ring-black/5 cursor-pointer
+            -translate-y-1/2 cursor-pointer items-center justify-center rounded-full
+            bg-white/95 shadow-md ring-1 ring-black/5
             hover:shadow-lg
           "
           aria-label="Next"
@@ -336,16 +374,18 @@ function ServicesCarousel({ items = [], showDots = true }) {
 
       <div
         ref={trackRef}
-        className="flex w-full flex-row items-stretch"
+        className="flex w-max flex-row items-stretch"
         style={{
-          animation: "servicesInfiniteScroll 10s linear infinite",
-          animationPlayState: isHovered ? "paused" : "running",
+          animationName: "servicesInfiniteScroll",
+          animationDuration: "30s",
+          animationTimingFunction: "linear",
+          animationIterationCount: "infinite",
           willChange: "transform",
         }}
       >
         <div
           ref={groupRef}
-          className="flex flex-row items-stretch gap-6 shrink-0 pr-6 "
+          className="flex shrink-0 flex-row items-stretch gap-6 pr-6"
         >
           {safeItems.map((it, idx) => (
             <ServiceTile
@@ -355,7 +395,7 @@ function ServicesCarousel({ items = [], showDots = true }) {
           ))}
         </div>
 
-        <div className="flex flex-row items-stretch gap-6 shrink-0 pr-6">
+        <div className="flex shrink-0 flex-row items-stretch gap-6 pr-6">
           {safeItems.map((it, idx) => (
             <ServiceTile
               key={it?.id ? `serviceTile-dup-${it.id}` : `tile-dup-${idx}`}
@@ -367,6 +407,7 @@ function ServicesCarousel({ items = [], showDots = true }) {
     </div>
   );
 }
+
 /* ---------------- Card ---------------- */
 function ServiceTile({ item }) {
   const title = item?.title || "Untitled Service";
@@ -394,10 +435,10 @@ function ServiceTile({ item }) {
         {desc}
       </p>
 
-      <div className="mt-auto pt-6 flex justify-end">
+      <div className="mt-auto flex justify-end pt-6">
         <Link
           href={href}
-          className="text-sm font-medium text-blue-600 hover:text-blue-700 cursor-pointer"
+          className="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-700"
         >
           Explore more &nbsp;›
         </Link>

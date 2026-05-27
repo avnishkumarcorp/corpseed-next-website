@@ -227,7 +227,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                   const href = `/knowledge-centre/${b.slug}`;
                   return (
                     <Card key={b.id ?? b.slug} className="overflow-hidden">
-                      <Link href={href} className="block cursor-pointer">
+                      <Link href={href} prefetch={false} className="block cursor-pointer">
                         <div className="relative aspect-[16/9] w-full overflow-hidden bg-white">
                           <Image
                             src={b.image}
@@ -242,6 +242,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                       <div className="p-5">
                         <Link
                           href={href}
+                           prefetch={false}
                           className="line-clamp-2 text-base font-semibold text-slate-900 hover:underline cursor-pointer"
                         >
                           {b.title}
@@ -275,6 +276,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                           </span>
                           <Link
                             href={href}
+                            prefetch={false}
                             className="text-sm font-semibold text-slate-900 hover:text-blue-700 cursor-pointer"
                           >
                             Read →
@@ -376,6 +378,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                       <Link
                         key={x.id ?? x.slug}
                         href={href}
+                        prefetch={false}
                         className="flex gap-4 px-5 py-4 hover:bg-slate-50 cursor-pointer"
                       >
                         <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100">

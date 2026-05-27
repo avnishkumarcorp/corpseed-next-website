@@ -1,7 +1,7 @@
 // app/components/LatestArticlesSection.jsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import corpseedLogo from "../../../assets/CORPSEED.webp";
@@ -18,10 +18,6 @@ function formatDate(d) {
   return s || "";
 }
 
-function clampIndex(v, min, max) {
-  return Math.max(min, Math.min(max, v));
-}
-
 function getPerViewByWidth(w) {
   if (w >= 1024) return 3; // desktop
   if (w >= 768) return 2; // tablet
@@ -32,28 +28,32 @@ export default function LatestArticlesSection({
   data = [],
   autoplayMs = 3500,
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   const items = Array.isArray(data) ? data : [];
 
   const wrapRef = React.useRef(null);
+  const trackRef = React.useRef(null);
+  const jumpRafRef = React.useRef(null);
 
-  const GAP = 24; // gap-6 => 24px (matches Tailwind)
+  const GAP = 24; // gap-6 / pr-6 => 24px
   const IMG_H = 160;
 
   const [perView, setPerView] = React.useState(3);
   const [cardW, setCardW] = React.useState(0);
-  const [index, setIndex] = React.useState(0);
-  const [paused, setPaused] = React.useState(false);
 
-  // Skeleton until parent sends data (optional)
+  // Skeleton until parent sends data
   const [loading, setLoading] = React.useState(true);
+
   React.useEffect(() => {
     if (items.length) {
       setLoading(false);
-      setIndex(0);
       return;
     }
+
     setLoading(true);
     const t = setTimeout(() => setLoading(false), 1200);
+
     return () => clearTimeout(t);
   }, [items.length]);
 
@@ -82,47 +82,102 @@ export default function LatestArticlesSection({
     ro.observe(el);
 
     window.addEventListener("resize", recalc);
+
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", recalc);
     };
   }, []);
 
-  // Keep index safe when items/perView change
   React.useEffect(() => {
-    const maxIndex = Math.max(0, items.length - perView);
-    setIndex((p) => clampIndex(p, 0, maxIndex));
-  }, [items.length, perView]);
+    return () => {
+      if (jumpRafRef.current) {
+        cancelAnimationFrame(jumpRafRef.current);
+      }
+    };
+  }, []);
 
-  const maxIndex = Math.max(0, items.length - perView);
-  const canPrev = index > 0;
-  const canNext = index < maxIndex;
+  const getAnimationDurationMs = (track) => {
+    const computedStyle = window.getComputedStyle(track);
+    const durationValue = computedStyle.animationDuration || "15s";
 
-  const prev = () => setIndex((p) => clampIndex(p - 1, 0, maxIndex));
-  const next = React.useCallback(() => {
-    if (maxIndex <= 0) return;
-    setIndex((p) => (p >= maxIndex ? 0 : p + 1));
-  }, [maxIndex]);
+    if (durationValue.includes("ms")) {
+      return parseFloat(durationValue) || 15000;
+    }
 
-  // ✅ Autoplay
-  React.useEffect(() => {
-    if (paused) return;
-    if (loading) return;
-    if (items.length <= perView) return;
+    if (durationValue.includes("s")) {
+      return (parseFloat(durationValue) || 15) * 1000;
+    }
 
-    const id = setInterval(() => next(), autoplayMs);
-    return () => clearInterval(id);
-  }, [paused, loading, items.length, perView, next, autoplayMs]);
+    return 15000;
+  };
 
-  // px-based translate (no cutting)
-  const step = cardW + GAP; // one card + one gap
-  const translateX = index * step;
+  const easeInOutCubic = (t) => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
 
-  const dotsCount = Math.max(1, maxIndex + 1);
+  const moveCards = (direction) => {
+    const track = trackRef.current;
+
+    if (!track || loading || items.length <= perView || !cardW) return;
+
+    const animations = track.getAnimations?.() || [];
+    const animation = animations[0];
+
+    if (!animation) return;
+
+    if (jumpRafRef.current) {
+      cancelAnimationFrame(jumpRafRef.current);
+    }
+
+    const durationMs = getAnimationDurationMs(track);
+
+    /*
+      Track has duplicate items.
+      The keyframe moves from 0 to -50%.
+      So one complete visible cycle is half of track width.
+    */
+    const cycleWidth = Math.max(track.scrollWidth / 2, 1);
+    const stepPx = cardW + GAP;
+    const jumpMs = (stepPx / cycleWidth) * durationMs;
+
+    const startAnimationTime =
+      typeof animation.currentTime === "number" ? animation.currentTime : 0;
+
+    const distance = direction === "next" ? jumpMs : -jumpMs;
+    const jumpDuration = 550;
+    const startTime = performance.now();
+
+    const animateJump = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / jumpDuration, 1);
+      const eased = easeInOutCubic(progress);
+
+      let nextTime = startAnimationTime + distance * eased;
+
+      nextTime = ((nextTime % durationMs) + durationMs) % durationMs;
+
+      animation.currentTime = nextTime;
+
+      if (progress < 1) {
+        jumpRafRef.current = requestAnimationFrame(animateJump);
+      } else {
+        jumpRafRef.current = null;
+      }
+    };
+
+    jumpRafRef.current = requestAnimationFrame(animateJump);
+  };
+
+  const canSlide = !loading && items.length > perView;
 
   return (
-    <section className="w-full bg-[#eef5ff]">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <section
+      className="w-full overflow-x-hidden bg-[#eef5ff]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="mx-auto w-[calc(100%-32px)] py-6">
         {/* Header */}
         <div className="flex items-center gap-2">
           <span className="rounded-md bg-blue-600 px-3 py-1.5 text-[14px] font-semibold text-white">
@@ -134,22 +189,16 @@ export default function LatestArticlesSection({
         </div>
 
         {/* Carousel */}
-        <div
-          className="relative mt-4"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-        >
-          {/* Arrows (outside the cards area) */}
+        <div className="relative mt-4">
+          {/* Left Arrow */}
           <button
             type="button"
-            onClick={prev}
-            disabled={loading || !canPrev}
+            onClick={() => moveCards("prev")}
+            disabled={!canSlide}
             className={[
-              "hidden md:flex absolute left-0 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2",
+              "hidden md:flex absolute left-0 top-1/2 z-30 -translate-y-1/2",
               "h-11 w-11 items-center justify-center rounded-full text-[#212529] bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              loading || !canPrev
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:bg-slate-50",
+              !canSlide ? "opacity-40 cursor-not-allowed" : "hover:bg-slate-50",
             ].join(" ")}
             aria-label="Previous"
           >
@@ -164,17 +213,15 @@ export default function LatestArticlesSection({
             </svg>
           </button>
 
+          {/* Right Arrow */}
           <button
             type="button"
-            onClick={next}
-            disabled={loading || !canNext}
-            style={{ right: "-16px" }}
+            onClick={() => moveCards("next")}
+            disabled={!canSlide}
             className={[
-              "hidden md:flex absolute right-0 top-1/2 z-30 translate-x-1/2 -translate-y-1/2",
+              "hidden md:flex absolute right-0 top-1/2 z-30 -translate-y-1/2",
               "h-11 w-11 items-center justify-center rounded-full text-[#212529] bg-white shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              loading || !canNext
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:bg-slate-50",
+              !canSlide ? "opacity-40 cursor-not-allowed" : "hover:bg-slate-50",
             ].join(" ")}
             aria-label="Next"
           >
@@ -190,22 +237,22 @@ export default function LatestArticlesSection({
           </button>
 
           {/* Measured viewport */}
-          {/* Padding wrapper (NOT measured) */}
-          <div className="md:px-10">
-            {/* ✅ Measured viewport (NO padding, correct width) */}
+          <div className="w-full overflow-hidden">
             <div ref={wrapRef} className="overflow-hidden">
               <div
-                className="flex w-max flex-row items-stretch hover:[animation-play-state:paused]"
+                ref={trackRef}
+                className="flex w-max flex-row items-stretch"
                 style={{
                   animation: "servicesInfiniteScroll 15s linear infinite",
+                  animationPlayState: isHovered ? "paused" : "running",
                   willChange: "transform",
                 }}
               >
                 {(loading ? Array.from({ length: perView * 2 }) : items).map(
                   (a, i) => (
                     <div
-                      key={a?.slug || i}
-                      className="flex flex-row items-stretch gap-6 shrink-0 pr-6"
+                      key={a?.slug ? `article-${a.slug}` : `article-${i}`}
+                      className="shrink-0 pr-6"
                       style={{
                         width: cardW || "100%",
                       }}
@@ -218,11 +265,14 @@ export default function LatestArticlesSection({
                     </div>
                   ),
                 )}
+
                 {(loading ? Array.from({ length: perView * 2 }) : items).map(
                   (a, i) => (
                     <div
-                      key={a?.slug || i}
-                      className="flex flex-row items-stretch gap-6 shrink-0 pr-6"
+                      key={
+                        a?.slug ? `article-dup-${a.slug}` : `article-dup-${i}`
+                      }
+                      className="shrink-0 pr-6"
                       style={{
                         width: cardW || "100%",
                       }}
@@ -238,25 +288,6 @@ export default function LatestArticlesSection({
               </div>
             </div>
           </div>
-
-          {/* Dots */}
-          {/* Dots (hide on mobile) */}
-          {/* {!loading && items.length > perView ? (
-            <div className="mt-6 hidden md:flex items-center justify-center gap-2">
-              {Array.from({ length: dotsCount }).map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setIndex(i)}
-                  className={[
-                    "h-2.5 rounded-full transition cursor-pointer",
-                    i === index ? "w-8 bg-blue-600" : "w-2.5 bg-slate-300",
-                  ].join(" ")}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-          ) : null} */}
 
           {/* Empty */}
           {!loading && !items.length ? (
@@ -280,7 +311,7 @@ function ArticleCard({ article }) {
       className="block h-full overflow-hidden rounded-2xl bg-white shadow-[0_18px_45px_-35px_rgba(2,6,23,0.35)] ring-1 ring-slate-200 cursor-pointer"
     >
       <div className="flex h-full flex-col">
-        {/* ✅ Equal image area for all cards */}
+        {/* Equal image area for all cards */}
         <div className="relative w-full overflow-hidden bg-white aspect-[16/9]">
           {imgUrl ? (
             <Image
@@ -310,8 +341,6 @@ function ArticleCard({ article }) {
           <h3 className="mt-4 text-[15px] font-semibold leading-6 text-slate-900 line-clamp-2">
             {article?.title}
           </h3>
-
-          {/* <div className="mt-auto" /> */}
         </div>
       </div>
     </Link>

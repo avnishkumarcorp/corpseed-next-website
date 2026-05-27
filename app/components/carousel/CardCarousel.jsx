@@ -117,7 +117,7 @@ export default function CardCarousel({
 
   return (
     <section className="relative bg-[#EEF6FF] py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <h2 className="text-center text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
           {title}
         </h2>
@@ -189,6 +189,8 @@ function ServicesCarousel({ items = [], showDots = true }) {
   const trackRef = useRef(null);
   const groupRef = useRef(null);
   const jumpRafRef = useRef(null);
+
+  const [isHovered, setIsHovered] = useState(false);
 
   const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
 
@@ -295,7 +297,11 @@ function ServicesCarousel({ items = [], showDots = true }) {
   }
 
   return (
-    <div className="relative w-full overflow-hidden px-2 py-2">
+    <div
+      className="relative w-full overflow-hidden px-0 py-2"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {safeItems.length > 1 && (
         <button
           type="button"
@@ -330,15 +336,16 @@ function ServicesCarousel({ items = [], showDots = true }) {
 
       <div
         ref={trackRef}
-        className="flex w-max flex-row items-stretch hover:[animation-play-state:paused]"
+        className="flex w-full flex-row items-stretch"
         style={{
-          animation: "servicesInfiniteScroll 35s linear infinite",
+          animation: "servicesInfiniteScroll 10s linear infinite",
+          animationPlayState: isHovered ? "paused" : "running",
           willChange: "transform",
         }}
       >
         <div
           ref={groupRef}
-          className="flex flex-row items-stretch gap-6 shrink-0 pr-6"
+          className="flex flex-row items-stretch gap-6 shrink-0 pr-6 "
         >
           {safeItems.map((it, idx) => (
             <ServiceTile

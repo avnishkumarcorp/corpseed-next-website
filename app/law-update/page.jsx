@@ -224,12 +224,35 @@ function FilterBar({ searchParams, deptOptions = [] }) {
   );
 }
 
+function getVisiblePages(current, total, maxVisible = 5) {
+  if (total <= maxVisible) {
+    return Array.from({ length: total }, (_, index) => index + 1);
+  }
+
+  const half = Math.floor(maxVisible / 2);
+
+  let start = current - half;
+  let end = current + half;
+
+  if (start < 1) {
+    start = 1;
+    end = maxVisible;
+  }
+
+  if (end > total) {
+    end = total;
+    start = total - maxVisible + 1;
+  }
+
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+}
+
 function Pagination({ pageData, searchParams }) {
   const current = Number(pageData?.currentPage || 1);
   const total = Number(pageData?.totalPages || 1);
-  const nums = Array.isArray(pageData?.pageNumbers) ? pageData.pageNumbers : [];
 
   if (total <= 1) return null;
+  const visiblePages = getVisiblePages(current, total, 5);
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
@@ -257,7 +280,7 @@ function Pagination({ pageData, searchParams }) {
         Previous
       </Link>
 
-      {nums.map((pageNumber) => (
+      {visiblePages.map((pageNumber) => (
         <Link
           key={pageNumber}
           href={buildHref(searchParams, { page: pageNumber })}

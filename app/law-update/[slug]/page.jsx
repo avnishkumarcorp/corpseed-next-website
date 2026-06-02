@@ -17,10 +17,11 @@ function splitSummaryAndIframe(html = "") {
 }
 
 export async function generateMetadata({ params }) {
-  const { slug } =await params;
+  const { slug } = await params;
   const data = await getLawUpdateBySlug(slug);
 
-  const title = data?.title || data?.lawUpdate?.title || "Law Update | Corpseed";
+  const title =
+    data?.title || data?.lawUpdate?.title || "Law Update | Corpseed";
   const description =
     data?.metaDescription ||
     "Latest law update details, compliance summary and reference document.";
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function LawUpdateDetailPage({ params }) {
-  const { slug } =await params;
+  const { slug } = await params;
 
   const data = await getLawUpdateBySlug(slug);
 
@@ -65,7 +66,9 @@ export default async function LawUpdateDetailPage({ params }) {
   // your response shape: { title, metaDescription, metaKeyword, lawUpdate: {...} }
   const item = data?.lawUpdate || data;
 
-  const { summaryHtml, iframeHtml } = splitSummaryAndIframe(item?.summary || "");
+  const { summaryHtml, iframeHtml } = splitSummaryAndIframe(
+    item?.summary || "",
+  );
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -173,8 +176,8 @@ export default async function LawUpdateDetailPage({ params }) {
                   Quick note
                 </p>
                 <p className="mt-1 text-sm text-slate-700">
-                  Below is the official summary and the reference document preview.
-                  Use “Open PDF” for full screen view.
+                  Below is the official summary and the reference document
+                  preview. Use “Open PDF” for full screen view.
                 </p>
               </div>
             </div>
@@ -187,9 +190,46 @@ export default async function LawUpdateDetailPage({ params }) {
                 </h2>
               </div>
 
-              <div className="mt-4">
+              <div
+                className=" mt-4 text-sm leading-7 text-slate-700
+
+      [&_p]:mb-4
+
+      [&_ul]:my-4
+      [&_ul]:list-disc
+      [&_ul]:pl-6
+
+      [&_ol]:my-4
+      [&_ol]:list-decimal
+      [&_ol]:pl-6
+
+      [&_li]:mb-2
+      [&_li]:pl-1
+
+      [&_strong]:font-semibold
+      [&_strong]:text-slate-900
+
+      [&_a]:font-semibold
+      [&_a]:text-blue-600
+      [&_a]:underline
+      [&_a]:underline-offset-2
+
+      [&_h2]:mb-3
+      [&_h2]:mt-6
+      [&_h2]:text-xl
+      [&_h2]:font-semibold
+      [&_h2]:text-slate-900
+
+      [&_h3]:mb-2
+      [&_h3]:mt-5
+      [&_h3]:text-lg
+      [&_h3]:font-semibold
+      [&_h3]:text-slate-900"
+              >
                 {/* ✅ sanitized HTML but WITHOUT iframe */}
-                <SafeHtml html={summaryHtml || "<p>No summary available.</p>"} />
+                <SafeHtml
+                  html={summaryHtml || "<p>No summary available.</p>"}
+                />
               </div>
             </div>
           </div>
@@ -256,9 +296,7 @@ export default async function LawUpdateDetailPage({ params }) {
 
               {/* Extra info */}
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm font-semibold text-slate-900">
-                  Related
-                </p>
+                <p className="text-sm font-semibold text-slate-900">Related</p>
                 <p className="mt-1 text-sm text-slate-600">
                   Explore more updates from the same department.
                 </p>
@@ -272,7 +310,6 @@ export default async function LawUpdateDetailPage({ params }) {
                   </Link>
                 </div>
               </div>
-
             </div>
           </div>
         </div>

@@ -1,8 +1,9 @@
-// app/law-updates/page.jsx
+// app/law-update/page.jsx
 import Link from "next/link";
 import { getLawUpdatesList, stripHtml } from "../lib/lawUpdates";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function getParamValue(value, fallback = "") {
   if (Array.isArray(value)) return value[0] || fallback;
@@ -14,19 +15,19 @@ function normalizeSearchParams(searchParams) {
 
   if (!searchParams) return params;
 
-  for (const [k, v] of Object.entries(searchParams)) {
-    if (v === undefined || v === null || v === "") continue;
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") return;
 
-    // Next can give array values
-    if (Array.isArray(v)) {
-      v?.forEach((x) => {
-        if (x !== undefined && x !== null && x !== "")
-          params.append(k, String(x));
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item !== undefined && item !== null && item !== "") {
+          params.append(key, String(item));
+        }
       });
     } else {
-      params.set(k, String(v));
+      params.set(key, String(value));
     }
-  }
+  });
 
   return params;
 }
@@ -34,88 +35,181 @@ function normalizeSearchParams(searchParams) {
 function buildHref(searchParams, nextParams = {}) {
   const params = normalizeSearchParams(searchParams);
 
-  Object?.entries(nextParams)?.forEach(([k, v]) => {
-    if (v === "" || v === null || v === undefined) params?.delete(k);
-    else params.set(k, String(v));
+  Object.entries(nextParams).forEach(([key, value]) => {
+    if (value === "" || value === null || value === undefined) {
+      params.delete(key);
+    } else {
+      params.set(key, String(value));
+    }
   });
 
-  return `?${params.toString()}`;
+  const query = params.toString();
+  return query ? `/law-update?${query}` : "/law-update";
+}
+
+function parseDate(value) {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date;
+}
+
+function isWithinDateRange(itemDateValue, from, to) {
+  if (!from && !to) return true;
+
+  const itemDate = parseDate(itemDateValue);
+  if (!itemDate) return false;
+
+  const fromDate = from ? parseDate(from) : null;
+  const toDate = to ? parseDate(to) : null;
+
+  if (fromDate) {
+    fromDate.setHours(0, 0, 0, 0);
+  }
+
+  if (toDate) {
+    toDate.setHours(23, 59, 59, 999);
+  }
+
+  if (fromDate && itemDate < fromDate) return false;
+  if (toDate && itemDate > toDate) return false;
+
+  return true;
+}
+
+function applyFilters(list = [], { from = "", to = "", dept = "" }) {
+  return list.filter((item) => {
+    const matchesDept = dept
+      ? String(item?.department || "")
+          .trim()
+          .toLowerCase() === String(dept).trim().toLowerCase()
+      : true;
+
+    const matchesDate = isWithinDateRange(item?.publishDate, from, to);
+
+    return matchesDept && matchesDate;
+  });
+}
+
+function paginateList(list = [], page = 1, size = 6) {
+  const safePage = Math.max(Number(page) || 1, 1);
+  const safeSize = Math.max(Number(size) || 6, 1);
+
+  const totalItems = list.length;
+  const totalPages = Math.max(Math.ceil(totalItems / safeSize), 1);
+
+  const currentPage = Math.min(safePage, totalPages);
+  const startIndex = (currentPage - 1) * safeSize;
+  const endIndex = startIndex + safeSize;
+
+  const paginatedList = list.slice(startIndex, endIndex);
+
+  const pageNumbers = Array.from(
+    { length: totalPages },
+    (_, index) => index + 1,
+  );
+
+  return {
+    lawUpdates: paginatedList,
+    currentPage,
+    totalPages,
+    totalItems,
+    pageNumbers,
+  };
 }
 
 function FilterBar({ searchParams, deptOptions = [] }) {
-  // Server component version (no client JS): simple & fast
-
   const from = getParamValue(searchParams?.from, "");
   const to = getParamValue(searchParams?.to, "");
   const dept = getParamValue(searchParams?.dept, "");
   const size = getParamValue(searchParams?.size, "6");
 
+  const safeDeptOptions = Array.from(
+    new Set([...deptOptions, dept].filter(Boolean)),
+  ).sort((a, b) => a.localeCompare(b));
+
   return (
-    <form className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <form
+      method="GET"
+      action="/law-update"
+      className="rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
       <div className="p-4 sm:p-5">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-3">
-            <label className="block text-xs font-semibold text-slate-600">
+            <label
+              htmlFor="from"
+              className="block text-xs font-semibold text-slate-600"
+            >
               From
             </label>
+
             <input
+              id="from"
               name="from"
               type="date"
               defaultValue={from}
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none
-                         focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
           <div className="lg:col-span-3">
-            <label className="block text-xs font-semibold text-slate-600">
+            <label
+              htmlFor="to"
+              className="block text-xs font-semibold text-slate-600"
+            >
               To
             </label>
+
             <input
+              id="to"
               name="to"
               type="date"
               defaultValue={to}
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none
-                         focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
           <div className="lg:col-span-4">
-            <label className="block text-xs font-semibold text-slate-600">
+            <label
+              htmlFor="dept"
+              className="block text-xs font-semibold text-slate-600"
+            >
               Department
             </label>
+
             <select
+              id="dept"
               name="dept"
               defaultValue={dept}
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none
-                         focus:border-blue-500 focus:ring-2 focus:ring-blue-100 cursor-pointer"
+              className="mt-1 w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
               <option value="">All Departments</option>
-              {deptOptions.map((d) => (
-                <option key={d} value={d}>
-                  {d}
+
+              {safeDeptOptions.map((department) => (
+                <option key={department} value={department}>
+                  {department}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* keep size too */}
           <input type="hidden" name="size" value={size} />
           <input type="hidden" name="page" value="1" />
 
           <div className="flex gap-2 lg:col-span-2 lg:justify-end">
             <button
               type="submit"
-              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white
-                         hover:bg-blue-700 cursor-pointer"
+              className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
             >
               Search
             </button>
 
             <Link
-              href="?page=1&size=6"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700
-                         hover:bg-slate-50 cursor-pointer"
+              href="/law-update?page=1&size=6"
+              className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
               Reset
             </Link>
@@ -133,7 +227,9 @@ function FilterBar({ searchParams, deptOptions = [] }) {
 function Pagination({ pageData, searchParams }) {
   const current = Number(pageData?.currentPage || 1);
   const total = Number(pageData?.totalPages || 1);
-  const nums = pageData?.pageNumbers || [];
+  const nums = Array.isArray(pageData?.pageNumbers) ? pageData.pageNumbers : [];
+
+  if (total <= 1) return null;
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
@@ -142,8 +238,8 @@ function Pagination({ pageData, searchParams }) {
         className={[
           "rounded-xl border px-3 py-2 text-sm font-semibold",
           current <= 1
-            ? "pointer-events-none border-slate-200 text-slate-400 bg-white"
-            : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer",
+            ? "pointer-events-none border-slate-200 bg-white text-slate-400"
+            : "cursor-pointer border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
         ].join(" ")}
       >
         First
@@ -154,35 +250,37 @@ function Pagination({ pageData, searchParams }) {
         className={[
           "rounded-xl border px-3 py-2 text-sm font-semibold",
           current <= 1
-            ? "pointer-events-none border-slate-200 text-slate-400 bg-white"
-            : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer",
+            ? "pointer-events-none border-slate-200 bg-white text-slate-400"
+            : "cursor-pointer border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
         ].join(" ")}
       >
         Previous
       </Link>
 
-      {nums.map((n) => (
+      {nums.map((pageNumber) => (
         <Link
-          key={n}
-          href={buildHref(searchParams, { page: n })}
+          key={pageNumber}
+          href={buildHref(searchParams, { page: pageNumber })}
           className={[
             "rounded-xl border px-3 py-2 text-sm font-semibold",
-            n === current
+            pageNumber === current
               ? "border-blue-600 bg-blue-600 text-white"
-              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer",
+              : "cursor-pointer border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
           ].join(" ")}
         >
-          {n}
+          {pageNumber}
         </Link>
       ))}
 
       <Link
-        href={buildHref(searchParams, { page: Math.min(total, current + 1) })}
+        href={buildHref(searchParams, {
+          page: Math.min(total, current + 1),
+        })}
         className={[
           "rounded-xl border px-3 py-2 text-sm font-semibold",
           current >= total
-            ? "pointer-events-none border-slate-200 text-slate-400 bg-white"
-            : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer",
+            ? "pointer-events-none border-slate-200 bg-white text-slate-400"
+            : "cursor-pointer border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
         ].join(" ")}
       >
         Next
@@ -193,8 +291,8 @@ function Pagination({ pageData, searchParams }) {
         className={[
           "rounded-xl border px-3 py-2 text-sm font-semibold",
           current >= total
-            ? "pointer-events-none border-slate-200 text-slate-400 bg-white"
-            : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer",
+            ? "pointer-events-none border-slate-200 bg-white text-slate-400"
+            : "cursor-pointer border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
         ].join(" ")}
       >
         Last
@@ -212,24 +310,42 @@ export default async function LawUpdatesPage({ searchParams }) {
   const to = getParamValue(resolvedParams?.to, "");
   const dept = getParamValue(resolvedParams?.dept, "");
 
-  const data = await getLawUpdatesList({ page, size, from, to, dept });
+  /*
+    Important:
+    Fetch a larger list because we are applying filter in this page.
+    If you fetch only 6 records and then filter, your filter will check only those 6 records.
+  */
+  const data = await getLawUpdatesList({
+    page: 1,
+    size: 1000,
+  });
 
-  const pageData = data?.page || {};
-  const list = pageData?.lawUpdates || [];
+  const apiPageData = data?.page || {};
+  const allList = Array.isArray(apiPageData?.lawUpdates)
+    ? apiPageData.lawUpdates
+    : [];
 
-  // department options: build from list (fast) — if you have dedicated API, swap later
   const deptOptions = Array.from(
-    new Set(list.map((x) => x?.department).filter(Boolean)),
+    new Set(allList.map((item) => item?.department).filter(Boolean)),
   ).sort((a, b) => a.localeCompare(b));
+
+  const filteredList = applyFilters(allList, {
+    from,
+    to,
+    dept,
+  });
+
+  const pageData = paginateList(filteredList, page, size);
+  const list = pageData.lawUpdates;
 
   return (
     <section className="min-h-screen bg-slate-50">
-      {/* Header */}
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
             Law Updates
           </h1>
+
           <p className="mt-2 text-center text-sm text-slate-600">
             Latest notifications, circulars, orders and compliance changes.
           </p>
@@ -243,16 +359,36 @@ export default async function LawUpdatesPage({ searchParams }) {
         </div>
       </div>
 
-      {/* List */}
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-600">
+            Showing{" "}
+            <span className="font-semibold text-slate-900">{list.length}</span>{" "}
+            of{" "}
+            <span className="font-semibold text-slate-900">
+              {filteredList.length}
+            </span>{" "}
+            result(s)
+          </p>
+
+          {(from || to || dept) && (
+            <Link
+              href="/law-update?page=1&size=6"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              Clear filters
+            </Link>
+          )}
+        </div>
+
         <div className="space-y-4">
-          {list.length ? (
+          {list.length > 0 ? (
             list.map((item) => {
               const summaryText = stripHtml(item?.summary || "");
 
               return (
                 <div
-                  key={item?.uuid || item?.id}
+                  key={item?.uuid || item?.id || item?.slug}
                   className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -263,16 +399,18 @@ export default async function LawUpdatesPage({ searchParams }) {
 
                       <Link
                         href={`/law-update/${item?.slug}`}
-                        className="mt-1 block text-lg font-semibold leading-snug text-slate-900 hover:text-blue-700 cursor-pointer"
+                        className="mt-1 block cursor-pointer text-lg font-semibold leading-snug text-slate-900 hover:text-blue-700"
                       >
-                        {item?.title}
+                        {item?.title || "Untitled Law Update"}
                       </Link>
 
                       <p className="mt-3 text-sm text-slate-700">
                         <span className="font-semibold text-slate-800">
                           Summary:
                         </span>{" "}
-                        <span className="line-clamp-3">{summaryText}</span>
+                        <span className="line-clamp-3">
+                          {summaryText || "No summary available."}
+                        </span>
                       </p>
 
                       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -307,6 +445,7 @@ export default async function LawUpdatesPage({ searchParams }) {
               <p className="text-sm font-semibold text-slate-900">
                 No results found
               </p>
+
               <p className="mt-1 text-sm text-slate-600">
                 Try adjusting date range or department filter.
               </p>
@@ -314,17 +453,15 @@ export default async function LawUpdatesPage({ searchParams }) {
           )}
         </div>
 
-        {pageData?.totalPages > 1 ? (
-          <div className="mt-10">
-            <Pagination pageData={pageData} searchParams={resolvedParams} />
-          </div>
-        ) : null}
+        <div className="mt-10">
+          <Pagination pageData={pageData} searchParams={resolvedParams} />
+        </div>
 
-        {/* CTA like your UI but modern */}
         <div className="mt-12 rounded-2xl border border-blue-200 bg-blue-50 p-6">
           <p className="text-sm font-semibold text-slate-900">
             Subscribe to Us
           </p>
+
           <p className="mt-1 text-sm text-slate-700">
             Find different law updates directly in your inbox. Subscribe now.
           </p>

@@ -240,6 +240,7 @@ function AuthorCard({ author }) {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getKnowledgeCentreBySlug(slug);
+  // console.log("Knowledge Centre Data:", data);
 
   if (!data?.blog) {
     return {
@@ -278,6 +279,13 @@ export default async function KnowledgeCentreSlugPage({ params }) {
   const url = `${protocol}://${host}/knowledge-centre/${slug}`;
 
   const { tocItems, bodyHtml } = splitTocAndBody(blog.description || "", url);
+
+  const formMarker = "<!--BLOG_CONTACT_FORM-->";
+  const hasInlineForm = bodyHtml.includes(formMarker);
+
+  const [beforeFormHtml, afterFormHtml = ""] = hasInlineForm
+    ? bodyHtml.split(formMarker)
+    : [bodyHtml, ""];
   // console.log("ToC Content:", tocItems);
   return (
     <div className="">
@@ -387,7 +395,17 @@ export default async function KnowledgeCentreSlugPage({ params }) {
                     data-article-content
                     className=" prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed"
                   >
-                    <BlogContentClient html={bodyHtml} />
+                    <BlogContentClient html={beforeFormHtml} />
+
+                    {hasInlineForm ? (
+                      <div className="not-prose my-8 bg-[#f2f3ff] p-3">
+                        <EnquiryOtpInline page={slug} />
+                      </div>
+                    ) : null}
+
+                    {afterFormHtml ? (
+                      <BlogContentClient html={afterFormHtml} />
+                    ) : null}
                   </div>
                 </div>
               </div>

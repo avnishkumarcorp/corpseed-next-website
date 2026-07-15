@@ -108,9 +108,9 @@ export function splitTocAndBody(html = "", currentUrl = "") {
   let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
 
   bodyHtml = bodyHtml.replace(
-    /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
-    "",
-  );
+  /<p[^>]*>\s*<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>\s*<\/p>/gi,
+  "<!--BLOG_CONTACT_FORM-->",
+);
 
   bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
 

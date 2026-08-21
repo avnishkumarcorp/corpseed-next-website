@@ -11,9 +11,15 @@ export const metadata = {
   description: "Corpseed public website",
   metadataBase: new URL("https://www.corpseed.com"),
   charset: "utf-8",
+  // Served from /public so the URLs stay stable (no build hash) — Google caches
+  // the favicon by URL and only re-fetches it when it recrawls the page.
   icons: {
-    icon: "/fav.png",
-    apple: "/fav.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48 96x96", type: "image/x-icon" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   other: {
     "msvalidate.01": "6FE373E64B7D16AE4CC9FA10A4FCA067",

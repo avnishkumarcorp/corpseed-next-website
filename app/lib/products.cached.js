@@ -10,5 +10,5 @@ export const getProductsPageCached = unstable_cache(
   },
   // cache key prefix (Next will also include the args)
   ["getProductsPageCached"],
-  { cache: "no-store" }, // ✅ 5 min
+  { revalidate: 300 }, // ✅ 5 min
 );

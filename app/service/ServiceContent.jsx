@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import SafeHtmlShadow from "../components/SafeHtmlShadow";
@@ -195,7 +197,7 @@ function ProductCards({ slugs = [], serviceCards = {}, loadingSlugs = {} }) {
           if (!item?.name) return null;
 
           return (
-            <a
+            <Link
               key={slug}
               href={`/service/${slug}`}
               className="group min-w-[200px] max-w-[200px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
@@ -229,7 +231,7 @@ function ProductCards({ slugs = [], serviceCards = {}, loadingSlugs = {} }) {
                   Explore Product →
                 </div>
               </div>
-            </a>
+            </Link>
           );
         })}
       </div>
@@ -289,13 +291,13 @@ function ServiceCards({ slugs = [], serviceCards = {}, loadingSlugs = {} }) {
                 <span />
               )}
 
-              <a
+              <Link
                 href={`/service/${slug}`}
                 className="flex items-center gap-1 text-sm font-medium text-blue-600"
               >
                 Explore More
                 <span className="text-lg leading-none">›</span>
-              </a>
+              </Link>
             </div>
           </div>
         );

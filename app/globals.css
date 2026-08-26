@@ -16,18 +16,10 @@ html {
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
+  /* Typography (font-family, size, colour) lives in design-system.css so
+     Tailwind text-* utilities can still override it per component. */
   user-select: none;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .section {
@@ -63,21 +55,6 @@ body {
   scrollbar-width: none;
 }
 
-@keyframes logoMarquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    /* Move exactly half track width because we duplicated items */
-    transform: translateX(-50%);
-  }
-}
-
-.animate-logoMarquee {
-  animation-name: logoMarquee;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
 
 /* globals.css */
 .marquee-no-select {
@@ -5834,30 +5811,9 @@ h6 {
   width: 100%;
 }
 
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  color: #212529;
-}
+/* Heading colour moved to design-system.css @layer base — this unlayered
+   rule beat every Tailwind text-* colour utility on the site. */
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-10%);
-  } /* fixed pixel shift */
-}
-
-.animate-marquee {
-  animation-name: marquee;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -5867,19 +5823,6 @@ h6 {
   scrollbar-width: none;
 }
 
-@keyframes productsScroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-products-scroll {
-  animation: productsScroll 10s linear infinite;
-  will-change: transform;
-}
 
 .text-center {
   text-align: center !important;
@@ -5928,23 +5871,4 @@ textarea::placeholder {
   -webkit-text-fill-color: #9ca3af !important;
 }
 
-/* Services auto infinite carousel */
-@keyframes servicesInfiniteScroll {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
-}
-@keyframes latestArticleInfiniteScroll {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
-}
 

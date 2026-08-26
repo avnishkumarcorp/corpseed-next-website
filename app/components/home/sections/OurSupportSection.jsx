@@ -1,287 +1,220 @@
-// app/components/OurSupportersSection.jsx
 "use client";
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
-// ✅ KEEP YOUR IMPORTS EXACTLY (NO PATH CHANGES)
-import corpseedLogo from "../../../assets/CORPSEED.webp";
-import mgmt1 from "../../../../public/home/sakshi.png";
-import mgmt2 from "../../../../public/home/VipanThakur.jpg";
-import mgmt3 from "../../../../public/home/VinayThakur.jpg";
-import viresh from "../../../../public/home/VireshOberoi.jpg";
+import founderImg from "../../../../public/home/VipanThakur.jpg";
+import sakshiImg from "../../../../public/home/sakshi.png";
+import vinayImg from "../../../../public/home/VinayThakur.jpg";
+import vireshImg from "../../../../public/home/VireshOberoi.jpg";
+import isoImg from "../../../../public/home/iso.png";
+import ciiImg from "../../../../public/home/cii.png";
 
-import mem1 from "../../../../public/home/iso.png";
-import mem2 from "../../../../public/home/cii.png";
-import mem3 from "../../../../public/home/cii.png";
-
-const TAB_KEYS = {
-  INVESTOR: "investor",
-  MANAGEMENT: "management",
-  MEMBERS: "members",
-};
-
-const DATA = {
-  [TAB_KEYS.INVESTOR]: {
-    type: "static",
-    logo: corpseedLogo,
-    text: "We are a bootstrap organization based on the direct support of our clients themselves. It enables us to independently make decisions for the welfare of our clients and provide quality service at affordable rates. Our self-reliance and financial discipline promote efficiency and stimulate creativity.",
+/**
+ * Audit #9 — leadership was taking more homepage space than the service
+ * discovery content beside it, so it is down to one quote card plus a compact
+ * team list. Selecting a person swaps the card, which keeps every profile
+ * reachable without stacking four full-height bios down the page.
+ */
+const PEOPLE = [
+  {
+    name: "Vipan Singh",
+    role: "Founder & CEO",
+    fullRole: "Founder & CEO, Corpseed ITES Pvt Ltd",
+    image: founderImg,
+    quote:
+      "Compliance should not be the reason a good business slows down. We built Corpseed so founders get one team, one price and one clear answer — instead of chasing five departments.",
   },
-
-  [TAB_KEYS.MANAGEMENT]: {
-    type: "carousel",
-    slides: [
-      {
-        name: "Sakshi Jaggi",
-        role: "Chief People Officer",
-        image: mgmt1,
-        description:
-          "Mrs. Sakshi Jaggi is a passionate and data-driven HR Expert who revolutionises how Corpseed manages its human resources. With her invaluable insights and expertise in recruitment, data analytics, and operations, she brings a fresh perspective to the table. With her unparalleled commitment and deep understanding of the HR landscape, she has become an indispensable asset to Corpseed.",
-      },
-      {
-        name: "Vinay Singh",
-        role: "Advisor",
-        image: mgmt3,
-        description:
-          "With over fifteen years of experience in financial innovation and technology, Mr. Vinay Singh advises and provides strategic guidance to our clients about banking, finance, and tech trends. Corpseed is implementing innovative digital finance solutions under his direction and evolving continuously.",
-      },
-      {
-        name: "Vipan Singh",
-        role: "Founder & CEO",
-        image: mgmt2,
-        description:
-          "Mr. Vipan Singh is the visionary founder and CEO of Corpseed ITES Pvt Ltd. With his unbeatable passion, he advocates automation in compliance management for businesses. Under his astute guidance, Corpseed has become synonymous with excellence and efficiency. His unwavering focus on delivering cutting-edge solutions has empowered countless businesses to stay ahead of the curve.",
-      },
-      {
-        name: "Viresh Oberoi",
-        role: "Co-founder and director",
-        image: viresh,
-        description: `Mr. Viresh Oberoi is an exceptional entrepreneur and the driving force behind mjunction services limited. As the Founder and CEO, he has revolutionized India's largest eCommerce company and left an indelible mark on Tata Steel's market-facing processes. He helps Corpseed in its overall business growth with his unwavering determination and innovative approach.`,
-      },
-    ],
+  {
+    name: "Viresh Oberoi",
+    role: "Co-founder & Director",
+    fullRole: "Co-founder & Director",
+    image: vireshImg,
+    quote:
+      "Having built India's largest eCommerce marketplace at mjunction, I know what disciplined process does for scale. That is the same rigour we bring to Corpseed's growth and governance.",
   },
-
-  [TAB_KEYS.MEMBERS]: {
-    type: "carousel",
-    slides: [
-      {
-        name: "ISO",
-        role: "Certification Partner",
-        image: mem1,
-        description:
-          "We work with recognized certification partners to help businesses meet global standards and strengthen credibility across markets.",
-      },
-      {
-        name: "CII",
-        role: "Industry Partner",
-        image: mem2,
-        description:
-          "Our ecosystem includes trusted industry bodies that support growth, compliance readiness, and strong governance practices.",
-      },
-      // {
-      //   name: "CII",
-      //   role: "Industry Partner",
-      //   image: mem3,
-      //   description:
-      //     "Through partnerships and alliances, we enable businesses to stay aligned with evolving regulatory and industry expectations.",
-      // },
-    ],
+  {
+    name: "Sakshi Jaggi",
+    role: "Chief People Officer",
+    fullRole: "Chief People Officer",
+    image: sakshiImg,
+    quote:
+      "Great compliance work is done by people, not templates. My job is to bring in specialists who genuinely know their departments — and to make sure they stay long enough to master them.",
   },
-};
+  {
+    name: "Vinay Singh",
+    role: "Advisor",
+    fullRole: "Advisor — Finance & Technology",
+    image: vinayImg,
+    quote:
+      "Fifteen years in financial technology taught me that automation only helps when it removes real friction. That is the test every Corpseed product has to pass.",
+  },
+];
 
-/* ----------------------------- UI ----------------------------- */
-
-function Tabs({ active, onChange }) {
-  const items = [
-    { key: TAB_KEYS.INVESTOR, label: "Investor" },
-    { key: TAB_KEYS.MANAGEMENT, label: "Management" },
-    { key: TAB_KEYS.MEMBERS, label: "Members" },
-  ];
-
-  return (
-    <div className="flex items-center gap-2 rounded-full bg-white p-1 ring-1 ring-slate-200 shadow-sm">
-      {items.map((it) => {
-        const isActive = active === it.key;
-        return (
-          <button
-            key={it.key}
-            type="button"
-            onClick={() => onChange(it.key)}
-            className={[
-              "rounded-full px-4 py-2 text-sm font-semibold transition cursor-pointer",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2",
-              isActive
-                ? "bg-blue-600 text-white shadow"
-                : "text-slate-700 hover:bg-slate-50",
-            ].join(" ")}
-          >
-            {it.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function Dots({ count, activeIndex, onDot }) {
-  if (!count || count <= 1) return null;
-  return (
-    <div className="mt-4 flex items-center justify-center gap-2">
-      {Array.from({ length: count }).map((_, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => onDot(i)}
-          className={[
-            "h-2 rounded-full transition cursor-pointer",
-            i === activeIndex
-              ? "w-7 bg-blue-600"
-              : "w-2 bg-slate-300 hover:bg-slate-400",
-          ].join(" ")}
-          aria-label={`Go to slide ${i + 1}`}
-        />
-      ))}
-    </div>
-  );
-}
-
-function Avatar({ src, alt, variant }) {
-  const isMember = variant === TAB_KEYS.MEMBERS;
-
-  // ✅ bigger image (as you asked)
-  const size = isMember ? 140 : 160;
-
-  return (
-    <div className="relative">
-      <div className="absolute inset-0 -z-10 rounded-full bg-blue-600/10 blur-2xl" />
-      <div
-        className="relative overflow-hidden rounded-full bg-white ring-1 ring-slate-200 shadow-[0_16px_40px_-30px_rgba(2,6,23,0.45)]"
-        style={{ width: size, height: size }}
-      >
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className={isMember ? "object-contain p-7" : "object-cover"}
-          priority
-        />
-      </div>
-    </div>
-  );
-}
-
-function StaticInvestor({ logo, text }) {
-  return (
-    <div className="grid items-center gap-6 md:grid-cols-[220px_1fr]">
-      <div className="flex justify-center md:justify-start">
-        <div className="relative h-[52px] w-[190px]">
-          <Image
-            src={logo}
-            alt="Corpseed"
-            fill
-            className="object-contain"
-            priority
-          />
-        </div>
-      </div>
-      <p className="text-sm leading-7 text-slate-600">{text}</p>
-    </div>
-  );
-}
-
-function Slide({ slide, variant }) {
-  return (
-    <div className="grid items-center gap-6 md:grid-cols-[220px_1fr]">
-      <div className="flex justify-center md:justify-start">
-        <Avatar src={slide.image} alt={slide.name} variant={variant} />
-      </div>
-
-      <div className="min-w-0">
-        <div className="text-[20px] font-semibold leading-tight text-slate-900">
-          {slide.name}
-        </div>
-        <div className="mt-1 text-xs font-semibold text-blue-600">
-          {slide.role}
-        </div>
-
-        {/* ✅ compact description (less height) */}
-        <div className="mt-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
-          <p className="text-sm leading-7 text-slate-600 line-clamp-4">
-            {slide.description}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AutoCarousel({ slides, autoplayMs = 4200, resetKey, variant }) {
-  const [index, setIndex] = React.useState(0);
-
-  React.useEffect(() => setIndex(0), [resetKey]);
-
-  React.useEffect(() => {
-    if (!slides?.length) return;
-    const id = setInterval(() => {
-      setIndex((p) => (p + 1) % slides.length);
-    }, autoplayMs);
-    return () => clearInterval(id);
-  }, [slides, autoplayMs]);
-
-  return (
-    <div>
-      <div key={index} className="animate-[fadeUp_.2s_ease-out]">
-        <Slide slide={slides[index]} variant={variant} />
-      </div>
-
-      <Dots count={slides.length} activeIndex={index} onDot={setIndex} />
-
-      <style jsx>{`
-        @keyframes fadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(6px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-/* ----------------------------- MAIN ----------------------------- */
+const MEMBERSHIPS = [
+  { name: "ISO certified", image: isoImg },
+  { name: "CII member", image: ciiImg },
+];
 
 export default function OurSupportSection() {
-  const [activeTab, setActiveTab] = React.useState(TAB_KEYS.MANAGEMENT);
-  const current = DATA[activeTab];
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const active = PEOPLE[activeIndex];
 
   return (
-    <section className="w-full bg-[#f3f6fb]">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* ✅ compact header row */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-[38px] font-semibold tracking-tight text-blue-600 sm:text-[44px]">
-            Our Supporters
-          </h2>
-          <Tabs active={activeTab} onChange={setActiveTab} />
-        </div>
+    <section className="w-full bg-slate-50">
+      <div className="cs-container cs-section--tight">
+        <div className="cs-reveal grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:gap-12">
+          {/* Selected person */}
+          <figure className="relative m-0 flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_20px_50px_-45px_rgba(15,23,42,0.7)] sm:p-8">
+            <svg
+              aria-hidden="true"
+              width="42"
+              height="42"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="absolute right-6 top-5 text-blue-100"
+            >
+              <path d="M7.5 5A5.5 5.5 0 0 0 2 10.5 5.5 5.5 0 0 0 7.5 16c.42 0 .82-.05 1.2-.14C8.1 17.7 6.5 18.9 4.4 19.3l.5 1.9c4.4-.9 7.3-4.4 7.3-9.4V10.5A5.5 5.5 0 0 0 7.5 5Zm11 0A5.5 5.5 0 0 0 13 10.5 5.5 5.5 0 0 0 18.5 16c.42 0 .82-.05 1.2-.14-.6 1.84-2.2 3.04-4.3 3.44l.5 1.9c4.4-.9 7.3-4.4 7.3-9.4V10.5A5.5 5.5 0 0 0 18.5 5Z" />
+            </svg>
 
-        {/* ✅ more compact container */}
-        <div className="mt-7 rounded-3xl bg-white p-5 shadow-[0_22px_55px_-45px_rgba(2,6,23,0.45)] ring-1 ring-slate-200 sm:p-7">
-          {/* ❌ removed big min-height; keeps compact */}
-          {current.type === "static" ? (
-            <StaticInvestor logo={current.logo} text={current.text} />
-          ) : (
-            <AutoCarousel
-              slides={current.slides}
-              autoplayMs={4200}
-              resetKey={activeTab}
-              variant={activeTab}
-            />
-          )}
+            <span className="cs-eyebrow">Leadership</span>
+
+            {/* min-height sized to the longest quote so switching people does
+                not make the card (and the section below it) jump */}
+            <blockquote
+              key={active.name}
+              className="mt-4 animate-[csFadeUp_.25s_ease-out] sm:min-h-[132px]"
+            >
+              <p className="text-[1.0625rem] leading-[1.75] text-slate-700 sm:text-[1.125rem]">
+                “{active.quote}”
+              </p>
+            </blockquote>
+
+            <figcaption className="mt-6 flex items-center gap-4">
+              <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full ring-2 ring-white ring-offset-2 ring-offset-blue-100">
+                <Image
+                  src={active.image}
+                  alt={`${active.name}, ${active.fullRole}`}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
+              </span>
+
+              <span className="min-w-0">
+                <span className="block text-[15.5px] font-semibold text-slate-900">
+                  {active.name}
+                </span>
+                <span className="block text-[13px] text-slate-500">
+                  {active.fullRole}
+                </span>
+              </span>
+            </figcaption>
+
+            <Link href="/about-us" className="cs-link-arrow mt-6 !text-[13.5px]">
+              Read our story
+              <span className="cs-arrow" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          </figure>
+
+          {/* Team picker + memberships */}
+          <div className="flex flex-col gap-6">
+            <div>
+              <h2 className="text-[1.0625rem] font-semibold text-slate-900">
+                The people behind it
+              </h2>
+              <p className="mt-1 text-[13px] text-slate-500">
+                Select a name to read more.
+              </p>
+
+              <ul className="mt-4 space-y-2.5">
+                {PEOPLE.map((person, i) => {
+                  const isActive = i === activeIndex;
+
+                  return (
+                    <li key={person.name}>
+                      <button
+                        type="button"
+                        onClick={() => setActiveIndex(i)}
+                        aria-pressed={isActive}
+                        className={[
+                          "flex w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition duration-200",
+                          isActive
+                            ? "border-blue-300 bg-blue-50/70 shadow-[0_10px_24px_-20px_rgba(37,99,235,0.9)]"
+                            : "border-slate-200 bg-white hover:border-blue-200 hover:bg-white hover:shadow-sm",
+                        ].join(" ")}
+                      >
+                        <span
+                          className={[
+                            "relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-slate-100 transition",
+                            isActive ? "ring-2 ring-blue-400 ring-offset-1" : "",
+                          ].join(" ")}
+                        >
+                          <Image
+                            src={person.image}
+                            alt=""
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
+                        </span>
+
+                        <span className="min-w-0 flex-1">
+                          <span
+                            className={[
+                              "block text-[14px] font-semibold leading-tight",
+                              isActive ? "text-blue-800" : "text-slate-900",
+                            ].join(" ")}
+                          >
+                            {person.name}
+                          </span>
+                          <span className="block text-[12.5px] text-slate-500">
+                            {person.role}
+                          </span>
+                        </span>
+
+                        <span
+                          aria-hidden="true"
+                          className={[
+                            "shrink-0 text-[13px] transition",
+                            isActive
+                              ? "text-blue-600"
+                              : "text-slate-300",
+                          ].join(" ")}
+                        >
+                          →
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.09em] text-slate-500">
+                Accreditations
+              </p>
+
+              <ul className="mt-3 flex items-center gap-6">
+                {MEMBERSHIPS.map((m) => (
+                  <li key={m.name} className="flex items-center">
+                    <Image
+                      src={m.image}
+                      alt={m.name}
+                      height={52}
+                      width={96}
+                      sizes="96px"
+                      className="h-[52px] w-auto object-contain"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>

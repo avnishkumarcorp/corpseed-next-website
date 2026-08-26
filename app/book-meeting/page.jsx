@@ -1,3 +1,4 @@
+import Link from "next/link";
 // app/book-meeting/page.jsx
 
 import EnquiryForm from "../components/enquiry-form/EnquiryForm";
@@ -152,12 +153,12 @@ export default function BookMeetingPage() {
             <div className="mt-8 text-sm text-slate-700">
               <p>
                 Have questions? Visit our{" "}
-                <a
+                <Link
                   href="/faq"
                   className="font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
                 >
                   FAQs
-                </a>
+                </Link>
                 . If you’re an existing customer and have feedback, please let
                 us know.
               </p>
@@ -165,22 +166,22 @@ export default function BookMeetingPage() {
               <div className="mt-4 space-y-2">
                 <p>
                   For job opportunities, please view our{" "}
-                  <a
+                  <Link
                     href="/join-our-team"
                     className="font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
                   >
                     open roles
-                  </a>
+                  </Link>
                   .
                 </p>
                 <p>
                   For business partnerships, please visit our{" "}
-                  <a
+                  <Link
                     href="/partner"
                     className="font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
                   >
                     forum
-                  </a>
+                  </Link>
                   .
                 </p>
               </div>

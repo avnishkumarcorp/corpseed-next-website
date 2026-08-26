@@ -30,7 +30,7 @@ export async function getProductsPage({
       method: "GET",
       headers: { "Content-Type": "application/json" },
       // ✅ allow caching + revalidate
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {
@@ -60,7 +60,7 @@ export async function getProductBySlug(slug) {
     const res = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {
@@ -93,7 +93,7 @@ export async function getLatestProducts() {
     const res = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      cache: "no-store", // ✅ ISR instead of no-store
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {

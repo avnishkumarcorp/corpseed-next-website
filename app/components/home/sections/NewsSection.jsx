@@ -1,7 +1,3 @@
-// app/components/InTheNewsSection.jsx
-"use client";
-
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,285 +5,130 @@ function toImgUrl(image) {
   const img = String(image || "").trim();
   if (!img) return "";
   if (img.startsWith("http://") || img.startsWith("https://")) return img;
-
   return `https://corpseed-main.s3.ap-south-1.amazonaws.com/corpseed/${img}`;
 }
 
-function clampText(text, n = 220) {
+function clampText(text, n = 240) {
   const t = String(text || "").trim();
-  return t.length > n ? t.slice(0, n).trim() + "…" : t;
+  return t.length > n ? `${t.slice(0, n).trim()}…` : t;
 }
 
+/**
+ * Audit #10 — one featured story with real editorial weight, a short list of
+ * the rest, and a single "View all news" action. Reads as credibility
+ * content rather than another card grid.
+ */
 export default function NewsSection({ data }) {
-  const [slides, setSlides] = React.useState([]);
-  const [index, setIndex] = React.useState(0);
-  const [paused, setPaused] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
+  const slides = (Array.isArray(data) ? data : []).filter(Boolean);
 
-  // ✅ sync slides from parent + fix loading + reset index
-  React.useEffect(() => {
-    const nextSlides = Array.isArray(data) ? data : [];
-    setSlides(nextSlides);
-    setIndex(0);
-    setLoading(false);
-  }, [data]);
+  if (!slides.length) return null;
 
-  // ✅ keep index safe when slides length changes
-  React.useEffect(() => {
-    if (!slides.length) return;
-    setIndex((p) => Math.min(p, slides.length - 1));
-  }, [slides.length]);
-
-  // ✅ autoplay
-  React.useEffect(() => {
-    if (paused) return;
-    if (!slides?.length || slides.length < 2) return;
-
-    const id = setInterval(() => {
-      setIndex((p) => (p + 1) % slides.length);
-    }, 3500);
-
-    return () => clearInterval(id);
-  }, [paused, slides]);
-
-  const goTo = (i) => setIndex(i);
-
-  const prev = () => {
-    if (!slides?.length) return;
-    setIndex((p) => (p - 1 + slides.length) % slides.length);
-  };
-
-  const next = () => {
-    if (!slides?.length) return;
-    setIndex((p) => (p + 1) % slides.length);
-  };
+  const [lead, ...rest] = slides;
+  const others = rest.slice(0, 3);
 
   return (
     <section className="w-full bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div
-          className="relative overflow-hidden rounded-2xl bg-[#f6f8fb] shadow-[0_24px_60px_-50px_rgba(2,6,23,0.5)] ring-1 ring-slate-200"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-        >
-          {/* Slides track */}
-          <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${index * 100}%)` }}
-          >
-            {loading ? (
-              Array.from({ length: 2 }).map((_, i) => <NewsSkeleton key={i} />)
-            ) : slides.length ? (
-              slides.map((slide) => (
-                <NewsSlide key={slide?.id || slide?.slug} slide={slide} />
-              ))
-            ) : (
-              <EmptyState />
-            )}
+      <div className="cs-container cs-section--tight">
+        <div className="cs-section-head cs-section-head--split cs-reveal">
+          <div>
+            <span className="cs-eyebrow">In the news</span>
+            <h2 className="cs-section-title">Corpseed in the press</h2>
+            <p className="cs-section-sub">
+              Coverage of our work on regulatory reform, sustainability and
+              India&apos;s compliance landscape.
+            </p>
           </div>
 
-          {/* dots */}
-          {/* dots (hide on mobile) */}
-          {/* {!loading && slides.length > 1 ? (
-            <div className="pointer-events-auto absolute bottom-5 left-1/2 z-20 -translate-x-1/2 hidden md:block">
-              <Dots count={slides.length} activeIndex={index} onDot={goTo} />
-            </div>
-          ) : null} */}
+          <Link href="/press-release" className="cs-btn cs-btn--secondary shrink-0">
+            View all news
+            <span className="cs-arrow" aria-hidden="true">
+              →
+            </span>
+          </Link>
+        </div>
 
-          {/* arrows */}
-          <button
-            type="button"
-            onClick={prev}
-            disabled={loading || slides.length < 2}
-            className={[
-              "hidden md:flex absolute left-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full text-[#212529] bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              loading || slides.length < 2
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:bg-white",
-            ].join(" ")}
-            aria-label="Previous"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 18l-6-6 6-6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+        <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:gap-8">
+          <FeaturedStory slide={lead} />
 
-          <button
-            type="button"
-            onClick={next}
-            disabled={loading || slides.length < 2}
-            className={[
-              "hidden md:flex absolute right-4 top-1/2 z-20 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full text-[#212529] bg-white/90 shadow-sm ring-1 ring-slate-200 cursor-pointer",
-              loading || slides.length < 2
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:bg-white",
-            ].join(" ")}
-            aria-label="Next"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M9 6l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          {others.length ? (
+            <ul className="cs-reveal flex flex-col divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-slate-50/60">
+              {others.map((slide) => (
+                <li key={slide?.id || slide?.slug}>
+                  <Link
+                    href={`/press-release/${slide?.slug || ""}`}
+                    className="group flex flex-col gap-1.5 p-5 transition hover:bg-white"
+                  >
+                    <span className="cs-badge cs-badge--neutral self-start">
+                      Press release
+                    </span>
 
-          {/* label */}
-          {/* <div className="absolute left-0 top-0 z-50 -translate-y-1/2 rounded-md bg-white px-6 py-3 text-[14px] font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
-            In The News
-          </div> */}
+                    <span className="text-[14.5px] font-semibold leading-snug text-slate-900 cs-clamp-3 transition-colors group-hover:text-blue-700">
+                      {slide?.title}
+                    </span>
+
+                    {slide?.postDate ? (
+                      <span className="text-[12.5px] text-slate-500">
+                        {slide.postDate}
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </div>
     </section>
   );
 }
 
-function NewsSlide({ slide }) {
+function FeaturedStory({ slide }) {
+  if (!slide) return null;
+
+  const href = `/press-release/${slide?.slug || ""}`;
   const imgUrl = toImgUrl(slide?.image);
-  const href = `/press-release/${slide?.slug}`; // adjust route if needed
 
   return (
-    <div className="w-full shrink-0">
-      <div className="grid min-h-full grid-cols-1 md:grid-cols-2">
-        {/* LEFT IMAGE */}
-        <div className="relative min-h-[240px] md:min-h-[360px] bg-slate-100 overflow-hidden">
-          {imgUrl && (
+    <article className="cs-card cs-card--hover cs-reveal group overflow-hidden">
+      <div className="grid md:grid-cols-2">
+        <div className="relative min-h-[220px] overflow-hidden bg-slate-100 md:min-h-[300px]">
+          {imgUrl ? (
             <Image
               src={imgUrl}
-              alt={slide?.title || "News"}
+              alt={slide?.title || "Press coverage"}
               fill
-              sizes="(max-width: 768px) 100vw, 620px"
-              className="object-contain object-center"
+              sizes="(max-width: 768px) 100vw, 420px"
+              className="object-contain object-center p-4 transition-transform duration-500 group-hover:scale-[1.03]"
             />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-slate-100 to-slate-200" />
           )}
-
-          <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent" />
         </div>
 
-        {/* RIGHT CONTENT */}
-        <div className="relative bg-[#eaf3ff] px-6 py-10 sm:px-10">
-          <div className="hidden md:block absolute left-0 top-10 -translate-x-full">
-            <div className="h-0 w-0 border-y-[14px] border-y-transparent border-r-[18px] border-r-[#eaf3ff]" />
-          </div>
+        <div className="flex flex-col justify-center gap-3 bg-blue-50/60 p-6 sm:p-7">
+          <span className="cs-badge cs-badge--brand self-start">
+            Featured story
+          </span>
 
-          <div className="max-w-xl">
-            <div className="text-[12px] font-semibold tracking-widest text-blue-600">
-              Press release
-            </div>
-
-            <Link href={href} className="mt-5 text-[22px] leading-snug text-blue-600 sm:text-[24px] line-clamp-3">
+          <h3 className="text-[1.1875rem] font-bold leading-snug tracking-tight text-slate-900 cs-clamp-3 transition-colors group-hover:text-blue-700 sm:text-[1.3125rem]">
+            <Link href={href} className="after:absolute after:inset-0">
               {slide?.title}
             </Link>
+          </h3>
 
-            <div className="mt-6 flex gap-4">
-              <div className="mt-1 h-auto w-[3px] rounded-full bg-yellow-400" />
-              <p className="text-[14px] leading-7 text-slate-700">
-                {clampText(slide?.summary, 260)}
-              </p>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-slate-600">
-              {slide?.postDate ? (
-                <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
-                  {slide.postDate}
-                </span>
-              ) : null}
-              {/* <span className="rounded-md bg-white/70 px-3 py-1 ring-1 ring-slate-200">
-                {slide?.visited ?? 0} views
-              </span> */}
-            </div>
-
-            {/* <div className="mt-8">
-              <Link
-                href={href}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-[13px] font-semibold text-white shadow-sm cursor-pointer hover:bg-blue-700"
-              >
-                Read More
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M9 6l6 6-6 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Link>
-            </div> */}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Dots({ count, activeIndex, onDot }) {
-  return (
-    <div className="flex items-center justify-center gap-2">
-      {Array.from({ length: count }).map((_, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => onDot(i)}
-          className={[
-            "h-2.5 rounded-full transition cursor-pointer",
-            i === activeIndex ? "w-8 bg-blue-600" : "w-2.5 bg-slate-300",
-          ].join(" ")}
-          aria-label={`Go to slide ${i + 1}`}
-        />
-      ))}
-    </div>
-  );
-}
-
-function NewsSkeleton() {
-  return (
-    <div className="w-full shrink-0">
-      <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
-        <div className="min-h-[240px] md:min-h-[360px] animate-pulse bg-slate-200" />
-        <div className="bg-[#eaf3ff] px-6 py-10 sm:px-10">
-          <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
-          <div className="mt-5 h-6 w-5/6 animate-pulse rounded bg-slate-200" />
-          <div className="mt-3 h-6 w-4/6 animate-pulse rounded bg-slate-200" />
-          <div className="mt-6 flex gap-4">
-            <div className="h-20 w-[3px] rounded-full bg-yellow-300" />
-            <div className="flex-1 space-y-3">
-              <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
-              <div className="h-4 w-11/12 animate-pulse rounded bg-slate-200" />
-              <div className="h-4 w-10/12 animate-pulse rounded bg-slate-200" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="w-full shrink-0">
-      <div className="grid min-h-[360px] grid-cols-1 md:grid-cols-2">
-        <div className="min-h-[240px] md:min-h-[360px] bg-slate-100" />
-        <div className="bg-[#eaf3ff] px-6 py-10 sm:px-10 flex items-center">
-          <div>
-            <p className="text-lg font-semibold text-slate-900">
-              No news found
+          {slide?.summary ? (
+            <p className="border-l-[3px] border-amber-400 pl-4 text-[14px] leading-[1.75] text-slate-700 cs-clamp-4">
+              {clampText(slide.summary, 260)}
             </p>
-            <p className="mt-1 text-sm text-slate-600">
-              Please try again later.
-            </p>
-          </div>
+          ) : null}
+
+          {slide?.postDate ? (
+            <span className="text-[12.5px] text-slate-500">
+              {slide.postDate}
+            </span>
+          ) : null}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -1,18 +1,36 @@
+"use client";
+
 import React from "react";
-import { Portal } from "./sections/HomeHeroSection";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Portal from "../ui/Portal";
 
 const GRID_KEYS_ORDER = [
   "Services",
-  // "Product Based Services",
   "Knowledge Center",
   "Knowledge Centre",
-  // "Department Updates",
   "Compliance Updates",
   "Industries",
 ];
 
-function useDebouncedValue(value, delay = 250) {
+/** Shown before the user types — turns an empty box into a discovery surface. */
+const POPULAR_SEARCHES = [
+  { label: "EPR Authorisation", href: "/service/epr-authorization" },
+  { label: "BIS Certification", href: "/service/bis-certification" },
+  { label: "FSSAI Licence", href: "/service/fssai-basic-registration-renewal" },
+  { label: "Factory Licence", href: "/service/factory-license" },
+  { label: "CDSCO Registration", href: "/service/cdsco-online-registration" },
+  { label: "Import Export Code", href: "/service/import-export-code" },
+];
+
+const TRENDING = [
+  { label: "Plastic Waste (PWM)", href: "/service/plastic-waste-management-authorization" },
+  { label: "E-Waste (EWM)", href: "/service/e-waste-management-authorization" },
+  { label: "Environmental Clearance", href: "/service/environmental-clearance" },
+  { label: "ISO Certification", href: "/service/iso-certification-consulting" },
+];
+
+function useDebouncedValue(value, delay = 200) {
   const [debounced, setDebounced] = React.useState(value);
   React.useEffect(() => {
     const t = setTimeout(() => setDebounced(value), delay);
@@ -21,18 +39,59 @@ function useDebouncedValue(value, delay = 250) {
   return debounced;
 }
 
-function useTypewriterPlaceholders(items, delay = 1800) {
-  const [idx, setIdx] = React.useState(0);
+/**
+ * Types the placeholder out character by character so the search box keeps
+ * suggesting what it can do without the jarring instant swap.
+ */
+function useTypewriterPlaceholder(items, { active = true } = {}) {
+  const [text, setText] = React.useState(items?.[0] || "");
+  const [index, setIndex] = React.useState(0);
+
   React.useEffect(() => {
-    if (!items?.length) return;
-    const t = setInterval(() => setIdx((v) => (v + 1) % items.length), delay);
-    return () => clearInterval(t);
-  }, [items, delay]);
-  return items?.[idx] || "";
+    if (!active || !items?.length) return;
+
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReduced) {
+      setText(items[index % items.length]);
+      const swap = setInterval(
+        () => setIndex((v) => (v + 1) % items.length),
+        3000,
+      );
+      return () => clearInterval(swap);
+    }
+
+    const full = items[index % items.length];
+    let char = 0;
+    let holdTimer;
+
+    const typer = setInterval(() => {
+      char += 1;
+      setText(full.slice(0, char));
+
+      if (char >= full.length) {
+        clearInterval(typer);
+        holdTimer = setTimeout(
+          () => setIndex((v) => (v + 1) % items.length),
+          2200,
+        );
+      }
+    }, 28);
+
+    return () => {
+      clearInterval(typer);
+      clearTimeout(holdTimer);
+    };
+  }, [items, index, active]);
+
+  return text;
 }
 
 function normalizeGroups(apiData) {
   if (!apiData || typeof apiData !== "object") return [];
+
   const entries = Object.entries(apiData).map(([k, v]) => [
     k,
     Array.isArray(v) ? v : [],
@@ -51,309 +110,101 @@ function normalizeGroups(apiData) {
     (a, b) => GRID_KEYS_ORDER.indexOf(a[0]) - GRID_KEYS_ORDER.indexOf(b[0]),
   );
   unknown.sort((a, b) => a[0].localeCompare(b[0]));
+
   return [...known, ...unknown];
 }
 
-/** ✅ Voice popup (Google-like) */
-function VoicePopup({
-  open,
-  listening,
-  interim,
-  error,
-  onClose,
-  onMicClick,
-  popupRef,
-}) {
-  if (!open) return null;
-
+function SearchIcon({ className = "" }) {
   return (
-    <div className="fixed inset-0 z-[99999]">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClose();
-        }}
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+    >
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M21 21l-4.3-4.3"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
-
-      {/* Modal */}
-      <div className="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 px-2">
-        <div
-          ref={popupRef}
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                {listening ? "Listening…" : "Voice search"}
-              </p>
-              <p className="mt-1 text-xs text-slate-600">
-                Speak now. It will stop automatically after 8 seconds of
-                silence.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
-              aria-label="Close voice search"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-            {error ? (
-              <p className="text-sm text-red-600">{error}</p>
-            ) : interim ? (
-              <p className="text-sm text-slate-900">{interim}</p>
-            ) : (
-              <p className="text-sm text-slate-500">
-                {listening ? "Say something…" : "Press mic to start"}
-              </p>
-            )}
-          </div>
-
-          {/* ✅ Mic button (THIS was missing) */}
-          <div className="mt-4 flex items-center justify-center">
-            <button
-              type="button"
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation();
-                onMicClick?.();
-              }}
-              className={[
-                "flex h-14 w-14 items-center justify-center rounded-full border cursor-pointer",
-                listening
-                  ? "border-blue-300 bg-blue-50 ring-4 ring-blue-100"
-                  : "border-slate-200 bg-white hover:bg-slate-50",
-              ].join(" ")}
-              aria-label={listening ? "Stop voice" : "Start voice"}
-              title={listening ? "Stop" : "Start"}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M19 11a7 7 0 0 1-14 0"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 18v3"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    </svg>
   );
 }
 
-/**
- * ✅ Voice engine with "silence auto-stop"
- * - Works with SpeechRecognition if available
- * - Fallback to MediaRecorder if not (Android Chrome)
- * - Auto-stops if no speech for `silenceMs` (default 8000)
- */
-function useVoiceSearch({ onText, lang = "en-IN" }) {
-  const recognitionRef = React.useRef(null);
-
-  const [supported, setSupported] = React.useState(false);
-  const [listening, setListening] = React.useState(false);
-  const [error, setError] = React.useState("");
-  const [interim, setInterim] = React.useState("");
-
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      setSupported(false);
-      return;
-    }
-
-    setSupported(true);
-
-    const recognition = new SR();
-    recognition.lang = lang;
-    recognition.interimResults = true;
-    recognition.continuous = false;
-
-    recognition.onstart = () => {
-      setListening(true);
-      setError("");
-      setInterim("");
-    };
-
-    recognition.onend = () => {
-      setListening(false);
-    };
-
-    recognition.onerror = (e) => {
-      setListening(false);
-      if (e.error === "not-allowed") {
-        setError("Microphone permission denied.");
-      } else {
-        setError("Voice search failed.");
-      }
-    };
-
-    recognition.onresult = (event) => {
-      let finalText = "";
-      let interimText = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalText += transcript;
-        else interimText += transcript;
-      }
-
-      setInterim(interimText);
-
-      if (finalText) {
-        onText?.(finalText.trim());
-        recognition.stop();
-      }
-    };
-
-    recognitionRef.current = recognition;
-
-    return () => {
-      recognition.stop();
-    };
-  }, [lang, onText]);
-
-  const start = () => {
-    if (!recognitionRef.current) return;
-    try {
-      recognitionRef.current.start();
-    } catch {}
-  };
-
-  const stop = () => {
-    recognitionRef.current?.stop();
-  };
-
-  return { supported, listening, error, interim, start, stop };
-}
-
-function HeroSearch({
+export default function HeroSearch({
   baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL,
+  size = "md",
   placeholders = [
-    "Try “EPR Plastic”…",
-    "Try “IMEI”…",
-    "Try “BIS Registration”…",
-    "Try “Pollution NOC”…",
+    "Search 500+ services — try “EPR”",
+    "Search 500+ services — try “BIS”",
+    "Search 500+ services — try “Factory licence”",
   ],
 }) {
+  const router = useRouter();
+
   const wrapRef = React.useRef(null);
   const inputRef = React.useRef(null);
-  const abortRef = React.useRef(null);
-  const popupRef = React.useRef(null);
   const panelRef = React.useRef(null);
+  const abortRef = React.useRef(null);
 
   const [open, setOpen] = React.useState(false);
   const [q, setQ] = React.useState("");
-  const dq = useDebouncedValue(q, 100);
+  const dq = useDebouncedValue(q, 180);
 
   const [loading, setLoading] = React.useState(false);
   const [apiData, setApiData] = React.useState(null);
   const [err, setErr] = React.useState("");
+  const [panelStyle, setPanelStyle] = React.useState(null);
 
-  const placeholder = useTypewriterPlaceholders(placeholders, 1600);
-
-  // ✅ popup state
-  const [voiceOpen, setVoiceOpen] = React.useState(false);
-
-  const voice = useVoiceSearch({
-    silenceMs: 8000,
-    onText: (text) => {
-      setOpen(true);
-      setQ(text);
-      inputRef.current?.focus?.();
-      // close popup once we got text
-      setVoiceOpen(false);
-    },
+  const isLarge = size === "lg";
+  const placeholder = useTypewriterPlaceholder(placeholders, {
+    active: !q && !open,
   });
 
-  const closeVoicePopup = () => {
-    setVoiceOpen(false);
-    voice.stop(); // ✅ closing popup stops listening always
-  };
-
-  const openVoicePopupAndStart = async () => {
-    setVoiceOpen(true);
-    await voice.start();
-  };
-
-  // close on outside click / esc
+  /* ------------------------------------------------ close on outside/esc */
   React.useEffect(() => {
     if (!open) return;
 
     const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        inputRef.current?.blur();
+      }
     };
 
-    const onMouseDown = (e) => {
-      // ✅ if voice popup open and click inside popup -> ignore
-      if (voiceOpen && popupRef.current?.contains(e.target)) return;
-
-      // ✅ if click is inside input area -> ignore
+    const onPointerDown = (e) => {
       if (wrapRef.current?.contains(e.target)) return;
-
-      // ✅ if click is inside dropdown panel (Portal) -> ignore
       if (panelRef.current?.contains(e.target)) return;
-
-      // otherwise close
       setOpen(false);
     };
 
     document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onMouseDown, true);
+    document.addEventListener("mousedown", onPointerDown, true);
+
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onMouseDown, true);
+      document.removeEventListener("mousedown", onPointerDown, true);
     };
-  }, [open, voiceOpen]);
+  }, [open]);
 
-  // fetch
+  /* ------------------------------------------------------------- fetching */
   React.useEffect(() => {
     if (!open) return;
 
     const query = dq.trim();
 
-    if (query.length < 2) return;
-    if (!query) {
+    if (query.length < 2) {
       setApiData(null);
       setErr("");
       setLoading(false);
       return;
     }
 
-    if (abortRef.current) abortRef.current.abort();
+    abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
@@ -362,16 +213,14 @@ function HeroSearch({
         setLoading(true);
         setErr("");
 
-        const url = `/api/search/service-industry-blog/${encodeURIComponent(
-          query,
-        )}`;
-
-        const res = await fetch(url, { signal: controller.signal });
+        const res = await fetch(
+          `/api/search/service-industry-blog/${encodeURIComponent(query)}`,
+          { signal: controller.signal },
+        );
 
         if (!res.ok) throw new Error(`Search failed: ${res.status}`);
 
-        const json = await res.json();
-        setApiData(json);
+        setApiData(await res.json());
       } catch (e) {
         if (e?.name === "AbortError") return;
         setErr("Something went wrong. Please try again.");
@@ -384,159 +233,126 @@ function HeroSearch({
     return () => controller.abort();
   }, [dq, open, baseUrl]);
 
-  const groups = React.useMemo(() => normalizeGroups(apiData), [apiData]);
-
-  const showPanel = open && (q.trim() || loading || err);
-
-  // ✅ auto-close popup when it stops listening (e.g. 8s silence)
+  /* ------------------------------------------------------ panel placement */
   React.useEffect(() => {
-    if (!voiceOpen) return;
-    if (!voice.listening && !voice.interim) {
-      // if it stopped without result, keep popup but show error if any.
-      // You can also auto-close:
-      // setVoiceOpen(false);
-    }
-  }, [voiceOpen, voice.listening, voice.interim]);
-
-  const [panelStyle, setPanelStyle] = React.useState(null);
-
-  React.useEffect(() => {
-    if (!showPanel) return;
+    if (!open) return;
 
     const update = () => {
       const el = wrapRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      setPanelStyle({ left: r.left, top: r.bottom + 8, width: r.width });
+      setPanelStyle({ left: r.left, top: r.bottom + 10, width: r.width });
     };
 
     update();
     window.addEventListener("scroll", update, true);
     window.addEventListener("resize", update);
+
     return () => {
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [showPanel]);
+  }, [open]);
+
+  const groups = React.useMemo(() => normalizeGroups(apiData), [apiData]);
+  const typed = q.trim();
+  const hasResults = groups.length > 0;
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!typed) {
+      inputRef.current?.focus();
+      return;
+    }
+    setOpen(false);
+    router.push(`/category/all?q=${encodeURIComponent(typed)}`);
+  };
+
+  const clear = () => {
+    setQ("");
+    setApiData(null);
+    setErr("");
+    setLoading(false);
+    inputRef.current?.focus();
+  };
 
   return (
-    <div ref={wrapRef} className="relative w-full max-w-xl">
-      {/* ✅ Voice Popup */}
-      <VoicePopup
-        open={voiceOpen}
-        listening={voice.listening}
-        interim={voice.interim}
-        error={voice.error}
-        onClose={closeVoicePopup}
-        popupRef={popupRef}
-        onMicClick={() => {
-          if (voice.listening) voice.stop();
-          else voice.start();
-        }}
-      />
-
-      {/* Search input */}
-      <div className="group flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100">
-        <span className="text-slate-400">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M21 21l-4.3-4.3"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <circle
-              cx="11"
-              cy="11"
-              r="7"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-          </svg>
+    <div ref={wrapRef} className="relative w-full">
+      <form
+        role="search"
+        onSubmit={submit}
+        className={[
+          "flex items-center gap-2 rounded-2xl border bg-white transition",
+          "border-slate-200 shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]",
+          "focus-within:border-blue-500 focus-within:shadow-[0_16px_38px_-22px_rgba(37,99,235,0.65)] focus-within:ring-4 focus-within:ring-blue-100",
+          isLarge ? "px-3 py-2 sm:px-4 sm:py-2.5" : "px-3 py-2",
+        ].join(" ")}
+      >
+        <span className="pl-0.5 text-slate-400">
+          <SearchIcon className={isLarge ? "h-6 w-6" : "h-5 w-5"} />
         </span>
 
+        <label htmlFor="hero-search" className="cs-sr-only">
+          Search Corpseed services
+        </label>
+
         <input
+          id="hero-search"
           ref={inputRef}
+          type="search"
           value={q}
+          autoComplete="off"
           onChange={(e) => {
             setQ(e.target.value);
             if (!open) setOpen(true);
           }}
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
-          className="w-full bg-transparent px-1 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
+          className={[
+            "w-full min-w-0 bg-transparent outline-none placeholder:text-slate-400",
+            "text-slate-900 [&::-webkit-search-cancel-button]:hidden",
+            isLarge ? "py-2.5 text-[15px] sm:text-[16px]" : "py-2 text-[14px]",
+          ].join(" ")}
         />
 
-        {/* 🎤 Mic button -> opens popup + starts listening */}
-        {/* <button
-          type="button"
-          onClick={() => {
-            if (voiceOpen) closeVoicePopup();
-            else openVoicePopupAndStart();
-          }}
-          disabled={!voice.supported}
-          title={!voice.supported ? "Voice not supported" : "Search by voice"}
-          aria-label="Search by voice"
-          className={[
-            "inline-flex h-9 w-9 items-center justify-center rounded-xl",
-            "border border-slate-200 bg-white text-slate-700 shadow-sm",
-            "hover:bg-slate-50 cursor-pointer",
-            voiceOpen ? "ring-2 ring-blue-300" : "",
-            !voice.supported ? "opacity-40 cursor-not-allowed" : "",
-          ].join(" ")}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M19 11a7 7 0 0 1-14 0"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M12 18v3"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button> */}
-
-        {/* Clear */}
         {q ? (
           <button
             type="button"
-            onClick={() => {
-              setQ("");
-              setApiData(null);
-              setErr("");
-              setLoading(false);
-              inputRef.current?.focus();
-            }}
-            className="rounded-xl px-2 py-1 text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"
+            onClick={clear}
+            aria-label="Clear search"
+            className="shrink-0 rounded-lg px-2 py-1.5 text-[13px] font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
           >
             Clear
           </button>
         ) : null}
+
+        <button
+          type="submit"
+          className={[
+            "shrink-0 cs-btn cs-btn--primary",
+            isLarge ? "!min-h-[44px] !px-5" : "!min-h-[38px] !px-4 !text-[13px]",
+          ].join(" ")}
+        >
+          <span className="hidden sm:inline">Search</span>
+          <span className="sm:hidden">
+            <SearchIcon className="h-5 w-5" />
+          </span>
+        </button>
+      </form>
+
+      {/* Trending shortcuts, always visible — discovery without typing */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+        <span className="text-[12.5px] font-semibold text-slate-500">
+          Popular:
+        </span>
+        {POPULAR_SEARCHES.slice(0, 4).map((s) => (
+          <Link key={s.href} href={s.href} className="cs-chip !min-h-[30px] !text-[12.5px]">
+            {s.label}
+          </Link>
+        ))}
       </div>
 
-      {/* Dropdown */}
-      {/* Dropdown */}
-      {showPanel && panelStyle ? (
+      {open && panelStyle ? (
         <Portal>
           <div
             ref={panelRef}
@@ -548,70 +364,62 @@ function HeroSearch({
               zIndex: 999999,
             }}
           >
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-              <div className="h-1 w-full bg-gradient-to-r from-slate-900 via-blue-600 to-slate-900 opacity-70" />
-
-              <div className="max-h-[52vh] overflow-y-auto p-4 [scrollbar-gutter:stable]">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_32px_70px_-30px_rgba(15,23,42,0.55)]">
+              <div className="max-h-[58vh] overflow-y-auto p-4 [scrollbar-gutter:stable]">
                 {err ? (
-                  <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-[14px] text-red-700">
                     {err}
                   </div>
                 ) : loading ? (
                   <div className="grid gap-4 sm:grid-cols-2">
-                    {Array.from({ length: 6 }).map((_, i) => (
+                    {Array.from({ length: 4 }).map((_, i) => (
                       <div key={i} className="space-y-2">
-                        <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
-                        <div className="h-3 w-56 animate-pulse rounded bg-slate-100" />
-                        <div className="h-3 w-48 animate-pulse rounded bg-slate-100" />
+                        <div className="h-3.5 w-32 animate-pulse rounded bg-slate-200" />
+                        <div className="h-11 animate-pulse rounded-xl bg-slate-100" />
+                        <div className="h-11 animate-pulse rounded-xl bg-slate-100" />
                       </div>
                     ))}
                   </div>
-                ) : !q.trim() ? (
-                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-sm font-semibold text-slate-900">
-                      Start typing to search
-                    </p>
-                    <p className="mt-1 text-sm text-slate-600">
-                      We’ll show Services, Knowledge Center, Department Updates,
-                      and more.
-                    </p>
+                ) : typed.length < 2 ? (
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <SuggestionList
+                      title="Most requested"
+                      items={POPULAR_SEARCHES}
+                      onPick={() => setOpen(false)}
+                    />
+                    <SuggestionList
+                      title="Trending this month"
+                      items={TRENDING}
+                      onPick={() => setOpen(false)}
+                    />
                   </div>
-                ) : groups.length ? (
-                  <div className="grid gap-6 sm:grid-cols-2">
+                ) : hasResults ? (
+                  <div className="grid gap-5 sm:grid-cols-2">
                     {groups.map(([groupTitle, list]) => (
                       <div key={groupTitle} className="min-w-0">
-                        <div className="mb-3 flex items-center justify-between">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <div className="mb-2.5 flex items-center justify-between">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.09em] text-slate-500">
                             {groupTitle}
                           </p>
-                          <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] text-slate-600">
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
                             {list.length}
                           </span>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           {list.slice(0, 6).map((x) => (
                             <Link
                               key={x?.url || x?.slug || x?.name}
-                              href={x?.url}
-                              // onClick={() => setOpen(false)}
-                              className="group block rounded-xl border border-slate-200 bg-white p-3 transition hover:border-slate-300 hover:shadow-sm cursor-pointer"
+                              href={x?.url || "#"}
+                              onClick={() => setOpen(false)}
+                              className="group flex items-start justify-between gap-3 rounded-xl border border-transparent px-3 py-2.5 transition hover:border-slate-200 hover:bg-slate-50"
                             >
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="min-w-0">
-                                  <p className="text-sm text-slate-900">
-                                    {x?.name}
-                                  </p>
-                                  {/* {x?.track ? (
-                                    <p className="mt-1 line-clamp-2 text-[12px] leading-5 text-slate-600">
-                                      {x.track}
-                                    </p>
-                                  ) : null} */}
-                                </div>
-                                <span className="mt-0.5 text-slate-400 transition group-hover:translate-x-0.5">
-                                  →
-                                </span>
-                              </div>
+                              <span className="min-w-0 text-[14px] leading-snug text-slate-800 group-hover:text-blue-700">
+                                {x?.name}
+                              </span>
+                              <span className="mt-0.5 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600">
+                                →
+                              </span>
                             </Link>
                           ))}
                         </div>
@@ -619,30 +427,45 @@ function HeroSearch({
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="text-sm font-semibold text-slate-900">
-                      No results found for “{q.trim()}”.
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-[14px] font-semibold text-slate-900">
+                      No matches for “{typed}”.
                     </p>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Try “EPR”, “BIS”, “NOC”, “IMEI”…
+                    <p className="mt-1 text-[13.5px] text-slate-600">
+                      Try a shorter term, or talk to an expert — we cover 500+
+                      services.
                     </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {POPULAR_SEARCHES.slice(0, 4).map((s) => (
+                        <Link
+                          key={s.href}
+                          href={s.href}
+                          onClick={() => setOpen(false)}
+                          className="cs-chip !min-h-[30px] !text-[12.5px]"
+                        >
+                          {s.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
 
-              <div className="border-t border-slate-200 bg-white px-4 py-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-slate-600">
-                    Press <span className="font-semibold">Esc</span> to close
-                  </p>
-                  <Link
-                    href="/service"
-                    onClick={() => setOpen(false)}
-                    className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
-                  >
-                    Go to Services →
-                  </Link>
-                </div>
+              <div className="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50/70 px-4 py-2.5">
+                <p className="text-[11.5px] text-slate-500">
+                  Press <kbd className="rounded border border-slate-300 bg-white px-1 font-sans">Esc</kbd>{" "}
+                  to close
+                </p>
+                <Link
+                  href="/category/all"
+                  onClick={() => setOpen(false)}
+                  className="cs-link-arrow !text-[12px]"
+                >
+                  Browse all 500+ services
+                  <span className="cs-arrow" aria-hidden="true">
+                    →
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
@@ -652,4 +475,32 @@ function HeroSearch({
   );
 }
 
-export default HeroSearch;
+function SuggestionList({ title, items, onPick }) {
+  return (
+    <div className="min-w-0">
+      <p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.09em] text-slate-500">
+        {title}
+      </p>
+      <div className="space-y-1.5">
+        {items.map((s) => (
+          <Link
+            key={s.href}
+            href={s.href}
+            onClick={onPick}
+            className="group flex items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-2.5 transition hover:border-slate-200 hover:bg-slate-50"
+          >
+            <span className="flex min-w-0 items-center gap-2.5">
+              <SearchIcon className="h-4 w-4 shrink-0 text-slate-400" />
+              <span className="truncate text-[14px] text-slate-800 group-hover:text-blue-700">
+                {s.label}
+              </span>
+            </span>
+            <span className="shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600">
+              →
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}

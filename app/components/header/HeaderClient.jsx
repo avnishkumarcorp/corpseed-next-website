@@ -51,6 +51,8 @@ export default function HeaderClient({ menuData = [] }) {
     allCloseTimerRef.current = setTimeout(() => setAllOpen(false), 120);
   };
 
+  const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     // 🔥 Close all dropdowns when route changes
     setOpenKey(null);
@@ -59,10 +61,32 @@ export default function HeaderClient({ menuData = [] }) {
     setMobileOpen(false);
   }, [pathname]);
 
+  // Lift the sticky header off the page once it starts overlapping content.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+
+    // Deferred rather than called inline: the page can load already scrolled
+    // (restored position, #anchor), and a synchronous setState in an effect
+    // body triggers a cascading render.
+    const initial = requestAnimationFrame(onScroll);
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(initial);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header
+      className={[
+        "sticky top-0 z-50 bg-white/95 backdrop-blur transition-shadow duration-200",
+        scrolled ? "shadow-[0_6px_20px_-14px_rgba(15,23,42,0.6)]" : "",
+      ].join(" ")}
+    >
       <div className="border-b border-slate-200">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 cursor-pointer">
             <Image
@@ -103,30 +127,61 @@ export default function HeaderClient({ menuData = [] }) {
               </button>
             ))}
 
-            <div className="ml-6 flex items-center gap-4">
+            <div className="ml-4 flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => setSearchOpen((v) => !v)}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+                aria-label="Search services"
+                className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 px-3 text-[14px] font-medium text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer"
               >
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+                  <path
+                    d="M21 21l-4.3-4.3"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
                 Search
               </button>
 
-              <div className="ml-6 flex items-center gap-4">
-                <div
-                  className="relative"
-                  onMouseEnter={openAll}
-                  onMouseLeave={closeAll}
+              <div
+                className="relative"
+                onMouseEnter={openAll}
+                onMouseLeave={closeAll}
+              >
+                <button
+                  type="button"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[14px] font-medium text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer"
                 >
-                  <button className="rounded-lg bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600 cursor-pointer">
-                    All Corpseed
-                  </button>
+                  All Corpseed
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="m6 9 6 6 6-6"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
 
-                  <div onMouseEnter={openAll} onMouseLeave={closeAll}>
-                    <AllCorpseedDropdown open={allOpen} menuMap={menuMap} />
-                  </div>
+                <div onMouseEnter={openAll} onMouseLeave={closeAll}>
+                  <AllCorpseedDropdown open={allOpen} menuMap={menuMap} />
                 </div>
               </div>
+
+              {/* Persistent conversion action — audit #4 & #5 */}
+              <a
+                href="tel:+917558640644"
+                className="inline-flex h-10 items-center gap-2 rounded-lg bg-blue-600 px-4 text-[14px] font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1l-2.2 2.2Z" />
+                </svg>
+                Talk to expert
+              </a>
             </div>
 
             <div onMouseEnter={() => open(openKey)} onMouseLeave={close}>
@@ -139,15 +194,34 @@ export default function HeaderClient({ menuData = [] }) {
             </div>
           </nav>
 
-          {/* Mobile button */}
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            className="lg:hidden inline-flex items-center justify-center text-xl rounded-lg px-3 py-2 text-[#212529] hover:bg-slate-50 cursor-pointer"
-            aria-label="Open menu"
-          >
-            ☰
-          </button>
+          {/* Mobile actions */}
+          <div className="flex items-center gap-1 lg:hidden">
+            <a
+              href="tel:+917558640644"
+              aria-label="Call Corpseed"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-blue-700 transition hover:bg-blue-50"
+            >
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1l-2.2 2.2Z" />
+              </svg>
+            </a>
+
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-slate-800 transition hover:bg-slate-100 cursor-pointer"
+              aria-label="Open menu"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M4 7h16M4 12h16M4 17h16"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 

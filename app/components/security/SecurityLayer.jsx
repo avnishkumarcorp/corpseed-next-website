@@ -2,19 +2,29 @@
 
 import { useEffect } from "react";
 
+const EDITABLE = "input, textarea, select, [contenteditable=''], [contenteditable='true']";
+
+/** True when the event originated inside something the user is meant to type in. */
+function isEditableTarget(target) {
+  if (!target || typeof target.closest !== "function") return false;
+  return Boolean(target.closest(EDITABLE));
+}
+
 export default function SecurityLayer() {
   useEffect(() => {
-    const block = (e) => e.preventDefault();
+    // Content protection stays, but it must never reach form fields —
+    // otherwise users cannot select, copy or paste inside their own
+    // enquiry, search and subscribe inputs.
+    const block = (e) => {
+      if (isEditableTarget(e.target)) return;
+      e.preventDefault();
+    };
 
-    // disable right click
     document.addEventListener("contextmenu", block);
-
-    // disable copy / cut
     document.addEventListener("copy", block);
     document.addEventListener("cut", block);
     document.addEventListener("selectstart", block);
 
-    // disable inspect shortcuts
     const handleKeyDown = (e) => {
       if (
         e.key === "F12" ||

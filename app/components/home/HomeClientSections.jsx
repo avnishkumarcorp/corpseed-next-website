@@ -1,17 +1,26 @@
 import dynamic from "next/dynamic";
 
+/**
+ * Homepage sequence, per audit #3:
+ *   Hero → Stats → Trusted by → Popular services → Why Corpseed →
+ *   How it works → Leadership → Press → Insights → Products → Closing CTA
+ *
+ * Deep catalogue content now lives on the category and product pages; the
+ * homepage keeps one block per job to be done.
+ */
+
 const ClientsMarquee = dynamic(() => import("../clients/ClientsMarquee"), {
   loading: () => (
-    <section className="mx-auto max-w-7xl px-4 py-10">
-      <div className="h-[110px] rounded-xl border border-gray-200 bg-white" />
-    </section>
+    <div className="cs-container py-8">
+      <div className="h-[92px] rounded-2xl border border-slate-200 bg-white" />
+    </div>
   ),
 });
 
 const CardCarousel = dynamic(() => import("../carousel/CardCarousel"), {
   loading: () => (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="h-56 rounded-xl border border-gray-200 bg-white" />
+    <div className="cs-container py-10">
+      <div className="h-64 rounded-2xl border border-slate-200 bg-white" />
     </div>
   ),
 });
@@ -19,9 +28,7 @@ const CardCarousel = dynamic(() => import("../carousel/CardCarousel"), {
 const ComplianceUpdateSection = dynamic(
   () => import("./sections/ComplianceUpdateSection"),
 );
-const VirtualMeetingSection = dynamic(
-  () => import("./sections/VirtualMeetingSection"),
-);
+const ProcessSection = dynamic(() => import("./sections/ProcessSection"));
 const OurSupportSection = dynamic(() => import("./sections/OurSupportSection"));
 const NewsSection = dynamic(() => import("./sections/NewsSection"));
 const LatestArticlesSection = dynamic(
@@ -30,6 +37,10 @@ const LatestArticlesSection = dynamic(
 const LatestProductsSection = dynamic(
   () => import("./sections/LatestProductsSection"),
 );
+const VirtualMeetingSection = dynamic(
+  () => import("./sections/VirtualMeetingSection"),
+);
+const FinalCtaSection = dynamic(() => import("./sections/FinalCtaSection"));
 
 export default function HomeClientSections({
   homeData,
@@ -39,21 +50,25 @@ export default function HomeClientSections({
 }) {
   return (
     <>
-      <section className="mx-auto max-w-full px-4 bg-white">
-        <ClientsMarquee />
-      </section>
-      <div className="min-h-[350px]">
-        <CardCarousel data={homeData} />
-      </div>
+      <ClientsMarquee />
 
-      <div className="min-h-[450px]">
-        <ComplianceUpdateSection data={homeData} />
-      </div>
-      <VirtualMeetingSection data={homeData} />
-      <OurSupportSection data={homeData} />
+      <CardCarousel data={homeData} />
+
+      <ComplianceUpdateSection data={homeData} />
+
+      <ProcessSection />
+
+      <OurSupportSection />
+
       <NewsSection data={newsData} />
+
       <LatestArticlesSection data={latestBlogs} />
+
       <LatestProductsSection data={products} />
+
+      <VirtualMeetingSection />
+
+      <FinalCtaSection />
     </>
   );
 }

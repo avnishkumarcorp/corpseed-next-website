@@ -7,7 +7,7 @@ export async function getPressReleaseData({ page, size, filter }) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store", // good for dynamic content; change if needed
+        next: { revalidate: 300 },
       },
     );
 
@@ -34,7 +34,7 @@ export async function getPressReleaseBySlug(slug) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store", // good for dynamic content; change if needed
+        next: { revalidate: 300 },
       },
     );
     if (!res.ok) {
@@ -62,7 +62,7 @@ async function safeJson(res) {
 
 export async function getLatestNews() {
   try {
-    return await apiGet("/api/news/latest", { cache: "no-store" });
+    return await apiGet("/api/news/latest", { revalidate: 300 });
   } catch (e) {
     console.error("getLatestNews error:", e);
     return [];
@@ -77,7 +77,7 @@ export async function getLatestUpdatedPressRelease() {
     const res = await fetch(`${base}/api/updated-press-release/latest`, {
       method: "GET",
       headers: { Accept: "application/json" },
-      cache: "no-store", // ✅ FIXED
+      next: { revalidate: 300 },
     });
 
     if (!res.ok) {

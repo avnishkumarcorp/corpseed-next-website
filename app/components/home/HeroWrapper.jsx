@@ -1,9 +1,10 @@
-// app/(home)/HeroWrapper.jsx
-
-import { getHomeTestData } from "@/app/lib/home";
 import HomeHeroSection from "./sections/HomeHeroSection";
 
-export default async function HeroWrapper() {
-  const homeData = await getHomeTestData();
-  return <HomeHeroSection data={homeData} />;
+/**
+ * The hero is entirely static copy now, so it no longer waits on the home
+ * API before painting — the largest element on the page renders on the
+ * first byte instead of after a round trip.
+ */
+export default function HeroWrapper() {
+  return <HomeHeroSection />;
 }

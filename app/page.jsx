@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import HeroWrapper from "./components/home/HeroWrapper";
 import HomeClientSectionsWrapper from "./components/home/HomeClientSectionsWrapper";
+import TrustStatsSection from "./components/home/sections/TrustStatsSection";
 import { getHomeTestData } from "./lib/home";
 
 export async function generateMetadata() {
@@ -39,9 +40,12 @@ export async function generateMetadata() {
 export default function HomePage() {
   return (
     <>
-      <Suspense fallback={<div className="h-[500px]" />}>
+      <Suspense fallback={<div className="h-[560px]" />}>
         <HeroWrapper />
       </Suspense>
+
+      {/* Static, so it renders immediately below the hero — audit #8 & #13 */}
+      <TrustStatsSection />
 
       <Suspense fallback={<div className="h-[1200px]" />}>
         <HomeClientSectionsWrapper />

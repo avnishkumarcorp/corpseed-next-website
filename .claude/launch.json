@@ -4,8 +4,26 @@
     {
       "name": "corpseed-web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3100"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3100"
+      ],
       "port": 3100
+    },
+    {
+      "name": "corpseed-web-prod",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start",
+        "--",
+        "-p",
+        "3210"
+      ],
+      "port": 3210
     }
   ]
 }

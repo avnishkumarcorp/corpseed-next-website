@@ -38,8 +38,17 @@ export async function generateMetadata() {
   };
 }
 
-export default async function CategoryAllPage() {
+export default async function CategoryAllPage({ searchParams }) {
   const data = await getAllCategories();
 
-  return <ServicesCatalogue apiData={data} />;
+  // ?q= lets the homepage search box hand off a query (server-side, so the
+  // filtered result is in the first paint).
+  const { q } = await searchParams;
+
+  return (
+    <ServicesCatalogue
+      apiData={data}
+      initialQuery={typeof q === "string" ? q : ""}
+    />
+  );
 }

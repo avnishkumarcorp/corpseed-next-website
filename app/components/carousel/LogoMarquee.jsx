@@ -5,7 +5,14 @@ export default function LogoMarquee({
   imageBaseUrl = "",
   height = 46,
   itemWidth = 120,
-  speed = 500, // 60s = slow and smooth
+  /**
+   * Seconds each logo takes to cross the viewport. Duration is derived from
+   * the number of logos so the *speed* stays constant no matter how many
+   * clients the API returns — a fixed total duration made the marquee race
+   * whenever the list grew.
+   */
+  secondsPerLogo = 4.5,
+  speed,
 }) {
   const normalized = items.map((it, i) => {
     const raw = it?.imageURL || it?.imageUrl || it?.logoUrl || it?.image || "";
@@ -60,6 +67,11 @@ export default function LogoMarquee({
       </div>
     ));
 
+  // One cycle moves the track by -50% (exactly one group), so the duration
+  // must scale with the group's length to keep a steady pace.
+  const durationSeconds =
+    speed ?? Math.max(30, Math.round(normalized.length * secondsPerLogo));
+
   return (
     <div className="relative w-full bg-white py-4 overflow-hidden">
       {/* Gradient fade */}
@@ -68,8 +80,8 @@ export default function LogoMarquee({
 
       <div className="overflow-hidden">
         <div
-          className="flex w-max animate-marquee hover:[animation-play-state:paused]"
-          style={{ animationDuration: `${speed}s` }}
+          className="cs-marquee flex w-max"
+          style={{ animationDuration: `${durationSeconds}s` }}
         >
           <div className="flex items-center gap-16">{renderGroup()}</div>
           <div className="flex items-center gap-16">{renderGroup("-dup")}</div>

@@ -34,7 +34,7 @@ export async function getKnowledgeCentreList({
 
     // ✅ List page changes often → cache for 60s
     return await apiGet(`/api/updated-knowledge-centre?${params.toString()}`, {
-      cache: "no-store",
+      revalidate: 60,
     });
   } catch (e) {
     console.error("getKnowledgeCentreList error:", e);
@@ -50,7 +50,7 @@ export async function getKnowledgeCentreBySlug(slug) {
     return await apiGet(
       `/api/updated-knowledge-centre/${encodeURIComponent(slug)}`,
       {
-        cache: "no-store",
+        revalidate: 300,
       },
     );
   } catch (e) {
@@ -62,7 +62,7 @@ export async function getKnowledgeCentreBySlug(slug) {
 export async function getLatestBlogs() {
   try {
     // ✅ Homepage latest blogs → cache 5 minutes
-    const data = await apiGet("/api/blogs/latest", { cache: "no-store" });
+    const data = await apiGet("/api/blogs/latest", { revalidate: 300 });
     return Array.isArray(data) ? data : [];
   } catch (e) {
     console.error("getLatestBlogs error:", e);

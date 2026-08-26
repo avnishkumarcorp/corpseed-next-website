@@ -6,17 +6,24 @@ function getApiBase() {
   return base.replace(/\/$/, "");
 }
 
-export async function apiGet(path, { revalidate = 600 } = {}) {
+export async function apiGet(path, { revalidate = 600, cache } = {}) {
   const base = getApiBase();
   if (!base) throw new Error("Missing API_BASE_URL / NEXT_PUBLIC_API_BASE_URL");
 
   // ✅ ensure single slash between base + path
   const url = `${base}${path.startsWith("/") ? "" : "/"}${path}`;
 
+  // The `revalidate` option used to be accepted and then thrown away — every
+  // call hardcoded `no-store`, so every page view re-fetched the API from
+  // scratch and no caller's cache hint did anything. Honour it, and let a
+  // caller still opt out explicitly with `{ cache: "no-store" }`.
+  const cacheOptions =
+    cache === "no-store" ? { cache: "no-store" } : { next: { revalidate } };
+
   const res = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
-    cache: "no-store",
+    ...cacheOptions,
   });
 
   // ✅ treat not-found as null (no crash)

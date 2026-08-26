@@ -31,7 +31,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function CategorySlugPage({ params }) {
+export default async function CategorySlugPage({ params, searchParams }) {
   const { slug } = await params;
   const data = await getAllCategories();
 
@@ -42,5 +42,15 @@ export default async function CategorySlugPage({ params }) {
     notFound();
   }
 
-  return <ServicesCatalogue apiData={data} activeSlug={slug} />;
+  // ?q= lets the homepage search box hand off a query. Read on the server so
+  // the filtered result is in the first paint, not applied after hydration.
+  const { q } = await searchParams;
+
+  return (
+    <ServicesCatalogue
+      apiData={data}
+      activeSlug={slug}
+      initialQuery={typeof q === "string" ? q : ""}
+    />
+  );
 }

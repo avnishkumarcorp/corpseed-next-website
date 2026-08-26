@@ -4,28 +4,20 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-/**
- * You can still keep this fallback if needed
- */
 const FALLBACK_DATA = {
-  title: "Our Exclusive Services",
-  cta: { label: "SEE ALL SERVICES", href: "/service" },
+  title: "Popular services",
+  cta: { label: "Browse all 500+ services", href: "/category/all" },
   specialCategories: [],
   cardCategories: [],
 };
 
 /**
- * Reusable section
- * @param {object} props.data - your API response object
- * @param {string} props.defaultTabKey
- * @param {boolean} props.showDots
+ * Audit #2 / #7 — surface a curated set first, keep every card the same
+ * shape, and label the standouts instead of decorating every tile.
  */
-export default function CardCarousel({
-  data = FALLBACK_DATA,
-  defaultTabKey,
-  showDots = false,
-}) {
-  // ---------- 1) Pick source array from API ----------
+const FEATURED_COUNT = 3; // first N cards in each tab get a "Most popular" flag
+
+export default function CardCarousel({ data = FALLBACK_DATA, defaultTabKey }) {
   const sourceList = useMemo(() => {
     if (Array.isArray(data?.specialCategories) && data.specialCategories.length)
       return data.specialCategories;
@@ -33,19 +25,13 @@ export default function CardCarousel({
     if (Array.isArray(data?.cardCategories) && data.cardCategories.length)
       return data.cardCategories;
 
-    // if someone passes already-normalized
-    if (Array.isArray(data?.tabs) && data?.itemsByTab) return [];
-
     return [];
   }, [data]);
 
-  // ---------- 2) Build tabs + itemsByTab from API ----------
   const normalized = useMemo(() => {
-    // If already normalized, use as-is
     if (Array.isArray(data?.tabs) && data?.itemsByTab) {
       return {
-        title: data?.title || "Our Exclusive Services",
-        cta: data?.cta || { label: "SEE ALL SERVICES", href: "/services" },
+        cta: data?.cta || FALLBACK_DATA.cta,
         tabs: data.tabs,
         itemsByTab: data.itemsByTab,
       };
@@ -71,19 +57,11 @@ export default function CardCarousel({
       return acc;
     }, {});
 
-    return {
-      title: data?.title || "Our Exclusive Services",
-      cta: data?.cta || { label: "SEE ALL SERVICES", href: "/service" },
-      tabs,
-      itemsByTab,
-    };
+    return { cta: data?.cta || FALLBACK_DATA.cta, tabs, itemsByTab };
   }, [data, sourceList]);
 
-  // ---------- 3) Safe values ----------
-  const title = "Our Exclusive Services";
-
-  const ctaLabel = normalized?.cta?.label || "SEE ALL SERVICES";
-  const ctaHref = normalized?.cta?.href || "/category/all";
+  const ctaLabel = normalized?.cta?.label || FALLBACK_DATA.cta.label;
+  const ctaHref = normalized?.cta?.href || FALLBACK_DATA.cta.href;
 
   const tabs = Array.isArray(normalized?.tabs) ? normalized.tabs : [];
   const itemsByTab =
@@ -91,14 +69,11 @@ export default function CardCarousel({
       ? normalized.itemsByTab
       : {};
 
-  // Pick a safe initial tab
   const initialTab =
-    defaultTabKey ||
-    (tabs[0]?.key ?? (Object.keys(itemsByTab)[0] || "default"));
+    defaultTabKey || tabs[0]?.key || Object.keys(itemsByTab)[0] || "default";
 
   const [activeTab, setActiveTab] = useState(initialTab);
 
-  // If tabs/data change, keep activeTab valid
   useEffect(() => {
     const availableKeys = tabs.map((t) => t?.key).filter(Boolean);
     const fallbackKey =
@@ -116,333 +91,246 @@ export default function CardCarousel({
   }, [activeTab, itemsByTab]);
 
   return (
-    <section className="relative overflow-x-hidden bg-[#EEF6FF] py-8">
-      <div className="mx-auto w-[calc(100%-32px)]">
-        <h2 className="text-center text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
-          {title}
-        </h2>
+    <section className="w-full overflow-x-hidden bg-gradient-to-b from-blue-50/80 to-white">
+      <div className="cs-container cs-section--tight">
+        <div className="cs-section-head cs-section-head--split">
+          <div>
+            <span className="cs-eyebrow">Start here</span>
+            <h2 className="cs-section-title">Popular compliance services</h2>
+            <p className="cs-section-sub">
+              The approvals businesses ask us for most. Pick a category, or
+              search the full catalogue of 500+ services.
+            </p>
+          </div>
 
-        {/* Tabs */}
+          <Link href={ctaHref} className="cs-btn cs-btn--secondary shrink-0">
+            {ctaLabel}
+            <span className="cs-arrow" aria-hidden="true">
+              →
+            </span>
+          </Link>
+        </div>
+
         {tabs?.length > 0 && (
-          <div className="mt-2 flex justify-center">
+          <div className="mt-7">
             <Tabs tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
           </div>
         )}
 
-        {/* Carousel */}
-        <div className="mt-2">
-          <ServicesCarousel items={items} showDots={showDots} />
-        </div>
-
-        {/* CTA */}
-        <div className="mt-10 flex justify-center">
-          <Link
-            href={ctaHref}
-            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
-          >
-            {ctaLabel}
-          </Link>
+        <div className="mt-6">
+          <ServicesCarousel items={items} />
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------------- Tabs ---------------- */
+/* ------------------------------------------------------------------ Tabs */
+
 function Tabs({ tabs = [], activeKey, onChange }) {
   const safeTabs = Array.isArray(tabs) ? tabs.filter(Boolean) : [];
 
   return (
-    <div className="w-full max-w-5xl">
-      <div className="no-scrollbar flex items-center gap-6 overflow-x-auto px-2 py-2.5 md:justify-center">
-        {safeTabs.map((t) => {
-          const key = t?.key ?? t?.label;
-          const label = t?.label ?? String(key ?? "");
-          const isActive = key === activeKey;
+    <div
+      role="tablist"
+      aria-label="Service categories"
+      className="no-scrollbar -mx-1 flex items-center gap-2 overflow-x-auto px-1 py-1"
+    >
+      {safeTabs.map((t) => {
+        const key = t?.key ?? t?.label;
+        const label = t?.label ?? String(key ?? "");
+        const isActive = key === activeKey;
 
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onChange?.(key)}
-              className={[
-                "relative cursor-pointer whitespace-nowrap text-lg font-medium",
-                isActive
-                  ? "text-blue-600"
-                  : "text-gray-800 hover:text-blue-600",
-              ].join(" ")}
-            >
-              {label}
-              {isActive && (
-                <span className="absolute -bottom-2 left-0 h-[2px] w-full rounded-full bg-blue-600" />
-              )}
-            </button>
-          );
-        })}
-      </div>
+        return (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onChange?.(key)}
+            className={[
+              "shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[14px] font-semibold transition duration-200",
+              isActive
+                ? "border-blue-600 bg-blue-600 text-white shadow-[0_10px_22px_-14px_rgba(37,99,235,0.9)]"
+                : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700",
+            ].join(" ")}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-/* ---------------- Carousel ---------------- */
-function ServicesCarousel({ items = [], showDots = true }) {
-  const trackRef = useRef(null);
-  const groupRef = useRef(null);
-  const jumpRafRef = useRef(null);
-  const hoverPausedRef = useRef(false);
-  const isJumpingRef = useRef(false);
+/* ------------------------------------------------------------- Carousel */
+
+function ServicesCarousel({ items = [] }) {
+  const scrollerRef = useRef(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
 
   const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
 
-  useEffect(() => {
-    return () => {
-      if (jumpRafRef.current) {
-        cancelAnimationFrame(jumpRafRef.current);
-      }
-    };
+  const syncArrows = React.useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const max = el.scrollWidth - el.clientWidth;
+    setCanPrev(el.scrollLeft > 8);
+    setCanNext(el.scrollLeft < max - 8);
   }, []);
 
-  const getTrackAnimation = () => {
-    const track = trackRef.current;
-    if (!track) return null;
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
 
-    const animations = track.getAnimations?.() || [];
-    return animations[0] || null;
-  };
+    syncArrows();
 
-  const pauseTrack = () => {
-    hoverPausedRef.current = true;
+    el.addEventListener("scroll", syncArrows, { passive: true });
+    const ro = new ResizeObserver(syncArrows);
+    ro.observe(el);
 
-    const animation = getTrackAnimation();
-    if (!animation) return;
-
-    animation.pause();
-  };
-
-  const resumeTrack = () => {
-    hoverPausedRef.current = false;
-
-    const animation = getTrackAnimation();
-    if (!animation || isJumpingRef.current) return;
-
-    animation.play();
-  };
-
-  const getAnimationDurationMs = (track) => {
-    const computedStyle = window.getComputedStyle(track);
-    const durationValue = computedStyle.animationDuration || "30s";
-
-    if (durationValue.includes("ms")) {
-      return parseFloat(durationValue) || 30000;
-    }
-
-    if (durationValue.includes("s")) {
-      return (parseFloat(durationValue) || 30) * 1000;
-    }
-
-    return 30000;
-  };
-
-  const smootherStep = (t) => {
-    // Very smooth acceleration/deceleration
-    return t * t * t * (t * (t * 6 - 15) + 10);
-  };
-
-  const moveCards = (direction) => {
-    const track = trackRef.current;
-    const group = groupRef.current;
-
-    if (!track || !group) return;
-
-    const animation = getTrackAnimation();
-    if (!animation) return;
-
-    if (jumpRafRef.current) {
-      cancelAnimationFrame(jumpRafRef.current);
-    }
-
-    isJumpingRef.current = true;
-
-    // Freeze base animation while we manually move its timeline
-    animation.pause();
-
-    const durationMs = getAnimationDurationMs(track);
-
-    const firstCard = group.querySelector("[data-service-card]");
-    const groupStyle = window.getComputedStyle(group);
-
-    const gap =
-      parseFloat(groupStyle.columnGap || groupStyle.gap || "24") || 24;
-
-    const cardWidth = firstCard?.getBoundingClientRect?.().width || 280;
-    const stepPx = cardWidth + gap;
-
-    const cycleWidth = group.scrollWidth || track.scrollWidth / 2 || 1;
-    const jumpMs = (stepPx / cycleWidth) * durationMs;
-
-    const startAnimationTime =
-      typeof animation.currentTime === "number" ? animation.currentTime : 0;
-
-    const distance = direction === "next" ? jumpMs : -jumpMs;
-
-    // Higher value = smoother / slower button slide
-    const jumpDuration = 950;
-    const startTime = performance.now();
-
-    const animateJump = (now) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / jumpDuration, 1);
-      const eased = smootherStep(progress);
-
-      let nextTime = startAnimationTime + distance * eased;
-
-      nextTime = ((nextTime % durationMs) + durationMs) % durationMs;
-
-      animation.currentTime = nextTime;
-
-      if (progress < 1) {
-        jumpRafRef.current = requestAnimationFrame(animateJump);
-      } else {
-        jumpRafRef.current = null;
-        isJumpingRef.current = false;
-
-        if (hoverPausedRef.current) {
-          animation.pause();
-        } else {
-          animation.play();
-        }
-      }
+    return () => {
+      el.removeEventListener("scroll", syncArrows);
+      ro.disconnect();
     };
+  }, [syncArrows, safeItems.length]);
 
-    jumpRafRef.current = requestAnimationFrame(animateJump);
+  const scrollByCards = (direction) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const card = el.querySelector("[data-service-card]");
+    const step = card ? card.getBoundingClientRect().width + 20 : 300;
+
+    el.scrollBy({
+      left: direction === "next" ? step : -step,
+      behavior: "smooth",
+    });
   };
 
   if (safeItems.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-10 text-center text-sm text-gray-600">
-        No services available right now.
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-10 text-center">
+        <p className="text-[15px] font-semibold text-slate-900">
+          Services are loading
+        </p>
+        <p className="mt-1 text-[14px] text-slate-600">
+          Meanwhile, you can{" "}
+          <Link href="/category/all" className="font-semibold text-blue-700 underline">
+            browse the full catalogue
+          </Link>
+          .
+        </p>
       </div>
     );
   }
 
   return (
-    <div
-      className="relative w-full overflow-hidden px-0 py-2"
-      onPointerEnter={pauseTrack}
-      onPointerMove={() => {
-        if (!hoverPausedRef.current) pauseTrack();
-      }}
-      onPointerLeave={resumeTrack}
-      onFocusCapture={pauseTrack}
-      onBlurCapture={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) {
-          resumeTrack();
-        }
-      }}
-    >
-      {safeItems.length > 1 && (
-        <button
-          type="button"
-          onClick={() => moveCards("prev")}
-          className="
-            absolute left-2 top-1/2 z-20 flex h-11 w-11
-            -translate-y-1/2 cursor-pointer items-center justify-center rounded-full
-            bg-white/95 shadow-md ring-1 ring-black/5
-            hover:shadow-lg
-          "
-          aria-label="Previous"
-        >
-          <ChevronLeft className="h-5 w-5 text-gray-700" />
-        </button>
-      )}
-
-      {safeItems.length > 1 && (
-        <button
-          type="button"
-          onClick={() => moveCards("next")}
-          className="
-            absolute right-2 top-1/2 z-20 flex h-11 w-11
-            -translate-y-1/2 cursor-pointer items-center justify-center rounded-full
-            bg-white/95 shadow-md ring-1 ring-black/5
-            hover:shadow-lg
-          "
-          aria-label="Next"
-        >
-          <ChevronRight className="h-5 w-5 text-gray-700" />
-        </button>
-      )}
-
+    <div className="relative">
+      {/* Native scroll-snap: no timers, no layout thrash, works with touch,
+          trackpad and keyboard out of the box. */}
       <div
-        ref={trackRef}
-        className="flex w-max flex-row items-stretch"
-        style={{
-          animationName: "servicesInfiniteScroll",
-          animationDuration: "30s",
-          animationTimingFunction: "linear",
-          animationIterationCount: "infinite",
-          willChange: "transform",
-        }}
+        ref={scrollerRef}
+        className="cs-scroll-x -mx-1 gap-5 px-1 pb-2 pt-1"
+        tabIndex={0}
+        aria-label="Popular services"
       >
-        <div
-          ref={groupRef}
-          className="flex shrink-0 flex-row items-stretch gap-6 pr-6"
-        >
-          {safeItems.map((it, idx) => (
-            <ServiceTile
-              key={it?.id ? `serviceTile-${it.id}` : `tile-${idx}`}
-              item={it}
-            />
-          ))}
-        </div>
-
-        <div className="flex shrink-0 flex-row items-stretch gap-6 pr-6">
-          {safeItems.map((it, idx) => (
-            <ServiceTile
-              key={it?.id ? `serviceTile-dup-${it.id}` : `tile-dup-${idx}`}
-              item={it}
-            />
-          ))}
-        </div>
+        {safeItems.map((item, idx) => (
+          <ServiceTile
+            key={item?.id ? `service-${item.id}` : `service-${idx}`}
+            item={item}
+            featured={idx < FEATURED_COUNT}
+          />
+        ))}
       </div>
+
+      {/* Edge fades hint at more content */}
+      <div
+        aria-hidden="true"
+        className={[
+          "pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-white to-transparent transition-opacity duration-300 sm:w-14",
+          canPrev ? "opacity-100" : "opacity-0",
+        ].join(" ")}
+      />
+      <div
+        aria-hidden="true"
+        className={[
+          "pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent transition-opacity duration-300 sm:w-14",
+          canNext ? "opacity-100" : "opacity-0",
+        ].join(" ")}
+      />
+
+      {safeItems.length > 1 && (
+        <div className="mt-5 flex items-center justify-center gap-3 md:justify-end">
+          <button
+            type="button"
+            onClick={() => scrollByCards("prev")}
+            disabled={!canPrev}
+            className="cs-nav-btn"
+            aria-label="Previous services"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollByCards("next")}
+            disabled={!canNext}
+            className="cs-nav-btn"
+            aria-label="More services"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-/* ---------------- Card ---------------- */
-function ServiceTile({ item }) {
+/* ----------------------------------------------------------------- Card */
+
+function ServiceTile({ item, featured }) {
   const title = item?.title || "Untitled Service";
   const desc = item?.desc || "Description will be available soon.";
   const href = item?.href || "#";
 
   return (
-    <div
+    <article
       data-service-card
       className={[
-        "w-[85vw] min-w-[85vw] max-w-[85vw]",
-        "sm:w-[280px] sm:min-w-[280px] sm:max-w-[280px]",
-        "shrink-0",
-        "rounded-2xl bg-white p-6",
-        "shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
-        "flex flex-col",
-        "min-h-[260px]",
+        "cs-card cs-card--hover group shrink-0 p-6",
+        "w-[82vw] sm:w-[300px]",
       ].join(" ")}
     >
-      <h5 className="font-medium text-lg leading-snug text-[#212529] line-clamp-2">
-        {title}
-      </h5>
+      {featured ? (
+        <span className="cs-badge cs-badge--accent mb-3 self-start">
+          Most popular
+        </span>
+      ) : (
+        <span className="cs-badge cs-badge--brand mb-3 self-start">Service</span>
+      )}
 
-      <p className="mt-2 text-sm leading-6 text-[#212529] line-clamp-6">
-        {desc}
-      </p>
-
-      <div className="mt-auto flex justify-end pt-6">
-        <Link
-          href={href}
-          className="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-700"
-        >
-          Explore more &nbsp;›
+      <h3 className="cs-card__title cs-clamp-2 transition-colors group-hover:text-blue-700">
+        <Link href={href} className="after:absolute after:inset-0">
+          {title}
         </Link>
+      </h3>
+
+      <p className="cs-card__desc mt-2.5 cs-clamp-4">{desc}</p>
+
+      <div className="mt-auto flex items-center justify-between gap-3 pt-6">
+        <span className="cs-link-arrow !text-[13.5px]">
+          Get a quote
+          <span className="cs-arrow" aria-hidden="true">
+            →
+          </span>
+        </span>
+
+        <span className="text-[12px] font-medium text-slate-400">
+          Flat fee
+        </span>
       </div>
-    </div>
+    </article>
   );
 }

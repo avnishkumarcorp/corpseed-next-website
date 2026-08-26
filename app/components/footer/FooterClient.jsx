@@ -107,13 +107,15 @@ export default function FooterClient({ data }) {
   return (
     <footer className="w-full bg-white">
       {/* Top strip */}
-      <div className="border-y border-slate-200">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <div className="border-y border-slate-200 bg-slate-50/60">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           {/* Follow us */}
-          <div className="col-lg-4 d-flex align-items-center">
-            <div className="w-full flex justify-center items-center gap-1.5">
-              <h4 className="text-xl font-semibold !m-0">Follow Us : </h4>
-              <nav className="flex gap-1.5">
+          <div className="flex items-center">
+            <div className="flex w-full items-center justify-center gap-3 lg:justify-start">
+              <span className="text-[14px] font-semibold text-slate-700">
+                Follow us
+              </span>
+              <nav aria-label="Corpseed on social media" className="flex gap-1.5">
                 <a
                   href="https://www.linkedin.com/company/corpseed/"
                   target="_blank"
@@ -244,29 +246,35 @@ export default function FooterClient({ data }) {
           </div>
 
           {/* ✅ Subscribe */}
-          <div className="w-full max-w-2xl lg:w-auto">
+          <div className="w-full max-w-xl lg:w-auto lg:min-w-[420px]">
+            <label
+              htmlFor="footer-subscribe"
+              className="mb-2 block text-[13.5px] text-slate-600"
+            >
+              Monthly compliance deadlines and rule changes, in one email.
+            </label>
+
             <form
-              className="flex w-full items-center gap-0"
+              className="flex w-full items-center gap-2"
               onSubmit={handleSubscribe}
             >
               <input
+                id="footer-subscribe"
                 type="email"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   if (status.type) setStatus({ type: "", msg: "" });
                 }}
-                placeholder="Email address..."
-                className="h-11 w-full rounded-none border border-slate-300 bg-white px-4 text-[14px] text-slate-700 outline-none focus:border-blue-600"
+                placeholder="you@company.com"
+                className="h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-[14px] text-slate-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className={`h-11 whitespace-nowrap px-6 text-[14px] font-semibold text-white cursor-pointer transition
-      ${submitting ? "bg-slate-700 opacity-80" : "bg-black hover:bg-slate-900"}
-    `}
+                className="cs-btn cs-btn--primary !min-h-[44px] shrink-0 disabled:opacity-70"
               >
-                {submitting ? "Subscribing..." : "Subscribe"}
+                {submitting ? "Subscribing…" : "Subscribe"}
               </button>
             </form>
 
@@ -288,56 +296,26 @@ export default function FooterClient({ data }) {
         </div>
       </div>
 
-      {/* Links */}
+      {/* Links — collapsed into named groups on mobile (audit #18) */}
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-14 lg:gap-y-10">
+        <div className="divide-y divide-slate-200 sm:grid sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10 sm:divide-y-0 lg:grid-cols-4 lg:gap-x-14">
           {footerCols.map((col) => (
-            <div key={col.title} className="min-w-0">
-              <h3 className="text-[18px] font-semibold text-slate-900">
-                {col.title}
-              </h3>
-
-              <ul className="mt-6 space-y-3">
-                {col.links.map((l) => (
-                  <li key={l.href + l.label}>
-                    <Link
-                      href={l.href}
-                      className="text-[14px] text-slate-600 hover:text-slate-900 cursor-pointer"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <FooterGroup key={col.title} title={col.title} links={col.links} />
           ))}
 
-          {/* STATIC About Us Column */}
-          <div className="min-w-0">
-            <h3 className="text-[18px] font-semibold text-slate-900">
-              {ABOUT_US_COL.title}
-            </h3>
-
-            <ul className="mt-6 space-y-3">
-              {ABOUT_US_COL.links.map((l) => (
-                <li key={l.href + l.label}>
-                  <Link
-                    href={l.href}
-                    className="text-[14px] text-slate-600 hover:text-slate-900 cursor-pointer"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterGroup
+            title={ABOUT_US_COL.title}
+            links={ABOUT_US_COL.links}
+            showAll
+          />
         </div>
-        <div className="flex justify-center mt-2.5">
-          <Link
-            href={"/category/all"}
-            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 cursor-pointer"
-          >
-            SEE ALL SERVICES
+
+        <div className="mt-8 flex justify-center">
+          <Link href="/category/all" className="cs-btn cs-btn--primary">
+            Browse all 500+ services
+            <span className="cs-arrow" aria-hidden="true">
+              →
+            </span>
           </Link>
         </div>
       </div>
@@ -390,6 +368,65 @@ export default function FooterClient({ data }) {
         </div>
       </div>
     </footer>
+  );
+}
+
+/** Mobile: a tappable disclosure. Desktop: a plain, always-open column. */
+const MOBILE_LINK_CAP = 8;
+
+function FooterGroup({ title, links = [], showAll = false }) {
+  const visible = showAll ? links : links.slice(0, MOBILE_LINK_CAP);
+  const hidden = links.length - visible.length;
+
+  return (
+    <details className="cs-footer-group min-w-0">
+      <summary>
+        <h3 className="text-[15px] font-semibold text-slate-900 sm:text-[16px]">
+          {title}
+        </h3>
+
+        <svg
+          className="cs-footer-caret shrink-0"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </summary>
+
+      <ul className="space-y-2.5 pb-5 sm:mt-5 sm:pb-0">
+        {visible.map((l) => (
+          <li key={l.href + l.label}>
+            <Link
+              href={l.href}
+              className="text-[14px] leading-relaxed text-slate-600 transition-colors hover:text-blue-700"
+            >
+              {l.label}
+            </Link>
+          </li>
+        ))}
+
+        {hidden > 0 ? (
+          <li>
+            <Link
+              href="/category/all"
+              className="text-[14px] font-semibold text-blue-700 hover:underline"
+            >
+              +{hidden} more
+            </Link>
+          </li>
+        ) : null}
+      </ul>
+    </details>
   );
 }
 

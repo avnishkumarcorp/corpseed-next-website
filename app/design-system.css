@@ -1,0 +1,873 @@
+/* Cascade layers: element defaults sit in @layer base and component
+   classes in @layer components, so Tailwind utilities (which live in the
+   later @layer utilities) always win when a component opts out. */
+/* ==========================================================================
+   Corpseed Design System
+   --------------------------------------------------------------------------
+   Loaded AFTER globals.css so it wins the cascade over legacy rules.
+   Everything here is token-driven: change a token, the whole site follows.
+   ========================================================================== */
+
+:root {
+  /* ---------- Brand / colour ---------- */
+  --cs-blue-50: #eff6ff;
+  --cs-blue-100: #dbeafe;
+  --cs-blue-200: #bfdbfe;
+  --cs-blue-300: #93c5fd;
+  --cs-blue-500: #3b82f6;
+  --cs-blue-600: #2563eb;
+  --cs-blue-700: #1d4ed8;
+  --cs-blue-800: #1e40af;
+  --cs-blue-900: #172554;
+
+  --cs-accent: #f59e0b; /* rating stars / highlight */
+  --cs-success: #059669;
+
+  /* ---------- Neutrals ---------- */
+  --cs-ink: #0f172a; /* headings */
+  --cs-body: #475569; /* body copy */
+  --cs-muted: #64748b; /* secondary copy */
+  --cs-faint: #94a3b8; /* meta / captions */
+  --cs-line: #e2e8f0; /* hairlines */
+  --cs-line-strong: #cbd5e1;
+  --cs-surface: #ffffff;
+  --cs-surface-2: #f8fafc;
+  --cs-surface-3: #f1f5f9;
+  --cs-surface-brand: #eff6ff;
+
+  /* ---------- Typography ----------
+     One scale for the entire website. Headings are fluid so they stay
+     proportional between 360px and 1536px without per-breakpoint overrides. */
+  --cs-font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI",
+    Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+
+  --cs-fs-2xs: 0.6875rem; /* 11 - micro labels */
+  --cs-fs-xs: 0.75rem; /* 12 - meta, eyebrows */
+  --cs-fs-sm: 0.8125rem; /* 13 - dense UI */
+  --cs-fs-base: 0.875rem; /* 14 - UI default */
+  --cs-fs-md: 1rem; /* 16 - body copy */
+  --cs-fs-lg: 1.125rem; /* 18 - lead / card title */
+  --cs-fs-xl: 1.25rem; /* 20 */
+  --cs-fs-2xl: 1.5rem; /* 24 */
+
+  /* Fluid display sizes */
+  --cs-fs-h4: clamp(1.0625rem, 0.98rem + 0.35vw, 1.1875rem); /* 17 → 19 */
+  --cs-fs-h3: clamp(1.25rem, 1.13rem + 0.5vw, 1.5rem); /* 20 → 24 */
+  --cs-fs-h2: clamp(1.625rem, 1.35rem + 1.15vw, 2.25rem); /* 26 → 36 */
+  --cs-fs-h1: clamp(2rem, 1.5rem + 2.2vw, 3.25rem); /* 32 → 52 */
+
+  --cs-lh-tight: 1.12;
+  --cs-lh-snug: 1.25;
+  --cs-lh-normal: 1.5;
+  --cs-lh-relaxed: 1.7;
+
+  --cs-fw-regular: 400;
+  --cs-fw-medium: 500;
+  --cs-fw-semibold: 600;
+  --cs-fw-bold: 700;
+
+  /* ---------- Radii ---------- */
+  --cs-r-xs: 6px;
+  --cs-r-sm: 8px;
+  --cs-r-md: 12px;
+  --cs-r-lg: 16px;
+  --cs-r-xl: 20px;
+  --cs-r-2xl: 28px;
+  --cs-r-full: 999px;
+
+  /* ---------- Elevation ---------- */
+  --cs-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --cs-shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.08);
+  --cs-shadow-md: 0 10px 24px -14px rgba(15, 23, 42, 0.28);
+  --cs-shadow-lg: 0 22px 48px -28px rgba(15, 23, 42, 0.32);
+  --cs-shadow-brand: 0 12px 28px -14px rgba(37, 99, 235, 0.55);
+
+  /* ---------- Rhythm ---------- */
+  --cs-section-y: 3rem;
+  --cs-gutter: 1rem;
+  --cs-maxw: 80rem; /* 1280 */
+
+  --cs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --cs-section-y: 4.5rem;
+    --cs-gutter: 1.5rem;
+  }
+}
+
+@layer base {
+/* ==========================================================================
+   Base typography — applies site-wide, Tailwind utilities still override
+   ========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--cs-font-sans);
+  font-size: var(--cs-fs-md);
+  line-height: var(--cs-lh-normal);
+  color: var(--cs-body);
+  background: var(--cs-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* globals.css sets `user-select: none` on the body for content protection.
+   Form fields must stay selectable or users cannot correct their own typing. */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* The mobile action bar is fixed to the viewport bottom — reserve its height
+   so it never covers the last section or the footer links. */
+@media (max-width: 767.98px) {
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--cs-font-sans);
+  color: var(--cs-ink);
+  letter-spacing: -0.011em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--cs-fs-h1);
+  line-height: var(--cs-lh-tight);
+  font-weight: var(--cs-fw-bold);
+  letter-spacing: -0.022em;
+}
+
+h2 {
+  font-size: var(--cs-fs-h2);
+  line-height: var(--cs-lh-snug);
+  font-weight: var(--cs-fw-bold);
+  letter-spacing: -0.018em;
+}
+
+h3 {
+  font-size: var(--cs-fs-h3);
+  line-height: var(--cs-lh-snug);
+  font-weight: var(--cs-fw-semibold);
+}
+
+h4 {
+  font-size: var(--cs-fs-h4);
+  line-height: var(--cs-lh-snug);
+  font-weight: var(--cs-fw-semibold);
+}
+
+h5,
+h6 {
+  font-size: var(--cs-fs-md);
+  line-height: var(--cs-lh-snug);
+  font-weight: var(--cs-fw-semibold);
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Readable, consistent focus ring for keyboard users only */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--cs-blue-600);
+  outline-offset: 2px;
+  border-radius: var(--cs-r-xs);
+}
+
+}
+
+@layer components {
+/* ==========================================================================
+   Layout primitives
+   ========================================================================== */
+
+.cs-container {
+  width: 100%;
+  max-width: var(--cs-maxw);
+  margin-inline: auto;
+  padding-inline: var(--cs-gutter);
+}
+
+.cs-section {
+  padding-block: var(--cs-section-y);
+}
+
+.cs-section--tight {
+  padding-block: calc(var(--cs-section-y) * 0.62);
+}
+
+.cs-surface-alt {
+  background: var(--cs-surface-2);
+}
+
+.cs-surface-brand {
+  background: linear-gradient(180deg, var(--cs-surface-brand), #ffffff);
+}
+
+.cs-hairline {
+  border-top: 1px solid var(--cs-line);
+}
+
+/* ==========================================================================
+   Section headers — one pattern used by every section
+   ========================================================================== */
+
+.cs-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--cs-fs-xs);
+  font-weight: var(--cs-fw-bold);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--cs-blue-700);
+}
+
+.cs-eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--cs-blue-600);
+}
+
+.cs-section-title {
+  margin: 0.625rem 0 0;
+  font-size: var(--cs-fs-h2);
+  line-height: var(--cs-lh-snug);
+  font-weight: var(--cs-fw-bold);
+  color: var(--cs-ink);
+  letter-spacing: -0.018em;
+}
+
+.cs-section-sub {
+  margin: 0.625rem 0 0;
+  max-width: 46rem;
+  font-size: var(--cs-fs-md);
+  line-height: var(--cs-lh-relaxed);
+  color: var(--cs-muted);
+}
+
+.cs-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .cs-section-head--split {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+/* ==========================================================================
+   Buttons — intent-driven, consistent height & type across the site
+   ========================================================================== */
+
+.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px; /* accessible tap target */
+  padding: 0 1.375rem;
+  border: 1px solid transparent;
+  border-radius: var(--cs-r-md);
+  font-family: inherit;
+  font-size: var(--cs-fs-base);
+  font-weight: var(--cs-fw-semibold);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.18s var(--cs-ease),
+    color 0.18s var(--cs-ease),
+    border-color 0.18s var(--cs-ease),
+    box-shadow 0.22s var(--cs-ease),
+    transform 0.18s var(--cs-ease);
+}
+
+.cs-btn:active {
+  transform: translateY(1px);
+}
+
+.cs-btn--lg {
+  min-height: 52px;
+  padding: 0 1.75rem;
+  font-size: var(--cs-fs-md);
+  border-radius: var(--cs-r-md);
+}
+
+.cs-btn--sm {
+  min-height: 38px;
+  padding: 0 1rem;
+  font-size: var(--cs-fs-sm);
+  border-radius: var(--cs-r-sm);
+}
+
+.cs-btn--block {
+  width: 100%;
+}
+
+.cs-btn--primary {
+  background: var(--cs-blue-600);
+  color: #fff;
+  box-shadow: var(--cs-shadow-brand);
+}
+
+.cs-btn--primary:hover {
+  background: var(--cs-blue-700);
+  box-shadow: 0 16px 34px -14px rgba(29, 78, 216, 0.62);
+}
+
+.cs-btn--secondary {
+  background: #fff;
+  color: var(--cs-ink);
+  border-color: var(--cs-line-strong);
+  box-shadow: var(--cs-shadow-xs);
+}
+
+.cs-btn--secondary:hover {
+  border-color: var(--cs-blue-300);
+  color: var(--cs-blue-700);
+  background: var(--cs-blue-50);
+}
+
+.cs-btn--ghost {
+  background: transparent;
+  color: var(--cs-blue-700);
+  border-color: transparent;
+}
+
+.cs-btn--ghost:hover {
+  background: var(--cs-blue-50);
+}
+
+.cs-btn--onDark {
+  background: #fff;
+  color: var(--cs-blue-700);
+}
+
+.cs-btn--onDark:hover {
+  background: var(--cs-blue-50);
+}
+
+.cs-btn--outlineDark {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.cs-btn--outlineDark:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Inline "more" link with a nudging arrow */
+.cs-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: var(--cs-fs-base);
+  font-weight: var(--cs-fw-semibold);
+  color: var(--cs-blue-700);
+  cursor: pointer;
+}
+
+.cs-link-arrow svg,
+.cs-link-arrow .cs-arrow {
+  transition: transform 0.2s var(--cs-ease);
+}
+
+.cs-link-arrow:hover svg,
+.cs-link-arrow:hover .cs-arrow {
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+
+.cs-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-line);
+  border-radius: var(--cs-r-lg);
+  box-shadow: var(--cs-shadow-xs);
+  transition:
+    transform 0.24s var(--cs-ease),
+    box-shadow 0.24s var(--cs-ease),
+    border-color 0.24s var(--cs-ease);
+}
+
+.cs-card--hover:hover {
+  transform: translateY(-4px);
+  border-color: var(--cs-blue-200);
+  box-shadow: var(--cs-shadow-md);
+}
+
+.cs-card__title {
+  font-size: var(--cs-fs-lg);
+  line-height: var(--cs-lh-snug);
+  font-weight: var(--cs-fw-semibold);
+  color: var(--cs-ink);
+}
+
+.cs-card__desc {
+  font-size: var(--cs-fs-base);
+  line-height: var(--cs-lh-relaxed);
+  color: var(--cs-muted);
+}
+
+/* ==========================================================================
+   Chips, badges, pills
+   ========================================================================== */
+
+.cs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 34px;
+  padding: 0 0.875rem;
+  border: 1px solid var(--cs-line);
+  border-radius: var(--cs-r-full);
+  background: #fff;
+  color: var(--cs-body);
+  font-size: var(--cs-fs-sm);
+  font-weight: var(--cs-fw-medium);
+  cursor: pointer;
+  transition:
+    background-color 0.18s var(--cs-ease),
+    border-color 0.18s var(--cs-ease),
+    color 0.18s var(--cs-ease);
+}
+
+.cs-chip:hover {
+  background: var(--cs-blue-50);
+  border-color: var(--cs-blue-200);
+  color: var(--cs-blue-700);
+}
+
+.cs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--cs-r-xs);
+  font-size: var(--cs-fs-2xs);
+  font-weight: var(--cs-fw-bold);
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  line-height: 1.35;
+}
+
+.cs-badge--brand {
+  background: var(--cs-blue-50);
+  color: var(--cs-blue-700);
+}
+
+.cs-badge--accent {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.cs-badge--neutral {
+  background: var(--cs-surface-3);
+  color: var(--cs-muted);
+}
+
+.cs-badge--new {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* ==========================================================================
+   Icon tiles — one consistent iconography treatment site-wide
+   ========================================================================== */
+
+.cs-icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--cs-r-md);
+  background: var(--cs-blue-50);
+  color: var(--cs-blue-700);
+}
+
+.cs-icon-tile svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.75;
+}
+
+.cs-icon-tile--lg {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--cs-r-lg);
+}
+
+.cs-icon-tile--lg svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* ==========================================================================
+   Carousel controls — shared by every slider on the site
+   ========================================================================== */
+
+.cs-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--cs-r-full);
+  background: #fff;
+  border: 1px solid var(--cs-line);
+  color: var(--cs-ink);
+  box-shadow: var(--cs-shadow-sm);
+  cursor: pointer;
+  transition:
+    background-color 0.18s var(--cs-ease),
+    box-shadow 0.18s var(--cs-ease),
+    border-color 0.18s var(--cs-ease);
+}
+
+.cs-nav-btn:hover:not(:disabled) {
+  background: var(--cs-blue-600);
+  border-color: var(--cs-blue-600);
+  color: #fff;
+  box-shadow: var(--cs-shadow-md);
+}
+
+.cs-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Scroll-reveal (progressive enhancement — visible by default)
+   ========================================================================== */
+
+/* Driven entirely by the CSS scroll-driven-animation timeline — no JS, and
+   crucially nothing mutates the DOM.
+ *
+ * The previous JS version added a class to these elements from a
+ * MutationObserver. Sections stream in progressively, so it could arm an
+ * element in the window between its HTML arriving and React hydrating it;
+ * React then found `class` changed underneath it and threw a hydration
+ * mismatch. There is no ordering fix for that race from outside React, so the
+ * animation moved into CSS where the race cannot exist.
+ *
+ * Both guards fail safe — an unsupported browser or a reduced-motion
+ * preference means no animation at all and the content simply renders. It is
+ * never hidden waiting for something to reveal it. */
+@keyframes csRevealIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cs-reveal {
+      animation: csRevealIn 1ms linear both;
+      animation-timeline: view();
+      /* Runs as the element enters, finishing well before it is centred, so
+         anything already on screen at load is past the range and fully
+         visible — no flash on first paint. */
+      animation-range: entry 0% cover 22%;
+    }
+  }
+}
+
+}
+
+@layer utilities {
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.cs-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cs-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cs-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cs-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cs-scroll-x {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
+.cs-scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+.cs-scroll-x > * {
+  scroll-snap-align: start;
+}
+
+.cs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link for keyboard/screen-reader users */
+.cs-skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 100000;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--cs-r-sm);
+  background: var(--cs-blue-700);
+  color: #fff;
+  font-size: var(--cs-fs-base);
+  font-weight: var(--cs-fw-semibold);
+  transition: top 0.2s var(--cs-ease);
+}
+
+.cs-skip-link:focus {
+  top: 1rem;
+}
+
+}
+
+/* ==========================================================================
+   Motion preferences
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Belt and braces: the reveal is already gated behind
+     `prefers-reduced-motion: no-preference`, but pin the end state so no
+     stalled timeline can ever leave a section invisible. */
+  .cs-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   Keyframes used by the new homepage sections
+   ========================================================================== */
+
+@keyframes csFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes csPulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.38);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(37, 99, 235, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+.cs-pulse {
+  animation: csPulseRing 2.4s infinite;
+}
+
+/* Route-change progress bar. Eases toward the right and slows down, so a long
+   navigation still reads as progress rather than a stalled bar. */
+@keyframes csRouteProgress {
+  0% {
+    transform: translateX(-100%);
+  }
+  55% {
+    transform: translateX(-28%);
+  }
+  100% {
+    transform: translateX(-8%);
+  }
+}
+
+.cs-route-progress {
+  animation: csRouteProgress 2.4s cubic-bezier(0.16, 0.84, 0.28, 1) forwards;
+}
+
+/* Skeleton placeholder. A travelling sheen rather than an opacity pulse, so a
+   grid of them does not strobe. */
+@keyframes csSkeleton {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.cs-skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--cs-surface-3) 0%,
+    #e9eef5 40%,
+    var(--cs-surface-3) 80%
+  );
+  background-size: 200% 100%;
+  animation: csSkeleton 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-skeleton {
+    background-image: none;
+    background-color: var(--cs-surface-3);
+  }
+}
+
+@layer components {
+/* ==========================================================================
+   Footer link groups — audit #18
+   Collapsible <details> on mobile (zero JS), plain always-open columns on
+   desktop. The UA's `details:not([open]) > *` rule has the lowest priority,
+   so forcing display here is enough to neutralise the disclosure.
+   ========================================================================== */
+
+.cs-footer-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.cs-footer-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cs-footer-group > summary .cs-footer-caret {
+  transition: transform 0.2s var(--cs-ease);
+  color: var(--cs-faint);
+}
+
+.cs-footer-group[open] > summary .cs-footer-caret {
+  transform: rotate(180deg);
+}
+
+@media (min-width: 640px) {
+  .cs-footer-group > summary {
+    padding-top: 0;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .cs-footer-group > summary .cs-footer-caret {
+    display: none;
+  }
+
+  .cs-footer-group > *:not(summary) {
+    display: block;
+  }
+}
+
+/* Seamless logo marquee. The track holds two identical groups, so a full
+   cycle is exactly -50% — the legacy -10% keyframe visibly jumped. */
+@keyframes csMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.cs-marquee {
+  animation: csMarquee linear infinite;
+  will-change: transform;
+}
+
+.cs-marquee:hover {
+  animation-play-state: paused;
+}
+}
+

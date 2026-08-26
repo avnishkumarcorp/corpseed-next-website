@@ -8,7 +8,7 @@ import { ArrowRight, Layers, Sparkles, X } from "lucide-react";
 import ServiceSearchBox from "./ServiceSearchBox";
 import TalkToExpertCard from "./TalkToExpertCard";
 import ConsultNowModal from "../components/ConsultNowModal";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // ... keep your helpers safeText, clamp, normalizeLabel
 
@@ -39,7 +39,7 @@ function DefaultCategoryIcon({ active }) {
   );
 }
 
-export default function ServicesCatalogue({ apiData, activeSlug }) {
+export default function ServicesCatalogue({ apiData, activeSlug, initialQuery = "" }) {
   const router = useRouter();
   const tabsRef = useRef(null);
 
@@ -48,7 +48,9 @@ export default function ServicesCatalogue({ apiData, activeSlug }) {
   const pageDesc =
     apiData?.metaDescription ||
     "Select a category and explore services tailored to your needs.";
-  const [query, setQuery] = useState("");
+  // Seeded by the server from ?q=, so a handed-off search is already applied
+  // in the first paint rather than flashing unfiltered then re-rendering.
+  const [query, setQuery] = useState(initialQuery);
   const [consultOpen, setConsultOpen] = useState(false);
 
   const initialActiveId = useMemo(() => {

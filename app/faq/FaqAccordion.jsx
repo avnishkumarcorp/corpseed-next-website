@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMemo, useState } from "react";
 
 function cn(...classes) {
@@ -147,22 +149,22 @@ export default function FaqAccordion({ data }) {
           <div className="mt-8 space-y-3 text-sm md:text-base text-slate-700">
             <p>
               For job opportunities, please view our{" "}
-              <a
+              <Link
                 href="/join-our-team"
                 className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
               >
                 open roles
-              </a>
+              </Link>
               .
             </p>
             <p>
               For business partnerships, please visit our{" "}
-              <a
+              <Link
                 href="/partner"
                 className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
               >
                 forum
-              </a>
+              </Link>
               .
             </p>
           </div>

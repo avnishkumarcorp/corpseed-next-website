@@ -1,3 +1,4 @@
+import Link from "next/link";
 // app/sitemap/page.jsx
 import { getSitemapMeta } from "../lib/sitemapApi";
 import SearchSitemap from "./SearchSitemap";
@@ -154,12 +155,12 @@ export default async function SitemapPage() {
                     View sitemap.xml
                   </a>
                   <span className="text-slate-400">•</span>
-                  <a
+                  <Link
                     href="/"
                     className="underline decoration-slate-300 underline-offset-4 hover:decoration-slate-600 cursor-pointer"
                   >
                     Go to Home
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

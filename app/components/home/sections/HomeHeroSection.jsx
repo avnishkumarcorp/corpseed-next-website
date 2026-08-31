@@ -85,10 +85,10 @@ export default function HomeHeroSection({
               <HeroSearch
                 baseUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
                 placeholders={[
-                  "Try “EPR For Plastic Waste”…",
-                  "Try “BIS Certification”…",
-                  "Try “Pollution NOC”…",
-                  "Try “IMEI Number”…",
+                  "Search 500+ services - try “EPR For Plastic Waste”…",
+                  "Search 500+ services - try “BIS Certification”…",
+                  "Search 500+ services - try “Pollution NOC”…",
+                  "Search 500+ services - try “IMEI Number”…",
                 ]}
               />
             </div>

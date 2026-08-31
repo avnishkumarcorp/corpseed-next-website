@@ -48,7 +48,7 @@ export default function SupportDock({
                 Talk to an expert
               </p>
               <p className="mt-0.5 text-[12.5px] text-slate-500">
-                Mon–Sat, 9am–6pm IST
+                Mon–Fri, 9:30am–6:30pm IST
               </p>
             </div>
 

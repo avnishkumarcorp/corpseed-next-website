@@ -28,26 +28,31 @@ export async function getPressReleaseData({ page, size, filter }) {
 
 export async function getPressReleaseBySlug(slug) {
   if (!slug) return null;
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-press-release/${encodeURIComponent(slug)}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        next: { revalidate: 300 },
-      },
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-press-release/${encodeURIComponent(slug)}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      next: { revalidate: 300 },
+    },
+  );
+
+  // A real 404 means no such press release → the page renders its 404.
+  if (res.status === 404) return null;
+
+  // Anything else is an outage. Returning null here made the page call
+  // notFound(), so a temporary API failure served a hard 404 on a ranking
+  // page. Raise instead, so the route answers 5xx via error.jsx.
+  if (!res.ok) {
+    const error = new Error(
+      `API ${res.status} on /api/updated-press-release/${slug}`,
     );
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      const errText = await res.text().catch(() => "");
-      console.error("API Error:", res.status, res.statusText, errText);
-      return null;
-    }
-    const data = await res.json(); // ✅ read once
-    return data;
-  } catch (err) {
-    return null;
+    error.status = res.status;
+    throw error;
   }
+
+  return res.json();
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;

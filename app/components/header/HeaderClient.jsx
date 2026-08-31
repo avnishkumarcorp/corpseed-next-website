@@ -153,7 +153,7 @@ export default function HeaderClient({ menuData = [] }) {
               >
                 <button
                   type="button"
-                  className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[14px] font-medium text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer"
+                  className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 px-3 text-[14px] font-medium text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer"
                 >
                   All Corpseed
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -171,17 +171,6 @@ export default function HeaderClient({ menuData = [] }) {
                   <AllCorpseedDropdown open={allOpen} menuMap={menuMap} />
                 </div>
               </div>
-
-              {/* Persistent conversion action — audit #4 & #5 */}
-              <a
-                href="tel:+917558640644"
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-blue-600 px-4 text-[14px] font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1l-2.2 2.2Z" />
-                </svg>
-                Talk to expert
-              </a>
             </div>
 
             <div onMouseEnter={() => open(openKey)} onMouseLeave={close}>
@@ -195,11 +184,42 @@ export default function HeaderClient({ menuData = [] }) {
           </nav>
 
           {/* Mobile actions */}
-          <div className="flex items-center gap-1 lg:hidden">
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 lg:hidden">
+            {/* Styled as a field rather than an icon so the search is
+                discoverable. Tapping opens the same SearchPanel the desktop
+                uses, which autofocuses its input — so it behaves like typing
+                straight into this field. */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search services"
+              className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-slate-300 bg-slate-50 px-3 py-2 text-left transition active:bg-slate-100 sm:max-w-[260px]"
+            >
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+                className="shrink-0 text-slate-500"
+              >
+                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M21 21l-4.3-4.3"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="truncate text-[13px] text-slate-500">
+                Search services
+              </span>
+            </button>
+
             <a
               href="tel:+917558640644"
               aria-label="Call Corpseed"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-blue-700 transition hover:bg-blue-50"
+              className="inline-flex h-11 w-10 shrink-0 items-center justify-center rounded-lg text-blue-700 transition hover:bg-blue-50"
             >
               <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1l-2.2 2.2Z" />
@@ -209,7 +229,7 @@ export default function HeaderClient({ menuData = [] }) {
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-slate-800 transition hover:bg-slate-100 cursor-pointer"
+              className="inline-flex h-11 w-10 shrink-0 items-center justify-center rounded-lg text-slate-800 transition hover:bg-slate-100 cursor-pointer"
               aria-label="Open menu"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -225,12 +245,13 @@ export default function HeaderClient({ menuData = [] }) {
         </div>
       </div>
 
-      {/* Desktop search overlay (lazy loaded) */}
+      {/* Search overlay (lazy loaded) — shared by the desktop Search button
+          and the mobile search field. */}
       {searchOpen ? (
         <SearchPanel
           open={searchOpen}
           onClose={() => setSearchOpen(false)}
-          topOffset={72}
+          topOffset={68}
         />
       ) : null}
 

@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { Suspense } from "react";
 import Footer from "./components/footer/Footer";
 import "./globals.css";
 import "./design-system.css";
@@ -6,6 +7,7 @@ import HeaderWrapper from "./components/header/HeaderWrapper";
 import SupportDock from "./components/SupportDock";
 import MobileStickyFooter from "./components/mobile/MobileStickyFooter";
 import SecurityLayer from "./components/security/SecurityLayer";
+import NavigationProgress from "./components/ui/NavigationProgress";
 
 const SITE_URL = "https://www.corpseed.com";
 
@@ -198,6 +200,12 @@ export default function RootLayout({ children }) {
         </a>
 
         <SecurityLayer />
+
+        {/* Suspense because it reads useSearchParams — without a boundary that
+            would opt every prerendered route into dynamic rendering. */}
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
 
         <div className="flex min-h-screen flex-col">
           <HeaderWrapper />

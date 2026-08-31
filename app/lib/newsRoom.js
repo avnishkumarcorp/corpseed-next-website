@@ -36,35 +36,28 @@ export function stripHtml(html = "") {
 export async function getNewsBySlug(slug) {
   if (!slug) return null;
 
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-news/${encodeURIComponent(
-        slug,
-      )}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        next: { revalidate: 30 },
-      },
-    );
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/updated-news/${encodeURIComponent(
+      slug,
+    )}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      next: { revalidate: 30 },
+    },
+  );
 
-    if (!res.ok) {
-      if (res.status === 404) return null;
+  // A real 404 means no such article → the page renders its 404.
+  if (res.status === 404) return null;
 
-      const errText = await res.text().catch(() => "");
-      console.error(
-        "getNewsBySlug API Error:",
-        res.status,
-        res.statusText,
-        errText,
-      );
-      return null;
-    }
-
-    const data = await res.json(); // ✅ read once
-    return data;
-  } catch (err) {
-    console.error("getNewsBySlug error:", err);
-    return null;
+  // Anything else is an outage. Raise it instead of returning null, which
+  // would make the page call notFound() and serve a hard 404 for what is
+  // only a temporary API failure.
+  if (!res.ok) {
+    const error = new Error(`API ${res.status} on /api/updated-news/${slug}`);
+    error.status = res.status;
+    throw error;
   }
+
+  return await res.json();
 }

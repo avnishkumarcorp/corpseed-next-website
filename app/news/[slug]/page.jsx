@@ -265,7 +265,7 @@ export default async function NewsRoomSlugPage({ params }) {
     <div className="bg-white">
       <section className="bg-white">
         {/* ROW 1: FULL-WIDTH BORDER WRAPPER */}
-        <div className="border-b ">
+        <div className="border-b border-slate-200">
           <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
             <div className="overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
@@ -310,11 +310,11 @@ export default async function NewsRoomSlugPage({ params }) {
                 </div>
 
                 {/* RIGHT: ENQUIRY FORM */}
-                <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
+                {/* <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
                   <div className="h-full w-full">
                     <EnquiryOtpInline page={slug} />
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

@@ -774,6 +774,76 @@ p {
   animation: csRouteProgress 2.4s cubic-bezier(0.16, 0.84, 0.28, 1) forwards;
 }
 
+/* ==========================================================================
+   Navigation progress bar (NavigationProgress.jsx)
+   Creeps quickly to ~92% then holds, so a slow route still reads as progress
+   and never looks stalled. Snaps to 100% when the route commits.
+   ========================================================================== */
+
+@keyframes csNavBar {
+  0% {
+    transform: scaleX(0.02);
+  }
+  35% {
+    transform: scaleX(0.55);
+  }
+  70% {
+    transform: scaleX(0.8);
+  }
+  100% {
+    transform: scaleX(0.92);
+  }
+}
+
+.cs-navbar {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0.02);
+  background: linear-gradient(
+    90deg,
+    var(--cs-blue-500),
+    var(--cs-blue-600) 55%,
+    #6366f1
+  );
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.55);
+  animation: csNavBar 6s cubic-bezier(0.16, 0.84, 0.28, 1) forwards;
+}
+
+.cs-navbar--done {
+  animation: none;
+  transform: scaleX(1);
+  transition:
+    transform 0.16s ease-out,
+    opacity 0.22s ease-out 0.1s;
+  opacity: 0;
+}
+
+/* While a navigation is in flight, the whole page says "working on it". This
+   is what stops people clicking the same link four or five times. */
+html[data-cs-nav] {
+  cursor: progress;
+}
+
+html[data-cs-nav] a,
+html[data-cs-nav] button {
+  cursor: progress;
+}
+
+/* The link that was actually clicked dims slightly, so it is obvious which
+   action was registered. */
+[data-cs-pending] {
+  opacity: 0.65;
+  transition: opacity 0.12s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-navbar {
+    animation: none;
+    transform: scaleX(0.35);
+  }
+}
+
 /* Skeleton placeholder. A travelling sheen rather than an opacity pulse, so a
    grid of them does not strobe. */
 @keyframes csSkeleton {

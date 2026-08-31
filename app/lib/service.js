@@ -20,13 +20,20 @@ export async function getServiceBySlug(slug) {
       signal: controller.signal,
     });
 
+    // Only a real 404 means "no such service" → the page renders its 404.
+    if (res.status === 404) return null;
+
+    // Anything else is an outage, not a missing page. Raise it so the route
+    // answers 5xx via error.jsx. Returning null here made the page call
+    // notFound(), so a brief API failure served a hard 404 on a ranking
+    // service page — the quickest way to lose it from Google's index.
     if (!res.ok) {
-      return null;
+      const error = new Error(`API ${res.status} on /api/customer/service/${slug}`);
+      error.status = res.status;
+      throw error;
     }
 
     return await res.json();
-  } catch (err) {
-    return null;
   } finally {
     clearTimeout(t);
   }
@@ -65,11 +72,15 @@ export async function getServiceByCityAndSlug(city, slug) {
       signal: controller.signal,
     });
 
-    if (!res.ok) return null;
+    if (res.status === 404) return null;
+
+    if (!res.ok) {
+      const error = new Error(`API ${res.status} on /api/customer/service/${city}/${slug}`);
+      error.status = res.status;
+      throw error;
+    }
 
     return await res.json();
-  } catch {
-    return null;
   } finally {
     clearTimeout(t);
   }

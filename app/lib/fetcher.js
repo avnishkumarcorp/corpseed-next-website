@@ -26,18 +26,22 @@ export async function apiGet(path, { revalidate = 600, cache } = {}) {
     ...cacheOptions,
   });
 
-  // ✅ treat not-found as null (no crash)
+  // ✅ treat not-found as null (no crash). Callers turn this into notFound().
   if (res.status === 404) return null;
 
   if (!res.ok) {
-    const ct = res.headers.get("content-type") || "";
-    const t = await res.text().catch(() => "");
-    throw new Error(
-      `API failed ${res.status} ${path} (${url}) content-type=${ct} :: ${t.slice(
-        0,
-        250,
-      )}`,
-    );
+    // Keep the thrown message short and readable. It used to splice 250 chars
+    // of the upstream response into it, which for a Spring/Thymeleaf error
+    // page meant pages of raw HTML in the log and the dev overlay — burying
+    // the one thing that mattered (which endpoint returned what).
+    const error = new Error(`API ${res.status} on ${path}`);
+    error.status = res.status;
+    error.endpoint = url;
+
+    // Full body stays available for debugging, just not in the message.
+    error.body = (await res.text().catch(() => "")).slice(0, 500);
+
+    throw error;
   }
 
   return res.json();

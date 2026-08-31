@@ -15,11 +15,17 @@ export const metadata = {
   // the favicon by URL and only re-fetches it when it recrawls the page.
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "16x16 32x32 48x48 96x96", type: "image/x-icon" },
+      {
+        url: "/favicon.ico",
+        sizes: "16x16 32x32 48x48 96x96",
+        type: "image/x-icon",
+      },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   other: {
     "msvalidate.01": "6FE373E64B7D16AE4CC9FA10A4FCA067",
@@ -140,7 +146,7 @@ export default function RootLayout({ children }) {
           <MobileStickyFooter />
           <Footer />
           <WhatsAppFloat
-            phone="917558640644"
+            phone="919311255283"
             message="Welcome to Corpseed. Please type your query, and we shall provide immediate assistance"
           />
         </div>

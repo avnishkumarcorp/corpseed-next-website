@@ -17,7 +17,7 @@ export async function getNewsRoomList({
 
   const res = await fetch(url, {
     // news list changes often → keep it fresh
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
   });
   if (!res.ok) return null;
   return res.json();
@@ -44,7 +44,7 @@ export async function getNewsBySlug(slug) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        next: { revalidate: 300 },
+        next: { revalidate: 30 },
       },
     );
 

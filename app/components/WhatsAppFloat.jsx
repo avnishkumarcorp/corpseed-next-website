@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 export default function WhatsAppFloat({
-  phone = "917558640644",
+  phone = "919311255283",
   message = "Welcome to Corpseed. Please type your query, and we shall provide immediate assistance.",
   showDelayMs = 600,
 }) {

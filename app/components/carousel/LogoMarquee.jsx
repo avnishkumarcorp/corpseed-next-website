@@ -8,8 +8,7 @@ export default function LogoMarquee({
   speed = 500, // 60s = slow and smooth
 }) {
   const normalized = items.map((it, i) => {
-    const raw =
-      it?.imageURL || it?.imageUrl || it?.logoUrl || it?.image || "";
+    const raw = it?.imageURL || it?.imageUrl || it?.logoUrl || it?.image || "";
 
     const src = raw.startsWith("http")
       ? raw
@@ -72,12 +71,8 @@ export default function LogoMarquee({
           className="flex w-max animate-marquee hover:[animation-play-state:paused]"
           style={{ animationDuration: `${speed}s` }}
         >
-          <div className="flex items-center gap-16">
-            {renderGroup()}
-          </div>
-          <div className="flex items-center gap-16">
-            {renderGroup("-dup")}
-          </div>
+          <div className="flex items-center gap-16">{renderGroup()}</div>
+          <div className="flex items-center gap-16">{renderGroup("-dup")}</div>
         </div>
       </div>
     </div>

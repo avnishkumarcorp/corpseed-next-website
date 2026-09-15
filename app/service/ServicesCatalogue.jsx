@@ -41,7 +41,6 @@ function DefaultCategoryIcon({ active }) {
 
 export default function ServicesCatalogue({ apiData, activeSlug }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const tabsRef = useRef(null);
 
   const categories = apiData?.allCategories || [];
@@ -116,24 +115,23 @@ export default function ServicesCatalogue({ apiData, activeSlug }) {
     return filtered.slice(0, 12);
   }, [normalizedQ, filtered]);
 
-useEffect(() => {
-  if (!tabsRef.current) return;
+  useEffect(() => {
+    if (!tabsRef.current) return;
 
-  const container = tabsRef.current;
-  const activeButton = container.querySelector(
-    `[data-id="${activeId ?? "all"}"]`
-  );
+    const container = tabsRef.current;
+    const activeButton = container.querySelector(
+      `[data-id="${activeId ?? "all"}"]`,
+    );
 
-  if (!activeButton) return;
+    if (!activeButton) return;
 
-  // Scroll instantly, no animation
-  activeButton.scrollIntoView({
-    behavior: "auto",     // 👈 important
-    inline: "nearest",    // 👈 prevents jump to center
-    block: "nearest"
-  });
-
-}, [activeId]);
+    // Scroll instantly, no animation
+    activeButton.scrollIntoView({
+      behavior: "auto", // 👈 important
+      inline: "nearest", // 👈 prevents jump to center
+      block: "nearest",
+    });
+  }, [activeId]);
 
   return (
     <section className="bg-gradient-to-b from-white to-slate-50">

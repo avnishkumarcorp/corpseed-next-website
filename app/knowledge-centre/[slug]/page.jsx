@@ -2,22 +2,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  Calendar,
-  Eye,
-  User2,
-  ChevronRight,
-  Newspaper,
-  BookOpen,
-} from "lucide-react";
+import { Calendar, Eye, User2, Newspaper, BookOpen, Phone } from "lucide-react";
 import { getKnowledgeCentreBySlug } from "@/app/lib/knowledgeCentre";
 import SafeHtml from "@/app/components/SafeHtml";
 import EnquiryOtpInline from "@/app/components/otp/EnquiryOtpFlow";
 import FeedbackBox from "@/app/components/FeedbackBox";
-import SocialRail from "@/app/components/ShareRailClient"; // ✅ keep using external component
+import SocialRail from "@/app/components/ShareRailClient";
 import dynamic from "next/dynamic";
+import NewTocClient from "@/app/components/NewTocClient";
+import { splitTocAndBody } from "@/app/lib/tocUtils";
+import { headers } from "next/headers";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 const BlogContentClient = dynamic(
   () => import("@/app/components/BlogContentClient"),
@@ -35,9 +31,7 @@ function formatDate(dateStr) {
 
 function Card({ children, className = "" }) {
   return (
-    <div
-      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
-    >
+    <div className={`rounded-2xl  bg-white shadow-sm ${className}`}>
       {children}
     </div>
   );
@@ -49,47 +43,83 @@ function Card({ children, className = "" }) {
  * 2) Removes that TOC block from main content
  * 3) Removes formView marker
  */
-function splitTocAndBody(html = "") {
-  const input = String(html || "");
+// function splitTocAndBody(html = "", url = "") {
+//   let input = String(html || "");
 
-  const tocMatch = input.match(
-    /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
-  );
+//   // remove <base ...> from full html
+//   input = input.replace(/<base[^>]*>/gi, "");
 
-  const tocHtml = tocMatch ? tocMatch[0] : "";
-  let bodyHtml = tocHtml ? input.replace(tocHtml, "") : input;
+//   const tocMatch = input.match(
+//     /<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>|<div[^>]*id=["']main-toc["'][^>]*>[\s\S]*?<\/div>/i,
+//   );
 
-  bodyHtml = bodyHtml.replace(
-    /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
-    "",
-  );
+//   const tocHtmlRaw = tocMatch ? tocMatch[0] : "";
 
-  return { tocHtml, bodyHtml };
-}
+//   // rewrite TOC links to current page path
+//   const tocHtml = tocHtmlRaw
+//     .replace(/<base[^>]*>/gi, "")
+//     .replace(
+//       /<a([^>]*?)href=(['"])([^'"]*?)\2([^>]*?)>/gi,
+//       (full, pre, q, href, post) => {
+//         const hashIndex = href.indexOf("#");
+//         if (hashIndex === -1) return full;
 
-function TocCard({ tocHtml }) {
-  if (!tocHtml) return null;
+//         const hash = href.slice(hashIndex + 1);
+//         return `<a${pre}href="${url}#${hash}"${post}>`;
+//       },
+//     );
 
-  return (
-    <>
-      <BlogContentClient html={tocHtml} />
-      {/* Mobile */}
-      <div className="block px-5 py-4 lg:hidden">
-        <details className="group">
-          <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
-            <span className="inline-flex items-center gap-2">
-              Open contents
-              <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
-            </span>
-          </summary>
-          <div className="mt-3 max-h-[320px] overflow-auto pr-1">
-            <BlogContentClient html={tocHtml} />
-          </div>
-        </details>
-      </div>
-    </>
-  );
-}
+//   let bodyHtml = tocHtmlRaw ? input.replace(tocHtmlRaw, "") : input;
+
+//   // remove form marker
+//   bodyHtml = bodyHtml.replace(
+//     /<span[^>]*class=["']formView["'][^>]*>[\s\S]*?<\/span>/gi,
+//     "",
+//   );
+
+//   // remove <base> if any remains
+//   bodyHtml = bodyHtml.replace(/<base[^>]*>/gi, "");
+
+//   return { tocHtml, bodyHtml };
+// }
+
+// function TocCard({ tocHtml }) {
+//   if (!tocHtml) return null;
+//   console.log("Table of Content:", tocHtml);
+//   return (
+//     <Card className="overflow-hidden">
+//       <div className="border-b border-slate-200 px-5 py-4">
+//         <div className="flex items-center gap-2">
+//           <BookOpen className="h-5 w-5 text-blue-600" />
+//           <p className="text-sm font-semibold text-slate-900">
+//             Table of Contents
+//           </p>
+//         </div>
+//       </div>
+
+//       {/* Desktop ToC */}
+//       <div className="hidden max-h-[calc(100vh-220px)] overflow-auto px-4 py-4 lg:block">
+//         <NewTocClient html={tocHtml} headerOffset={90} />
+//       </div>
+
+//       {/* Mobile ToC */}
+//       <div className="block px-5 py-4 lg:hidden">
+//         <details className="group">
+//           <summary className="cursor-pointer list-none text-sm font-semibold text-slate-800">
+//             <span className="inline-flex items-center gap-2">
+//               Open contents
+//               <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
+//             </span>
+//           </summary>
+
+//           <div className="mt-3 max-h-[320px] overflow-auto pr-1">
+//             <TocClient html={tocHtml} headerOffset={90} />
+//           </div>
+//         </details>
+//       </div>
+//     </Card>
+//   );
+// }
 
 function ListCard({ title, icon: Icon, items, basePath, badge }) {
   if (!items?.length) return null;
@@ -103,6 +133,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <Icon className="h-5 w-5" />
             </span>
           ) : null}
+
           <div>
             <p className="text-sm font-semibold text-slate-900">{title}</p>
             {badge ? <p className="text-xs text-slate-500">{badge}</p> : null}
@@ -115,7 +146,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
           <Link
             key={x.slug}
             href={`${basePath}/${x.slug}`}
-            className="group flex gap-3 px-5 py-4 hover:bg-slate-50 cursor-pointer"
+            className="group flex cursor-pointer gap-3 px-5 py-4 hover:bg-slate-50"
           >
             <div className="relative h-14 w-16 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
               {x.image ? (
@@ -133,6 +164,7 @@ function ListCard({ title, icon: Icon, items, basePath, badge }) {
               <p className="line-clamp-2 text-sm font-medium text-slate-900 group-hover:underline">
                 {safeText(x.title)}
               </p>
+
               <p className="mt-1 text-xs text-slate-500">
                 {x.postDate ? formatDate(x.postDate) : "Read"}
                 {typeof x.visited === "number" ? ` • ${x.visited} views` : ""}
@@ -150,20 +182,16 @@ function AuthorCard({ author }) {
 
   return (
     <Card className="overflow-hidden">
-      {/* Thin accent line */}
       <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-slate-900 to-blue-600 opacity-80" />
 
       <div className="px-6 py-5">
-        {/* Header */}
         <div className="mb-4">
           <p className="text-sm font-semibold text-slate-900">
             About the Author
           </p>
         </div>
 
-        {/* Main Layout */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          {/* Avatar */}
           <div className="relative h-[95px] w-[95px] flex-none overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
             <Image
               src={author.profilePicture}
@@ -174,30 +202,27 @@ function AuthorCard({ author }) {
             />
           </div>
 
-          {/* Content */}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h3 className="text-base font-semibold text-slate-900">
                 {author.firstName} {author.lastName}
               </h3>
 
-              {author.jobTitle && (
+              {author.jobTitle ? (
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                   {author.jobTitle}
                 </span>
-              )}
+              ) : null}
             </div>
 
-            {/* Compact Bio */}
-            <div className="mt-2 text-sm leading-6 text-slate-600 line-clamp-4">
+            <div className="mt-2 line-clamp-4 text-sm leading-6 text-slate-600">
               <SafeHtml html={author.aboutMe} />
             </div>
 
-            {/* Button */}
             <div className="mt-3">
               <Link
                 href={`/profile/${author.slug}`}
-                className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+                className="inline-flex cursor-pointer items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800"
               >
                 View profile →
               </Link>
@@ -215,6 +240,7 @@ function AuthorCard({ author }) {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getKnowledgeCentreBySlug(slug);
+  // console.log("Knowledge Centre Data:", data);
 
   if (!data?.blog) {
     return {
@@ -238,202 +264,254 @@ export async function generateMetadata({ params }) {
 export default async function KnowledgeCentreSlugPage({ params }) {
   const { slug } = await params;
   const apiData = await getKnowledgeCentreBySlug(slug);
+
   if (!apiData?.blog) return notFound();
 
   const blog = apiData.blog;
   const author = apiData.author || null;
 
   const pageUrl = `https://www.corpseed.com/knowledge-centre/${blog.slug}`;
-  const { tocHtml, bodyHtml } = splitTocAndBody(blog.description || "");
 
+  const headersList = await headers();
+  const host = headersList.get("host");
+  const protocol = headersList.get("x-forwarded-proto") || "http";
+
+  const url = `${protocol}://${host}/knowledge-centre/${slug}`;
+
+  const { tocItems, bodyHtml } = splitTocAndBody(blog.description || "", url);
+
+  const formMarker = "<!--BLOG_CONTACT_FORM-->";
+  const hasInlineForm = bodyHtml.includes(formMarker);
+
+  const [beforeFormHtml, afterFormHtml = ""] = hasInlineForm
+    ? bodyHtml.split(formMarker)
+    : [bodyHtml, ""];
+  // console.log("ToC Content:", tocItems);
   return (
-    <div className="bg-slate-50">
-      {/* HERO (same as news-room) */}
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-          <div className="mt-4 grid gap-8 lg:grid-cols-[1.45fr_1.05fr] lg:items-start">
-            {/* LEFT image */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-              <div className="relative h-[260px] w-full sm:h-[320px]">
-                <Image
-                  src={blog.image}
-                  alt={safeText(blog.title)}
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 700px"
-                />
-              </div>
-            </div>
+    <div className="">
+      {/* ===============================
+    TOP SECTION
+    SECTION 1: HEADING + ENQUIRY SAME HEIGHT
+    SECTION 2: IMAGE + TOC, IMAGE KEEPS ITS OWN HEIGHT
+================================= */}
+      <section className="bg-white">
+        {/* ROW 1: FULL-WIDTH BORDER WRAPPER */}
+        <div className="border-b border-slate-300">
+          <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+            {/* ROW 1: HEADING + ENQUIRY IN ONE COMMON SECTION */}
+            <div className="overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+                {/* LEFT: HEADING CONTENT */}
+                <div className="flex min-w-0 flex-col justify-center p-5 sm:p-6">
+                  <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                    {blog.title}
+                  </h1>
 
-            {/* RIGHT text */}
-            <div className="min-w-0 lg:flex lg:h-full lg:flex-col lg:justify-center">
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                {blog.title}
-              </h1>
+                  {blog.summary ? (
+                    <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
+                      {blog.summary}
+                    </p>
+                  ) : null}
 
-              <p className="mt-3 max-w-3xl text-sm text-slate-600">
-                {apiData?.metaDescription || blog.summary}
-              </p>
+                  <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
+                    {blog.modifyDate ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(blog.modifyDate)}
+                      </span>
+                    ) : null}
 
-              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
-                {blog.modifyDate ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    {formatDate(blog.modifyDate)}
-                  </span>
-                ) : null}
+                    {typeof blog.visited === "number" ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        {blog.visited}
+                      </span>
+                    ) : null}
 
-                {typeof blog.visited === "number" ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    {blog.visited}
-                  </span>
-                ) : null}
+                    {author ? (
+                      <span className="inline-flex items-center gap-2">
+                        <User2 className="h-4 w-4" />
+                        {author?.firstName || "Corpseed"}{" "}
+                        {author?.lastName || "Corpseed"}
+                      </span>
+                    ) : null}
 
-                {author ? (
-                  <span className="inline-flex items-center gap-2">
-                    <User2 className="h-4 w-4" />
-                    {author?.firstName || "Corpseed"}{" "}
-                    {author?.lastName || "Corpseed"}
-                  </span>
-                ) : null}
-
-                {blog?.categoryTitle ? (
-                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                    {blog.categoryTitle}
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CONTENT (same as news-room: rail overlay + 2-col grid) */}
-      <section className="py-6 md:py-8 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="relative">
-            {/* Social rail overlay (doesn't consume grid column) */}
-            <div className="hidden lg:block absolute left-0 top-0 -translate-x-16">
-              <SocialRail pageUrl={pageUrl} title={blog.title} />
-            </div>
-
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
-              {/* Main */}
-              <div className="space-y-6 bg-white">
-                {/* <Card className="overflow-hidden"> */}
-                <div className="bg-white flex flex-col gap-6">
-                  <div className="prose prose-slate prose-sm max-w-none prose-p:leading-relaxed prose-headings:tracking-tight">
-                    <BlogContentClient html={bodyHtml} />
+                    {blog?.categoryTitle ? (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        {blog.categoryTitle}
+                      </span>
+                    ) : null}
                   </div>
+                </div>
 
-                  <div className="border border-[#e5e5e5] shadow-[0_0_0_12px_#f8f9fa]">
+                {/* RIGHT: ENQUIRY FORM INSIDE SAME CARD */}
+                <div className="min-w-0 border-t border-slate-200 bg-[#f2f3ff] p-3 lg:border-l lg:border-t-0">
+                  <div className="h-full w-full">
                     <EnquiryOtpInline page={slug} />
                   </div>
                 </div>
-                {/* </Card> */}
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {author ? (
-                  <div className="mt-10">
-                    <AuthorCard author={author} />
+        {/* ROW 2 + ARTICLE CONTENT
+      LEFT COLUMN  = Image + Article Content
+      RIGHT COLUMN = TOC + Top Articles + Latest Articles + News
+  */}
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 ">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch">
+            {/* LEFT COLUMN */}
+            <main className="min-w-0 space-y-8">
+              {/* IMAGE */}
+              {blog.image ? (
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+                  <Image
+                    src={blog.image}
+                    alt={safeText(blog.title)}
+                    width={1200}
+                    height={800}
+                    priority
+                    className="block h-auto w-full object-cover"
+                    sizes="(max-width: 1024px) 100vw, 760px"
+                  />
+
+                  <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-1.5 rounded-lg bg-gray-200 px-2 py-1 font-bold text-blue-600 shadow-lg">
+                    <Phone className="h-4 w-4" />
+                    7558640644 - Harshita
                   </div>
-                ) : null}
+                </div>
+              ) : null}
 
-                {apiData?.feedback ? <FeedbackBox /> : null}
+              {/* ARTICLE CONTENT */}
+              <div className="relative ">
+                {/* Social rail overlay */}
+                <div className="absolute left-0 top-0 hidden -translate-x-16 lg:block">
+                  <SocialRail pageUrl={pageUrl} title={blog.title} />
+                </div>
 
-                {apiData?.relatedBlogs?.length ? (
-                  <Card>
-                    <div className="border-b border-slate-200 px-5 py-4">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Related articles
-                      </p>
-                    </div>
+                <div className="overflow-hidden p-5 sm:p-6">
+                  <div
+                    data-article-content
+                    className=" prose prose-slate prose-sm max-w-none prose-headings:tracking-tight prose-p:leading-relaxed"
+                  >
+                    <BlogContentClient html={beforeFormHtml} />
 
-                    <div className="grid gap-4 p-5 sm:grid-cols-2">
-                      {apiData.relatedBlogs.slice(0, 6).map((x) => (
-                        <Link
-                          key={x.slug}
-                          href={`/knowledge-centre/${x.slug}`}
-                          className="group flex gap-3 rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50 cursor-pointer"
-                        >
-                          <div className="relative h-16 w-20 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
-                            {x.image ? (
-                              <Image
-                                src={x.image}
-                                alt={safeText(x.title)}
-                                fill
-                                className="object-cover"
-                                sizes="120px"
-                              />
-                            ) : null}
-                          </div>
+                    {hasInlineForm ? (
+                      <div className="not-prose my-8 bg-[#f2f3ff] p-3">
+                        <EnquiryOtpInline page={slug} />
+                      </div>
+                    ) : null}
 
-                          <div className="min-w-0">
-                            <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:underline">
-                              {safeText(x.title)}
-                            </p>
-                            <p className="mt-1 text-xs text-slate-500">
-                              {x.postDate ? formatDate(x.postDate) : "Read"}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </Card>
-                ) : null}
+                    {afterFormHtml ? (
+                      <BlogContentClient html={afterFormHtml} />
+                    ) : null}
+                  </div>
+                </div>
               </div>
 
-              {/* Sidebar */}
-              <aside className="space-y-6">
-                <div className="lg:sticky lg:top-24 space-y-6">
-                  <TocCard tocHtml={tocHtml} />
+              {author ? <AuthorCard author={author} /> : null}
 
-                  <ListCard
-                    title="Top Articles"
-                    badge="Most visited"
-                    icon={BookOpen}
-                    items={apiData?.topBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
+              {apiData?.feedback ? <FeedbackBox /> : null}
 
-                  <ListCard
-                    title="Latest Articles"
-                    badge="Recently published"
-                    icon={BookOpen}
-                    items={apiData?.latestBlogs || []}
-                    basePath="/knowledge-centre"
-                  />
+              {apiData?.relatedBlogs?.length ? (
+                <Card>
+                  <div className="border-b border-slate-200 px-5 py-4">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Related articles
+                    </p>
+                  </div>
 
-                  {/* ✅ if these are really news, keep basePath as per your API; change if needed */}
-                  <ListCard
-                    title="Top News"
-                    badge="Trending"
-                    icon={Newspaper}
-                    items={apiData?.topNews || []}
-                    basePath="/news"
-                  />
+                  <div className="grid gap-4 p-5 sm:grid-cols-2">
+                    {apiData.relatedBlogs.slice(0, 6).map((x) => (
+                      <Link
+                        key={x.slug}
+                        href={`/knowledge-centre/${x.slug}`}
+                        className="group flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-white p-3 hover:bg-slate-50"
+                      >
+                        <div className="relative h-16 w-20 flex-none overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                          {x.image ? (
+                            <Image
+                              src={x.image}
+                              alt={safeText(x.title)}
+                              fill
+                              className="object-cover"
+                              sizes="120px"
+                            />
+                          ) : null}
+                        </div>
 
-                  <ListCard
-                    title="Latest News"
-                    badge="Fresh updates"
-                    icon={Newspaper}
-                    items={apiData?.latestNews || []}
-                    basePath="/news"
-                  />
-                </div>
-              </aside>
-            </div>
+                        <div className="min-w-0">
+                          <p className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:underline">
+                            {safeText(x.title)}
+                          </p>
+
+                          <p className="mt-1 text-xs text-slate-500">
+                            {x.postDate ? formatDate(x.postDate) : "Read"}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </Card>
+              ) : null}
+            </main>
+            {/* RIGHT COLUMN: TOC + SIDEBAR CARDS */}
+            <aside className="min-w-0 lg:self-stretch">
+              {/* NORMAL SIDEBAR CONTENT */}
+              <div className="space-y-6">
+                {tocItems?.length ? (
+                  <Card className="overflow-hidden">
+                    <NewTocClient items={tocItems} headerOffset={90} />
+                  </Card>
+                ) : null}
+
+                <ListCard
+                  title="Top Articles"
+                  badge="Most visited"
+                  icon={BookOpen}
+                  items={apiData?.topBlogs || []}
+                  basePath="/knowledge-centre"
+                />
+
+                <ListCard
+                  title="Latest Articles"
+                  badge="Recently published"
+                  icon={BookOpen}
+                  items={apiData?.latestBlogs || []}
+                  basePath="/knowledge-centre"
+                />
+
+                <ListCard
+                  title="Top News"
+                  badge="Trending"
+                  icon={Newspaper}
+                  items={apiData?.topNews || []}
+                  basePath="/news"
+                />
+              </div>
+
+              {/* ONLY LATEST NEWS STICKY */}
+              <div className="mt-6 lg:sticky lg:top-24">
+                <ListCard
+                  title="Latest News"
+                  badge="Fresh updates"
+                  icon={Newspaper}
+                  items={apiData?.latestNews || []}
+                  basePath="/news"
+                />
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* Footer back (optional but matches style) */}
-      <div className="pb-10">
+      {/* Footer back */}
+      <div className="bg-white pb-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <Link
             href="/knowledge-centre"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
+            className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
           >
             ← Back to Knowledge Centre
           </Link>

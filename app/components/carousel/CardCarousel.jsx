@@ -64,7 +64,7 @@ export default function CardCarousel({
             id: s?.id || s?.uuid,
             title: s?.title || s?.serviceName || "Untitled Service",
             desc: s?.summary || "Description will be available soon.",
-            href: s?.slug ? `/service/${s.slug}` : "#", // ✅ change if your route is /service/[slug]
+            href: s?.slug ? `/service/${s.slug}` : "#",
           }))
         : [];
 
@@ -116,8 +116,8 @@ export default function CardCarousel({
   }, [activeTab, itemsByTab]);
 
   return (
-    <section className="relative bg-[#EEF6FF] py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-x-hidden bg-[#EEF6FF] py-8">
+      <div className="mx-auto w-[calc(100%-32px)]">
         <h2 className="text-center text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
           {title}
         </h2>
@@ -138,7 +138,7 @@ export default function CardCarousel({
         <div className="mt-10 flex justify-center">
           <Link
             href={ctaHref}
-            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 cursor-pointer"
+            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
           >
             {ctaLabel}
           </Link>
@@ -154,7 +154,7 @@ function Tabs({ tabs = [], activeKey, onChange }) {
 
   return (
     <div className="w-full max-w-5xl">
-      <div className="no-scrollbar flex items-center justify-center gap-10 overflow-x-auto px-2 py-2.5">
+      <div className="no-scrollbar flex items-center gap-6 overflow-x-auto px-2 py-2.5 md:justify-center">
         {safeTabs.map((t) => {
           const key = t?.key ?? t?.label;
           const label = t?.label ?? String(key ?? "");
@@ -166,7 +166,7 @@ function Tabs({ tabs = [], activeKey, onChange }) {
               type="button"
               onClick={() => onChange?.(key)}
               className={[
-                "relative whitespace-nowrap text-lg font-medium cursor-pointer",
+                "relative cursor-pointer whitespace-nowrap text-lg font-medium",
                 isActive
                   ? "text-blue-600"
                   : "text-gray-800 hover:text-blue-600",
@@ -186,80 +186,137 @@ function Tabs({ tabs = [], activeKey, onChange }) {
 
 /* ---------------- Carousel ---------------- */
 function ServicesCarousel({ items = [], showDots = true }) {
-  const scrollerRef = useRef(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const trackRef = useRef(null);
+  const groupRef = useRef(null);
+  const jumpRafRef = useRef(null);
+  const hoverPausedRef = useRef(false);
+  const isJumpingRef = useRef(false);
 
   const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
 
-  // Track active index while scrolling (drag/trackpad/touch)
   useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-
-    let rafId = null;
-
-    const update = () => {
-      const cards = el.querySelectorAll("[data-card]");
-      if (!cards.length) {
-        setActiveIndex(0);
-        return;
-      }
-
-      const containerLeft = el.getBoundingClientRect().left;
-
-      let bestIdx = 0;
-      let bestDist = Infinity;
-
-      cards.forEach((card, idx) => {
-        const dist = Math.abs(
-          card.getBoundingClientRect().left - containerLeft,
-        );
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestIdx = idx;
-        }
-      });
-
-      setActiveIndex(bestIdx);
-    };
-
-    const onScroll = () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(update);
-    };
-
-    el.addEventListener("scroll", onScroll, { passive: true });
-    update();
-
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      el.removeEventListener("scroll", onScroll);
+      if (jumpRafRef.current) {
+        cancelAnimationFrame(jumpRafRef.current);
+      }
     };
-  }, [safeItems.length]);
+  }, []);
 
-  // Clamp activeIndex if items length changes
-  useEffect(() => {
-    if (activeIndex > safeItems.length - 1) setActiveIndex(0);
-  }, [safeItems.length, activeIndex]);
+  const getTrackAnimation = () => {
+    const track = trackRef.current;
+    if (!track) return null;
 
-  const scrollToIndex = (idx) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll("[data-card]");
-    if (!cards.length) return;
-
-    const next = Math.max(0, Math.min(idx, cards.length - 1));
-    cards[next].scrollIntoView({
-      behavior: "smooth",
-      inline: "start",
-      block: "nearest",
-    });
+    const animations = track.getAnimations?.() || [];
+    return animations[0] || null;
   };
 
-  const handlePrev = () => scrollToIndex(activeIndex - 1);
-  const handleNext = () => scrollToIndex(activeIndex + 1);
+  const pauseTrack = () => {
+    hoverPausedRef.current = true;
 
-  // Empty state
+    const animation = getTrackAnimation();
+    if (!animation) return;
+
+    animation.pause();
+  };
+
+  const resumeTrack = () => {
+    hoverPausedRef.current = false;
+
+    const animation = getTrackAnimation();
+    if (!animation || isJumpingRef.current) return;
+
+    animation.play();
+  };
+
+  const getAnimationDurationMs = (track) => {
+    const computedStyle = window.getComputedStyle(track);
+    const durationValue = computedStyle.animationDuration || "30s";
+
+    if (durationValue.includes("ms")) {
+      return parseFloat(durationValue) || 30000;
+    }
+
+    if (durationValue.includes("s")) {
+      return (parseFloat(durationValue) || 30) * 1000;
+    }
+
+    return 30000;
+  };
+
+  const smootherStep = (t) => {
+    // Very smooth acceleration/deceleration
+    return t * t * t * (t * (t * 6 - 15) + 10);
+  };
+
+  const moveCards = (direction) => {
+    const track = trackRef.current;
+    const group = groupRef.current;
+
+    if (!track || !group) return;
+
+    const animation = getTrackAnimation();
+    if (!animation) return;
+
+    if (jumpRafRef.current) {
+      cancelAnimationFrame(jumpRafRef.current);
+    }
+
+    isJumpingRef.current = true;
+
+    // Freeze base animation while we manually move its timeline
+    animation.pause();
+
+    const durationMs = getAnimationDurationMs(track);
+
+    const firstCard = group.querySelector("[data-service-card]");
+    const groupStyle = window.getComputedStyle(group);
+
+    const gap =
+      parseFloat(groupStyle.columnGap || groupStyle.gap || "24") || 24;
+
+    const cardWidth = firstCard?.getBoundingClientRect?.().width || 280;
+    const stepPx = cardWidth + gap;
+
+    const cycleWidth = group.scrollWidth || track.scrollWidth / 2 || 1;
+    const jumpMs = (stepPx / cycleWidth) * durationMs;
+
+    const startAnimationTime =
+      typeof animation.currentTime === "number" ? animation.currentTime : 0;
+
+    const distance = direction === "next" ? jumpMs : -jumpMs;
+
+    // Higher value = smoother / slower button slide
+    const jumpDuration = 950;
+    const startTime = performance.now();
+
+    const animateJump = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / jumpDuration, 1);
+      const eased = smootherStep(progress);
+
+      let nextTime = startAnimationTime + distance * eased;
+
+      nextTime = ((nextTime % durationMs) + durationMs) % durationMs;
+
+      animation.currentTime = nextTime;
+
+      if (progress < 1) {
+        jumpRafRef.current = requestAnimationFrame(animateJump);
+      } else {
+        jumpRafRef.current = null;
+        isJumpingRef.current = false;
+
+        if (hoverPausedRef.current) {
+          animation.pause();
+        } else {
+          animation.play();
+        }
+      }
+    };
+
+    jumpRafRef.current = requestAnimationFrame(animateJump);
+  };
+
   if (safeItems.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-10 text-center text-sm text-gray-600">
@@ -269,71 +326,84 @@ function ServicesCarousel({ items = [], showDots = true }) {
   }
 
   return (
-    <div className="relative">
-      {/* Left arrow */}
-      <button
-        type="button"
-        onClick={handlePrev}
-        disabled={activeIndex === 0}
-        className={[
-          "absolute -left-10 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-black/5 md:flex cursor-pointer",
-          activeIndex === 0 ? "opacity-40 cursor-pointer" : "hover:shadow-lg",
-        ].join(" ")}
-        aria-label="Previous"
-      >
-        <ChevronLeft className="h-5 w-5 text-gray-700" />
-      </button>
+    <div
+      className="relative w-full overflow-hidden px-0 py-2"
+      onPointerEnter={pauseTrack}
+      onPointerMove={() => {
+        if (!hoverPausedRef.current) pauseTrack();
+      }}
+      onPointerLeave={resumeTrack}
+      onFocusCapture={pauseTrack}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          resumeTrack();
+        }
+      }}
+    >
+      {safeItems.length > 1 && (
+        <button
+          type="button"
+          onClick={() => moveCards("prev")}
+          className="
+            absolute left-2 top-1/2 z-20 flex h-11 w-11
+            -translate-y-1/2 cursor-pointer items-center justify-center rounded-full
+            bg-white/95 shadow-md ring-1 ring-black/5
+            hover:shadow-lg
+          "
+          aria-label="Previous"
+        >
+          <ChevronLeft className="h-5 w-5 text-gray-700" />
+        </button>
+      )}
 
-      {/* Right arrow */}
-      <button
-        type="button"
-        onClick={handleNext}
-        disabled={activeIndex === safeItems.length - 1}
-        className={[
-          "absolute -right-10 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-black/5 md:flex cursor-pointer",
-          activeIndex === safeItems.length - 1
-            ? "opacity-40 cursor-pointer"
-            : "hover:shadow-lg",
-        ].join(" ")}
-        aria-label="Next"
-      >
-        <ChevronRight className="h-5 w-5 text-gray-700" />
-      </button>
+      {safeItems.length > 1 && (
+        <button
+          type="button"
+          onClick={() => moveCards("next")}
+          className="
+            absolute right-2 top-1/2 z-20 flex h-11 w-11
+            -translate-y-1/2 cursor-pointer items-center justify-center rounded-full
+            bg-white/95 shadow-md ring-1 ring-black/5
+            hover:shadow-lg
+          "
+          aria-label="Next"
+        >
+          <ChevronRight className="h-5 w-5 text-gray-700" />
+        </button>
+      )}
 
-      {/* Scroll container */}
       <div
-        ref={scrollerRef}
-        className={[
-          "no-scrollbar flex gap-6 overflow-x-auto px-2 py-2",
-          "scroll-smooth snap-x snap-mandatory",
-          "touch-pan-x",
-        ].join(" ")}
+        ref={trackRef}
+        className="flex w-max flex-row items-stretch"
+        style={{
+          animationName: "servicesInfiniteScroll",
+          animationDuration: "30s",
+          animationTimingFunction: "linear",
+          animationIterationCount: "infinite",
+          willChange: "transform",
+        }}
       >
-        {safeItems.map((it, idx) => (
-          <ServiceTile
-            key={it?.id ? `serviceTile-${it.id}` : `tile-${idx}`} // ✅ fixed
-            item={it}
-          />
-        ))}
-      </div>
-
-      {/* Dots */}
-      {showDots && safeItems.length > 1 && (
-        <div className="mt-5 flex justify-center gap-2">
-          {safeItems.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => scrollToIndex(i)}
-              className={[
-                "h-2.5 w-2.5 rounded-full cursor-pointer",
-                i === activeIndex ? "bg-blue-600" : "bg-blue-200",
-              ].join(" ")}
-              aria-label={`Go to slide ${i + 1}`}
+        <div
+          ref={groupRef}
+          className="flex shrink-0 flex-row items-stretch gap-6 pr-6"
+        >
+          {safeItems.map((it, idx) => (
+            <ServiceTile
+              key={it?.id ? `serviceTile-${it.id}` : `tile-${idx}`}
+              item={it}
             />
           ))}
         </div>
-      )}
+
+        <div className="flex shrink-0 flex-row items-stretch gap-6 pr-6">
+          {safeItems.map((it, idx) => (
+            <ServiceTile
+              key={it?.id ? `serviceTile-dup-${it.id}` : `tile-dup-${idx}`}
+              item={it}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -346,31 +416,29 @@ function ServiceTile({ item }) {
 
   return (
     <div
-      data-card
+      data-service-card
       className={[
-        "snap-start",
-        "min-w-[85%] max-w-[85%] sm:min-w-[280px] sm:max-w-[280px]",
+        "w-[85vw] min-w-[85vw] max-w-[85vw]",
+        "sm:w-[280px] sm:min-w-[280px] sm:max-w-[280px]",
+        "shrink-0",
         "rounded-2xl bg-white p-6",
         "shadow-[0_14px_30px_rgba(0,0,0,0.10)] ring-1 ring-black/5",
         "flex flex-col",
         "min-h-[260px]",
       ].join(" ")}
     >
-      {/* Title */}
       <h5 className="font-medium text-lg leading-snug text-[#212529] line-clamp-2">
         {title}
       </h5>
 
-      {/* Description area (fixed space) */}
       <p className="mt-2 text-sm leading-6 text-[#212529] line-clamp-6">
         {desc}
       </p>
 
-      {/* ✅ Always bottom */}
-      <div className="mt-auto pt-6 flex justify-end">
+      <div className="mt-auto flex justify-end pt-6">
         <Link
           href={href}
-          className="text-sm font-medium text-blue-600 hover:text-blue-700 cursor-pointer"
+          className="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-700"
         >
           Explore more &nbsp;›
         </Link>

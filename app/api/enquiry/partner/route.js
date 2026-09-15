@@ -17,7 +17,7 @@ export async function POST(req) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-      next: { revalidate: 300 },
+      next: { revalidate: 30 },
     });
 
     const text = await res.text().catch(() => "");

@@ -6,7 +6,7 @@ export async function getIndustriesPage() {
   const res = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
   });
 
   if (!res.ok) {
@@ -43,7 +43,7 @@ export async function getIndustryBySlug(slug) {
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        next: { revalidate: 300 }, // good for dynamic content; change if needed
+        next: { revalidate: 30 }, // good for dynamic content; change if needed
       },
     );
 

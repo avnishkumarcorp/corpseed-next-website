@@ -4,7 +4,7 @@ import { Calendar, ShieldCheck, FileText } from "lucide-react";
 import { getLegalPageBySlug } from "@/app/lib/legalPages";
 import SafeHtml from "@/app/components/SafeHtml";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 function safeText(v, fallback = "") {
   if (v == null) return fallback;

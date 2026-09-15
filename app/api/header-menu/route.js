@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 
 function getApiBase() {
   const base =
-    process.env.API_BASE_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "";
+    process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
   return base.replace(/\/$/, "");
 }
 
@@ -14,7 +12,7 @@ export async function GET() {
     if (!base) {
       return NextResponse.json(
         { ok: false, error: "Missing API_BASE_URL", data: [] },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -25,7 +23,7 @@ export async function GET() {
       headers: { Accept: "application/json" },
 
       // ✅ keep it fresh but cacheable
-      next: { revalidate: 300 },
+      next: { revalidate: 30 },
     });
 
     const raw = await res.text().catch(() => "");
@@ -39,7 +37,7 @@ export async function GET() {
           error: raw || "Upstream error",
           data: [],
         },
-        { status: 200 } // keep 200 if your UI expects it
+        { status: 200 }, // keep 200 if your UI expects it
       );
     }
 
@@ -50,7 +48,7 @@ export async function GET() {
       data = raw;
     }
 
-    const list = Array.isArray(data) ? data : data?.data ?? [];
+    const list = Array.isArray(data) ? data : (data?.data ?? []);
 
     return NextResponse.json(
       { ok: true, data: list },
@@ -59,12 +57,12 @@ export async function GET() {
         headers: {
           "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
         },
-      }
+      },
     );
   } catch (e) {
     return NextResponse.json(
       { ok: false, error: "Server error", data: [] },
-      { status: 200 }
+      { status: 200 },
     );
   }
 }

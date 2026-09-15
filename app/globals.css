@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -20,6 +24,7 @@
 }
 
 body {
+  user-select: none;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
@@ -39,22 +44,6 @@ body {
 
 .container {
   @apply max-w-7xl mx-auto px-6;
-}
-
-.h1 {
-  @apply text-4xl md:text-6xl font-bold tracking-tight;
-}
-
-.h2 {
-  @apply text-3xl md:text-5xl font-semibold;
-}
-
-.h3 {
-  @apply text-2xl md:text-3xl font-semibold;
-}
-
-.text-body {
-  @apply text-gray-600 text-base md:text-lg leading-relaxed;
 }
 
 .iti {
@@ -4353,7 +4342,7 @@ h6 {
   letter-spacing: 0.2px !important;
   margin-bottom: 0.5rem !important;
   /* margin-top: 1rem !important;*/
-  font-weight: 500 !important;
+  /* font-weight: 500 !important; */
 }
 .blog-desc .blog-text h5 {
   font-size: 16px;
@@ -5845,13 +5834,23 @@ h6 {
   width: 100%;
 }
 
-p,h1,h2,h3,h4,h5,h6{
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: #212529;
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-10%); } /* fixed pixel shift */
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-10%);
+  } /* fixed pixel shift */
 }
 
 .animate-marquee {
@@ -5860,7 +5859,6 @@ p,h1,h2,h3,h4,h5,h6{
   animation-iteration-count: infinite;
 }
 
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -5868,7 +5866,6 @@ p,h1,h2,h3,h4,h5,h6{
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 
 @keyframes productsScroll {
   from {
@@ -5883,3 +5880,71 @@ p,h1,h2,h3,h4,h5,h6{
   animation: productsScroll 10s linear infinite;
   will-change: transform;
 }
+
+.text-center {
+  text-align: center !important;
+}
+
+.vediosec {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.playbtn {
+  text-align: center !important;
+}
+
+input,
+textarea,
+select {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000;
+  opacity: 1;
+  background-color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+  -webkit-text-fill-color: #9ca3af !important;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000;
+  background-color: #ffffff !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af !important;
+  -webkit-text-fill-color: #9ca3af !important;
+}
+
+/* Services auto infinite carousel */
+@keyframes servicesInfiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+@keyframes latestArticleInfiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+

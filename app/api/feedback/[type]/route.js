@@ -22,7 +22,7 @@ export async function POST(req, { params }) {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      next: { revalidate: 300 },
+      next: { revalidate: 30 },
     });
 
     const text = await res.text().catch(() => "");

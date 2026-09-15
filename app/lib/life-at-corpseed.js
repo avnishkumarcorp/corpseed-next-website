@@ -10,7 +10,7 @@ import { apiGet } from "./fetcher";
 export async function getLifeAtCorpseed({ page = 1, size = 5 } = {}) {
   return await apiGet(
     `/api/updated-life-at-corpseed?page=${page}&size=${size}`,
-    { revalidate: 60 } // 1 minute cache
+    { revalidate: 30 }, // 1 minute cache
   );
 }
 
@@ -24,8 +24,8 @@ export async function getLifeAtCorpseedBySlug(slug) {
     return await apiGet(
       `/api/updated-life-at-corpseed/slug?slug=${encodeURIComponent(slug)}`,
       {
-        revalidate: 600, // 10 min cache
-      }
+        revalidate: 30, // 10 min cache
+      },
     );
   } catch (e) {
     console.error("getLifeAtCorpseedBySlug error:", e);

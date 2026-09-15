@@ -47,7 +47,7 @@ export default function KnowledgeSearchInput({ initialValue = "" }) {
       } finally {
         setLoading(false);
       }
-    }, 400);
+    }, 100);
 
     return () => clearTimeout(debounceRef.current);
   }, [q]);

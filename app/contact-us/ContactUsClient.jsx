@@ -26,7 +26,7 @@ function Backdrop({ open, onClose, children }) {
 
 function Modal({ title, subtitle, onClose, children }) {
   return (
-    <div className="rounded-2xl bg-white shadow-2xl overflow-hidden">
+    <div className="rounded-2xl bg-white text-gray-900 shadow-2xl overflow-hidden">
       <div className="flex items-start justify-between border-b px-6 py-4 bg-slate-50">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -70,8 +70,7 @@ function OTPInput({ value, onChange, length = 4 }) {
               refs.current[i - 1]?.focus();
             }
           }}
-          className="h-12 w-12 rounded-xl border border-gray-200 text-center text-lg font-semibold
-                     focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none"
+          className="h-12 w-12 rounded-xl border border-gray-200 bg-white text-center text-lg font-semibold text-gray-900 placeholder:text-gray-400 caret-gray-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
         />
       ))}
     </div>
@@ -232,6 +231,12 @@ export default function ContactUsClient({ data }) {
     setError(contactRes.data?.message || "Something went wrong.");
   };
 
+  const inputClass =
+    "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 caret-gray-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100";
+
+  const plainInputClass =
+    "w-full bg-white text-sm text-gray-900 placeholder:text-gray-400 caret-gray-900 outline-none";
+
   return (
     <main className="bg-white">
       {/* HERO */}
@@ -271,8 +276,7 @@ export default function ContactUsClient({ data }) {
                     value={form.name}
                     onChange={onChange}
                     placeholder="Enter your name"
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none
-                               focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    className={inputClass}
                   />
                 </Field>
 
@@ -284,8 +288,7 @@ export default function ContactUsClient({ data }) {
                       value={form.email}
                       onChange={onChange}
                       placeholder="Enter your email"
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none
-                                 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                      className={inputClass}
                     />
                   </Field>
 
@@ -295,18 +298,17 @@ export default function ContactUsClient({ data }) {
                       value={form.city}
                       onChange={onChange}
                       placeholder="City / Location"
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none
-                                 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                      className={inputClass}
                     />
                   </Field>
                 </div>
 
                 <Field label="Mobile" required>
                   <div
-                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-3
-                                  focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
+                    className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3
+             focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
                   >
-                    <span className="text-sm text-gray-600">🇮🇳 +91</span>
+                    <span className="text-sm text-gray-700">🇮🇳 +91</span>
                     <div className="h-5 w-px bg-gray-200" />
                     <input
                       name="mobile"
@@ -314,7 +316,7 @@ export default function ContactUsClient({ data }) {
                       onChange={onChange}
                       inputMode="numeric"
                       placeholder="10 digit mobile number"
-                      className="w-full text-sm outline-none"
+                      className={plainInputClass}
                     />
                   </div>
                 </Field>
@@ -326,8 +328,7 @@ export default function ContactUsClient({ data }) {
                     onChange={onChange}
                     rows={4}
                     placeholder="Tell us what you need"
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none resize-none
-                               focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    className={`${inputClass} resize-none`}
                   />
                 </Field>
 

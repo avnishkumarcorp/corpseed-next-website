@@ -5,8 +5,9 @@ import { Eye, Search } from "lucide-react";
 import { getKnowledgeCentreList } from "../lib/knowledgeCentre";
 import EnquiryOtpInline from "../components/otp/EnquiryOtpFlow";
 import KnowledgeSearchInput from "../components/KnowledgeSearchInput";
+import KnowledgeCategoryCard from "../components/KnowledgeCategoryCard";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 function Card({ children, className = "" }) {
   return (
@@ -144,7 +145,6 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function KnowledgeCentrePage({ searchParams }) {
   const sp = await searchParams;
-  let pageLocation = `${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge-center`;
   let currentPage = Number(sp?.page || 1);
   const q = (sp?.q || "").toString();
   const filter = (sp?.filter || "").toString();
@@ -227,7 +227,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                   const href = `/knowledge-centre/${b.slug}`;
                   return (
                     <Card key={b.id ?? b.slug} className="overflow-hidden">
-                      <Link href={href} className="block cursor-pointer">
+                      <Link href={href} prefetch={false} className="block cursor-pointer">
                         <div className="relative aspect-[16/9] w-full overflow-hidden bg-white">
                           <Image
                             src={b.image}
@@ -242,6 +242,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                       <div className="p-5">
                         <Link
                           href={href}
+                           prefetch={false}
                           className="line-clamp-2 text-base font-semibold text-slate-900 hover:underline cursor-pointer"
                         >
                           {b.title}
@@ -275,6 +276,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                           </span>
                           <Link
                             href={href}
+                            prefetch={false}
                             className="text-sm font-semibold text-slate-900 hover:text-blue-700 cursor-pointer"
                           >
                             Read →
@@ -335,44 +337,11 @@ export default async function KnowledgeCentrePage({ searchParams }) {
               ) : null}
 
               {/* Categories */}
-              <Card className="overflow-hidden">
-                <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Categories
-                  </p>
-                </div>
+              <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                <EnquiryOtpInline page={"knowledge-centre"} />
+              </div>
 
-                <div className="divide-y divide-slate-200">
-                  {categories.map((c) => {
-                    const href = `/knowledge-centre${buildQueryString({
-                      page: 1,
-                      q,
-                      filter: c.slug,
-                      tag,
-                    })}`;
-
-                    return (
-                      <Link
-                        key={c.id ?? c.slug}
-                        href={href}
-                        className="flex items-center justify-between px-5 py-4 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-                      >
-                        <span className="min-w-0 truncate">
-                          {c.subCategoryName || c.categoryName}
-                        </span>
-                        <span className="text-xs text-slate-400">View</span>
-                      </Link>
-                    );
-                  })}
-
-                  <Link
-                    href="/knowledge-centre"
-                    className="block px-5 py-4 text-sm text-blue-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    View All
-                  </Link>
-                </div>
-              </Card>
+              <KnowledgeCategoryCard categories={categories} q={q} tag={tag} />
 
               {/* Tags */}
               <Card className="p-5">
@@ -409,6 +378,7 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                       <Link
                         key={x.id ?? x.slug}
                         href={href}
+                        prefetch={false}
                         className="flex gap-4 px-5 py-4 hover:bg-slate-50 cursor-pointer"
                       >
                         <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100">
@@ -441,11 +411,8 @@ export default async function KnowledgeCentrePage({ searchParams }) {
                 </div>
               </Card>
 
-              <div className="border border-gray-200 rounded-sm">
-                <EnquiryOtpInline
-                  page={"knowledge-centre"}
-                  location={pageLocation}
-                />
+              <div className="bg-[#f2f3ff] p-2 mt-2.5">
+                <EnquiryOtpInline page={"knowledge-centre"} />
               </div>
             </div>
           </aside>

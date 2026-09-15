@@ -20,7 +20,7 @@ export async function GET(req, { params }) {
 
   const res = await fetch(backendUrl, {
     method: "GET",
-    next: { revalidate: 300 },
+    next: { revalidate: 30 },
   });
   const text = await res.text().catch(() => "");
 

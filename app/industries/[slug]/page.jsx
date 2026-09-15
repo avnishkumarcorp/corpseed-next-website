@@ -7,7 +7,7 @@ import ServiceContent from "@/app/service/ServiceContent";
 import ServiceFaqs from "@/app/service/ServiceFaqs";
 import Image from "next/image";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 const IndustryCaterTabs = dynamic(() => import("../IndustryCaterTabs"));
 const IndustryHeroSection = dynamic(() => import("./IndustryHeroSection"));

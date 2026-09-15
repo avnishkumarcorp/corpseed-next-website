@@ -4,15 +4,28 @@ import "./globals.css";
 import HeaderWrapper from "./components/header/HeaderWrapper";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import MobileStickyFooter from "./components/mobile/MobileStickyFooter";
+import SecurityLayer from "./components/security/SecurityLayer";
 
 export const metadata = {
   title: "Corpseed",
   description: "Corpseed public website",
   metadataBase: new URL("https://www.corpseed.com"),
   charset: "utf-8",
+  // Served from /public so the URLs stay stable (no build hash) — Google caches
+  // the favicon by URL and only re-fetches it when it recrawls the page.
   icons: {
-    icon: "/fav.png",
-    apple: "/fav.png",
+    icon: [
+      {
+        url: "/favicon.ico",
+        sizes: "16x16 32x32 48x48 96x96",
+        type: "image/x-icon",
+      },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   other: {
     "msvalidate.01": "6FE373E64B7D16AE4CC9FA10A4FCA067",
@@ -57,10 +70,11 @@ export default function RootLayout({ children }) {
               },
               address: {
                 "@type": "PostalAddress",
-                streetAddress: "2nd Floor, A-154A, A Block, Sector 63",
+                streetAddress:
+                  "3rd Floor, A-5, Grovy Optiva, Block A, Sector 68, Noida, Basi Bahuddin Nagar, Uttar Pradesh",
                 addressLocality: "Noida",
                 addressRegion: "Uttar Pradesh",
-                postalCode: "201301",
+                postalCode: "201316",
                 addressCountry: "India",
               },
               geo: {
@@ -125,13 +139,14 @@ export default function RootLayout({ children }) {
       </head>
 
       <body className="min-h-screen bg-white text-gray-900">
+        <SecurityLayer />
         <div className="flex min-h-screen flex-col">
           <HeaderWrapper />
           <main className="flex-1">{children}</main>
           <MobileStickyFooter />
           <Footer />
           <WhatsAppFloat
-            phone="917558640644"
+            phone="919311255283"
             message="Welcome to Corpseed. Please type your query, and we shall provide immediate assistance"
           />
         </div>

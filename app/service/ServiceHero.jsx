@@ -55,7 +55,9 @@ export default function ServiceHero({
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              <VideoPopup videoUrl={videoUrl} videoText={videoText} />
+              {videoUrl && (
+                <VideoPopup videoUrl={videoUrl} videoText={videoText} />
+              )}
 
               <div className="inline-flex items-center gap-2 text-sm text-gray-700">
                 <Star className="h-4 w-4 text-yellow-500" />

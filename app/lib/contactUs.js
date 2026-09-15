@@ -6,7 +6,7 @@ export async function getContactUs() {
   try {
     // Contact page content — cache 10 minutes
     return await apiGet("/api/updated-contact-us", {
-      revalidate: 600,
+      revalidate: 60,
     });
   } catch (e) {
     console.error("getContactUs error:", e);

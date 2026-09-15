@@ -11,8 +11,9 @@ import StepsTimelineSection from "../StepsTimelineSection";
 import PdfShareBar from "@/app/components/PdfShareBar";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
+import logo from "../../assets/logo.webp";
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 const ClientsMarquee = nextDynamic(
   () => import("@/app/components/clients/ClientsMarquee"),
@@ -40,7 +41,7 @@ function jsonLdString(obj) {
 }
 
 export async function generateMetadata({ params }) {
-  const { segments } = (await params) ?? [];
+  const { segments } = (await params) ?? {};
 
   let state = null;
   let slug = null;
@@ -57,14 +58,17 @@ export async function generateMetadata({ params }) {
   const data = await getServiceData(slug, state);
   if (!data?.service) return {};
 
-  const titleBase = data.title || data.service.title || "Service";
+  const titleBase = data?.title || data?.metaTitle;
 
-  const title = state
-    ? `${titleBase} in ${state.replace(/-/g, " ")} - Corpseed`
-    : `${titleBase} - Corpseed`;
+  const descriptionBase = data?.metaDescription || "";
+
+  const title = `${titleBase}`;
+
+  const description = `${descriptionBase}`;
 
   return {
     title,
+    description,
     alternates: {
       canonical: state ? `/service/${state}/${slug}` : `/service/${slug}`,
     },
@@ -87,13 +91,16 @@ export default async function ServicePage({ params }) {
 
   const data = await getServiceData(slug, state);
   if (!data?.service) notFound();
-  const service = data.service;
-  const serviceCities = data.serviceCityMapResponseDTOS;
+  const service = data?.service;
+  const serviceCities = state
+    ? data.serviceCityMapResponseDTOS
+    : data?.serviceCityMapResponseDTOS;
+
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: service.title || "Corpseed",
-    image: "https://www.corpseed.com/assets/img/logo.webp",
+    image: logo,
     description:
       service.seoDescription ||
       service.metaDescription ||
@@ -174,9 +181,9 @@ export default async function ServicePage({ params }) {
       ) : null}
 
       <ServiceHero
-        title={service.title}
-        summary={service.summary}
-        videoUrl={service.videoUrl || "/videos/corpseed-intro.mp4"}
+        title={state ? data?.serviceCityMap?.title : service.title}
+        summary={state ? data?.serviceCityMap?.headerText : service.summary}
+        videoUrl={state ? null : service.videoUrl}
         badgeText="INCLUDES FREE SUPPORT"
         ratingText="Rated 4.9 by 74,861+ customers globally"
         videoText="Click to Watch & Know More"
@@ -191,11 +198,15 @@ export default async function ServicePage({ params }) {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <div className="sticky top-[72px] z-30 -mx-4 bg-white/80 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
-              <ServiceTabs tabs={service.serviceDetails} />
+              <ServiceTabs
+                tabs={state ? data?.cityServiceDetails : service.serviceDetails}
+              />
             </div>
 
             <div className="py-6">
-              <ServiceContent tabs={service.serviceDetails} />
+              <ServiceContent
+                tabs={state ? data?.cityServiceDetails : service.serviceDetails}
+              />
             </div>
 
             <StepsTimelineSection />
@@ -207,8 +218,10 @@ export default async function ServicePage({ params }) {
                 <PdfShareBar />
               </div>
               <EnquiryForm
-                serviceName={service.title}
-                serviceId={service?.id}
+                serviceName={
+                  state ? data?.serviceCityMap?.title : service.title
+                }
+                serviceId={state ? data?.serviceCityMap?.id : service?.id}
                 categoryId={service?.categoryId}
                 type={"service"}
                 slug={slug}
@@ -218,26 +231,28 @@ export default async function ServicePage({ params }) {
         </div>
       </div>
 
-      <ServiceFaqs faqs={service.serviceFaqs} />
+      <ServiceFaqs
+        faqs={state ? data?.serviceCityFaqs : service?.serviceFaqs}
+      />
 
       {serviceCities?.length > 0 && (
         <section className="bg-gray-50 py-6">
           <div className="mx-auto max-w-7xl px-4">
-            <h2 className="text-center text-2xl font-semibold mb-8">
+            <h2 className="text-center text-2xl font-semibold mb-10">
               {service?.title} by State/City
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1 text-center">
               {serviceCities?.map((city) => (
                 <Link
-                  key={city.id}
-                  href={`/service/${city.cityName
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}/${slug}`}
-                  className="group flex items-center justify-center gap-2 font-medium text-slate-700 transition"
+                  key={city?.id}
+                  href={`/service/${city?.cityName
+                    ?.toLowerCase()
+                    ?.replace(/\s+/g, "-")}/${slug}`}
+                  className="group flex items-center justify-start gap-2 font-medium text-slate-700 transition"
                 >
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500 transition group-hover:scale-110" />
-                  <span className="text-blue-600">{city.title}</span>
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 transition group-hover:scale-110" />
+                  <span className="text-blue-600 text-sm">{city.title}</span>
                 </Link>
               ))}
             </div>

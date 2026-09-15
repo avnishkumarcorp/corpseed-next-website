@@ -7,8 +7,9 @@ import Image from "next/image";
 // ✅ KEEP YOUR IMPORTS EXACTLY (NO PATH CHANGES)
 import corpseedLogo from "../../../assets/CORPSEED.webp";
 import mgmt1 from "../../../../public/home/sakshi.png";
-import mgmt2 from "../../../../public/home/vipan.png";
-import mgmt3 from "../../../../public/home/vinay.png";
+import mgmt2 from "../../../../public/home/VipanThakur.jpg";
+import mgmt3 from "../../../../public/home/VinayThakur.jpg";
+import viresh from "../../../../public/home/VireshOberoi.jpg";
 
 import mem1 from "../../../../public/home/iso.png";
 import mem2 from "../../../../public/home/cii.png";
@@ -51,6 +52,12 @@ const DATA = {
         description:
           "Mr. Vipan Singh is the visionary founder and CEO of Corpseed ITES Pvt Ltd. With his unbeatable passion, he advocates automation in compliance management for businesses. Under his astute guidance, Corpseed has become synonymous with excellence and efficiency. His unwavering focus on delivering cutting-edge solutions has empowered countless businesses to stay ahead of the curve.",
       },
+      {
+        name: "Viresh Oberoi",
+        role: "Co-founder and director",
+        image: viresh,
+        description: `Mr. Viresh Oberoi is an exceptional entrepreneur and the driving force behind mjunction services limited. As the Founder and CEO, he has revolutionized India's largest eCommerce company and left an indelible mark on Tata Steel's market-facing processes. He helps Corpseed in its overall business growth with his unwavering determination and innovative approach.`,
+      },
     ],
   },
 
@@ -71,13 +78,13 @@ const DATA = {
         description:
           "Our ecosystem includes trusted industry bodies that support growth, compliance readiness, and strong governance practices.",
       },
-      {
-        name: "CII",
-        role: "Industry Partner",
-        image: mem3,
-        description:
-          "Through partnerships and alliances, we enable businesses to stay aligned with evolving regulatory and industry expectations.",
-      },
+      // {
+      //   name: "CII",
+      //   role: "Industry Partner",
+      //   image: mem3,
+      //   description:
+      //     "Through partnerships and alliances, we enable businesses to stay aligned with evolving regulatory and industry expectations.",
+      // },
     ],
   },
 };
@@ -127,7 +134,9 @@ function Dots({ count, activeIndex, onDot }) {
           onClick={() => onDot(i)}
           className={[
             "h-2 rounded-full transition cursor-pointer",
-            i === activeIndex ? "w-7 bg-blue-600" : "w-2 bg-slate-300 hover:bg-slate-400",
+            i === activeIndex
+              ? "w-7 bg-blue-600"
+              : "w-2 bg-slate-300 hover:bg-slate-400",
           ].join(" ")}
           aria-label={`Go to slide ${i + 1}`}
         />
@@ -166,7 +175,13 @@ function StaticInvestor({ logo, text }) {
     <div className="grid items-center gap-6 md:grid-cols-[220px_1fr]">
       <div className="flex justify-center md:justify-start">
         <div className="relative h-[52px] w-[190px]">
-          <Image src={logo} alt="Corpseed" fill className="object-contain" priority />
+          <Image
+            src={logo}
+            alt="Corpseed"
+            fill
+            className="object-contain"
+            priority
+          />
         </div>
       </div>
       <p className="text-sm leading-7 text-slate-600">{text}</p>
@@ -223,8 +238,14 @@ function AutoCarousel({ slides, autoplayMs = 4200, resetKey, variant }) {
 
       <style jsx>{`
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </div>

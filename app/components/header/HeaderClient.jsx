@@ -12,10 +12,11 @@ import { NAV_ITEMS } from "./config";
 import { buildMenuMap } from "./helpers";
 import MegaPanel from "./MegaPanel";
 import AllCorpseedDropdown from "./AllCorpseedDropdown";
-
+import { Search, X } from "lucide-react";
 // ✅ Lazy load heavy overlays (performance win)
 const SearchPanel = dynamic(() => import("./SearchPanel"), { ssr: false });
 const MobileDrawer = dynamic(() => import("./MobileDrawer"), { ssr: false });
+const HeroSearch = dynamic(() => import("../home/HeroSearch"), { ssr: false });
 
 export default function HeaderClient({ menuData = [] }) {
   const pathname = usePathname();
@@ -25,7 +26,7 @@ export default function HeaderClient({ menuData = [] }) {
 
   const [allOpen, setAllOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const allCloseTimerRef = useRef(null);
 
@@ -56,6 +57,7 @@ export default function HeaderClient({ menuData = [] }) {
     setOpenKey(null);
     setAllOpen(false);
     setSearchOpen(false);
+    setMobileSearchOpen(false);
     setMobileOpen(false);
   }, [pathname]);
 
@@ -140,14 +142,26 @@ export default function HeaderClient({ menuData = [] }) {
           </nav>
 
           {/* Mobile button */}
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            className="lg:hidden inline-flex items-center justify-center text-xl rounded-lg px-3 py-2 text-[#212529] hover:bg-slate-50 cursor-pointer"
-            aria-label="Open menu"
-          >
-            ☰
-          </button>
+          <div className="flex items-center gap-1 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileSearchOpen(true)}
+              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[#212529] hover:bg-slate-50 cursor-pointer"
+              aria-label="Open search"
+            >
+              <Search className="h-5 w-5" />
+              <span>Search</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              className="inline-flex items-center justify-center text-xl rounded-lg px-3 py-2 text-[#212529] hover:bg-slate-50 cursor-pointer"
+              aria-label="Open menu"
+            >
+              ☰
+            </button>
+          </div>
         </div>
       </div>
 
@@ -158,6 +172,34 @@ export default function HeaderClient({ menuData = [] }) {
           onClose={() => setSearchOpen(false)}
           topOffset={72}
         />
+      ) : null}
+
+      {mobileSearchOpen ? (
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white lg:hidden">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <span className="text-sm font-semibold text-slate-700">Search</span>
+            <button
+              type="button"
+              onClick={() => setMobileSearchOpen(false)}
+              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 cursor-pointer"
+              aria-label="Close search"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            <HeroSearch
+              baseUrl={process.env.NEXT_PUBLIC_API_BASE_URL}
+              placeholders={[
+                "Search 500+ services - try “EPR For Plastic Waste”…",
+                "Search 500+ services - try “BIS Certification”…",
+                "Search 500+ services - try “Pollution NOC”…",
+                "Search 500+ services - try “IMEI Number”…",
+              ]}
+            />
+          </div>
+        </div>
       ) : null}
 
       {/* Mobile drawer (lazy loaded) */}

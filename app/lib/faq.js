@@ -6,7 +6,7 @@ export async function getFaqMeta() {
   try {
     // FAQ SEO + content — cache for 10 minutes
     return await apiGet("/api/updated-faq", {
-      revalidate: 600,
+      revalidate: 30,
     });
   } catch (error) {
     console.error("getFaqMeta error:", error);

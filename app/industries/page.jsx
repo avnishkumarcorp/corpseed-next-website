@@ -10,7 +10,7 @@ import { getClients } from "../lib/clients";
 
 /* ================= META DATA ================= */
 
-export const revalidate = 300;
+export const revalidate = 30;
 
 export async function generateMetadata() {
   return {

@@ -73,7 +73,7 @@ export default function NewsSearchBox({
 
         const res = await fetch(
           `/api/search/news/epr?q=${encodeURIComponent(trimmed)}`,
-          { signal: abortRef.current.signal, next: { revalidate: 300 } },
+          { signal: abortRef.current.signal, next: { revalidate: 30 } },
         );
 
         const json = await res.json().catch(() => ({}));

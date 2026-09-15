@@ -3,19 +3,21 @@
 import { useEffect, useRef } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import styles from "./SafeHtml.module.css";
+import { forwardRef } from "react";
+import logo from "../assets/logo.png";
 
 const LEGACY_BASE =
-  process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://www.admin.corpseed.com";
+  process.env.NEXT_PUBLIC_LEGACY_BASE_URL || "https://admin.corpseed.com";
 
 // ✅ Only CSS here (remove JS from this list)
 const CSS_URLS = [
-  "https://www.admin.corpseed.com/assets/css/bootstrap.min.css",
-  "https://www.admin.corpseed.com/assets/css/main.css",
-  "https://www.admin.corpseed.com/chat_boat/css/main.css",
-  "https://www.admin.corpseed.com/assets/css/owl.carousel.min.css",
-  "https://www.admin.corpseed.com/assets/css/intlTelInput.css",
-  "https://www.admin.corpseed.com/chat_boat/css/chatBot.css",
-  "https://www.admin.corpseed.com/assets/css/temp.css",
+  "https://admin.corpseed.com/assets/css/bootstrap.min.css",
+  "https://admin.corpseed.com/assets/css/main.css",
+  "https://admin.corpseed.com/chat_boat/css/main.css",
+  "https://admin.corpseed.com/assets/css/owl.carousel.min.css",
+  "https://admin.corpseed.com/assets/css/intlTelInput.css",
+  "https://admin.corpseed.com/chat_boat/css/chatBot.css",
+  "https://admin.corpseed.com/assets/css/temp.css",
 ];
 
 // Turn any relative/partial URL into absolute corpseed URL
@@ -104,7 +106,7 @@ function fixRelativeAssets(rootEl) {
   });
 }
 
-export default function SafeHtmlShadow({ html }) {
+const SafeHtmlShadow = forwardRef(({ html }, ref) => {
   const hostRef = useRef(null);
 
   useEffect(() => {
@@ -162,6 +164,8 @@ export default function SafeHtmlShadow({ html }) {
         text-align: left;
       }
 
+      
+
       .page-header article .checklist li,
       .page-header article ul li {
         position: relative;
@@ -175,22 +179,125 @@ export default function SafeHtmlShadow({ html }) {
       .content-scope ul { list-style: none; padding-left: 0; margin-left: 0;color: #212529; }
   .content-scope li { position: relative; padding-left: 24px;color: #212529; }
 
-  .content-scope li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.45em;
-    width: 15px;
-    height: 15px;
-    background: url("${iconUrl}") no-repeat center;
-    background-size: cover;
-    color: #212529;
-  }
-      .page-header h2 {
-        font-weight: 400;
-        color: #303134;
-        font-size: 24px;
-      }
+  // .content-scope li::before {
+  //   content: "";
+  //   position: absolute;
+  //   left: 0;
+  //   top: 0.45em;
+  //   width: 15px;
+  //   height: 15px;
+  //   background: url("${iconUrl}") no-repeat center;
+  //   background-size: cover;
+  //   color: #212529;
+  // }
+
+
+  .content-scope ul {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+.content-scope ul li {
+  position: relative;
+  padding-left: 24px;
+}
+
+.content-scope ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 15px;
+  height: 15px;
+  background: url("${iconUrl}") no-repeat center;
+  background-size: cover;
+}
+
+.content-scope ol li::before {
+  content: none;
+}
+
+.content-scope ol {
+  list-style: decimal;
+  padding-left: 20px;
+}
+
+.content-scope h2 {
+  font-weight: 400 !important;
+  color: #303134;
+  font-size: 24px;
+}
+
+.content-scope h2 strong,
+.content-scope h2 b {
+  font-weight: 400 !important;
+}
+
+      // .page-header h2 {
+      //   font-weight: 400;
+      //   color: #303134;
+      //   font-size: 24px;
+      // }
+
+
+.content-scope h1,
+.content-scope h2,
+.content-scope h3,
+.content-scope h4,
+.content-scope h5,
+.content-scope h6 {
+  font-weight: 400 !important;
+  color: #303134;
+}
+
+/* remove bold coming from CMS strong tags */
+.content-scope h1 strong,
+.content-scope h2 strong,
+.content-scope h3 strong,
+.content-scope h4 strong,
+.content-scope h5 strong,
+.content-scope h6 strong,
+.content-scope h1 b,
+.content-scope h2 b,
+.content-scope h3 b,
+.content-scope h4 b,
+.content-scope h5 b,
+.content-scope h6 b {
+  font-weight: 400 !important;
+}
+
+.content-scope a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.content-scope a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.content-scope table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 1rem 0;
+  background: #fff;
+}
+
+.content-scope table th,
+.content-scope table td {
+  border: 1px solid #000 !important;
+  padding: 8px !important;
+  text-align: center;
+  color: #000 !important;
+  background: #fff !important;
+}
+
+.content-scope table th {
+  font-weight: 600;
+  background: #f5f5f5;
+}
 
       .blog-desc h1 {
         letter-spacing: 0.2px !important;
@@ -228,6 +335,7 @@ export default function SafeHtmlShadow({ html }) {
     margin-bottom: 0.2rem !important;
     color: #212529;
 }
+
 
 #main-toc ul li, #main-toc ol li{
     padding: 3px;
@@ -276,7 +384,13 @@ margin: 0 auto;
     display: block !important;
 }
 
+.text-center{
+display:flex;
+justify-content: center;
+}
+
     `;
+
     shadowRoot.appendChild(base);
 
     // ✅ Append CSS links WITHOUT crossorigin (prevents CORS failures)
@@ -314,9 +428,74 @@ margin: 0 auto;
       };
     });
 
+    wrapper.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (src?.includes("/assets/img/logo.png")) {
+        img.setAttribute("src", logo.src);
+      }
+    });
+
+    // 🔥 Replace legacy video block with working YouTube iframe
+    wrapper.querySelectorAll(".vediosec").forEach((block) => {
+      const parent = block.closest("[data-oembed-url]");
+      const youtubeUrl = parent?.getAttribute("data-oembed-url");
+
+      const playContainer = block.querySelector(".playbtn");
+
+      if (playContainer && !playContainer.querySelector("svg")) {
+        playContainer.insertAdjacentHTML(
+          "beforeend",
+          `<div style="width:100%; display:flex;
+    align-items:center;
+    justify-content:center;">
+           <div style="
+    height:60px;
+    width:60px;
+    background:#ffffff;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+  ">
+    <svg viewBox="0 0 24 24" fill="none" style="height:40px; width:40px;">
+      <path d="M9 7L17 12L9 17V7Z" fill="#000"/>
+    </svg>
+  </div>
+ </div>
+  `,
+        );
+      }
+
+      if (!youtubeUrl) return;
+
+      block.addEventListener("click", () => {
+        block.innerHTML = `
+      <iframe
+        width="100%"
+        height="360"
+        src="${youtubeUrl}?autoplay=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>
+    `;
+      });
+    });
+
     const t = setTimeout(show, 1200);
     return () => clearTimeout(t);
   }, [html]);
 
-  return <div ref={hostRef} className={styles.bsWrapper} />;
-}
+  return (
+    <div
+      ref={(el) => {
+        hostRef.current = el;
+        if (ref) ref.current = el;
+      }}
+      className={styles.bsWrapper}
+    />
+  );
+});
+
+export default SafeHtmlShadow;

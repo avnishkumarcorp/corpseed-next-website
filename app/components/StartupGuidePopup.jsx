@@ -7,6 +7,7 @@ import {
   submitStartupGuideEnquiry,
   verifyOtp,
 } from "@/app/lib/enquiryOtp";
+import { trackVerifiedLead } from "@/app/lib/conversionTracking";
 
 /* ---------------- MODAL SHELL (matches screenshot) ---------------- */
 
@@ -266,6 +267,7 @@ export default function StartupGuidePopup({ open, onClose }) {
       const backendStatus = String(submitRes.data?.status || "").toLowerCase();
 
       if (["pass", "success", "duplicate"].includes(backendStatus)) {
+        trackVerifiedLead();
         /* ---------- 3️⃣ DOWNLOAD PDF ---------- */
         const pdfUrl =
           "https://erp-corpseed.s3.ap-south-1.amazonaws.com/1771321684648Corpseed_guide.pdf";

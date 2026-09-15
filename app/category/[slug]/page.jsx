@@ -7,6 +7,7 @@ export async function generateMetadata({ params }) {
   const data = await getAllCategories();
 
   if (!data) return {};
+  
 
   if (slug === "all") {
     return {

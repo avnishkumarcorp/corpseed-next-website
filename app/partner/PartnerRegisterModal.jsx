@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import OtpModal from "./OtpModal";
 import { sendOtp, verifyOtp, submitPartnerEnquiry } from "../lib/enquiryOtp";
+import { trackVerifiedLead } from "@/app/lib/conversionTracking";
 
 const OCCUPATIONS = [
   "Chartered Accountant",
@@ -148,6 +149,7 @@ export default function PartnerRegisterModal({ open, onClose, page }) {
         return;
       }
 
+      trackVerifiedLead();
       alert("Registered successfully!");
       setOtpOpen(false);
       onClose?.();

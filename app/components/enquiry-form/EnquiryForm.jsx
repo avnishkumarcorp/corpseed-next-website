@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Phone, ShieldCheck } from "lucide-react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
+import { trackVerifiedLead } from "@/app/lib/conversionTracking";
 import { createPortal } from "react-dom";
 
 /* ---------------- MODAL HELPERS ---------------- */
@@ -319,6 +320,7 @@ export default function EnquiryForm({
         return;
       }
 
+      trackVerifiedLead();
       setStep("success");
     } catch (err) {
       console.error("Verify/Enquiry Error:", err);

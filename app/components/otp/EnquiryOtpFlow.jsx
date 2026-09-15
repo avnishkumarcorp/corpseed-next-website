@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { sendOtp, verifyOtp } from "@/app/lib/enquiryOtp";
 import { createCallbackEnquiry } from "@/app/lib/callbackEnquiry";
+import { trackVerifiedLead } from "@/app/lib/conversionTracking";
 
 function cn(...s) {
   return s.filter(Boolean).join(" ");
@@ -158,6 +159,7 @@ export default function EnquiryOtpInline({ onVerified, page }) {
       }
 
       /* -------- SUCCESS -------- */
+      trackVerifiedLead();
       setStep("success");
 
       onVerified?.({

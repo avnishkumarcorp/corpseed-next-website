@@ -8,6 +8,7 @@ import {
   submitConsultNowEnquiry,
   submitBookMeetingEnquiry,
 } from "../lib/enquiryOtp";
+import { trackVerifiedLead } from "@/app/lib/conversionTracking";
 import { createPortal } from "react-dom";
 
 function Input({
@@ -246,6 +247,7 @@ export default function ConsultNowModal({
       const backendStatus = response.data?.status?.toLowerCase();
 
       if (["success", "duplicate", "pass"].includes(backendStatus)) {
+        trackVerifiedLead();
         setStep(3);
         setLoading(false);
         return;

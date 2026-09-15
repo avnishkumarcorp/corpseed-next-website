@@ -8,6 +8,7 @@ import {
   submitContactUsEnquiry,
   verifyOtp,
 } from "@/app/lib/enquiryOtp";
+import { trackVerifiedLead } from "@/app/lib/conversionTracking";
 
 /* ---------------- MODAL HELPERS ---------------- */
 
@@ -216,6 +217,7 @@ export default function ContactUsClient({ data }) {
     const backendStatus = contactRes.data?.status?.toLowerCase();
 
     if (["success", "pass", "duplicate"].includes(backendStatus)) {
+      trackVerifiedLead();
       setStep("success");
       setForm({
         name: "",
